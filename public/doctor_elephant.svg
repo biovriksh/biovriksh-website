@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <!-- Soft Gradients for 3D look -->
+    <linearGradient id="elephantSkin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9AA4B2" />
+      <stop offset="100%" stop-color="#6C788A" />
+    </linearGradient>
+
+    <linearGradient id="innerEar" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB6C1" />
+      <stop offset="100%" stop-color="#FFA0B4" />
+    </linearGradient>
+
+    <linearGradient id="doctorCoat" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#E2E8F0" />
+    </linearGradient>
+
+    <linearGradient id="scrubs" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+
+    <linearGradient id="stethTubing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+
+    <linearGradient id="metallic" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E2E8F0" />
+      <stop offset="50%" stop-color="#94A3B8" />
+      <stop offset="100%" stop-color="#64748B" />
+    </linearGradient>
+
+    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Ground Shadow (Optional, translucent) -->
+  <ellipse cx="300" cy="550" rx="140" ry="16" fill="#000000" opacity="0.1" />
+
+  <!-- LEFT EAR -->
+  <g id="left-ear">
+    <ellipse cx="170" cy="230" rx="90" ry="110" transform="rotate(-15 170 230)" fill="url(#elephantSkin)" />
+    <ellipse cx="175" cy="230" rx="65" ry="85" transform="rotate(-15 175 230)" fill="url(#innerEar)" opacity="0.9" />
+  </g>
+
+  <!-- RIGHT EAR -->
+  <g id="right-ear">
+    <ellipse cx="430" cy="230" rx="90" ry="110" transform="rotate(15 430 230)" fill="url(#elephantSkin)" />
+    <ellipse cx="425" cy="230" rx="65" ry="85" transform="rotate(15 425 230)" fill="url(#innerEar)" opacity="0.9" />
+  </g>
+
+  <!-- BODY / SCRUBS / DOCTOR COAT -->
+  <g id="body">
+    <!-- Blue Scrubs Shirt -->
+    <path d="M 230 330 L 370 330 L 390 520 L 210 520 Z" fill="url(#scrubs)" />
+    
+    <!-- V-Neck Inner -->
+    <polygon points="275,330 325,330 300,380" fill="#0284C7" />
+    
+    <!-- Doctor Coat Main -->
+    <path d="M 205 340 
+             C 180 370 175 440 185 530 
+             L 265 530 
+             L 275 350 Z" 
+          fill="url(#doctorCoat)" filter="url(#dropShadow)" />
+
+    <path d="M 395 340 
+             C 420 370 425 440 415 530 
+             L 335 530 
+             L 325 350 Z" 
+          fill="url(#doctorCoat)" filter="url(#dropShadow)" />
+
+    <!-- Coat Lapels -->
+    <polygon points="275,340 230,340 280,410 275,440 295,370" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5" />
+    <polygon points="325,340 370,340 320,410 325,440 305,370" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5" />
+
+    <!-- Coat Pocket with Pen -->
+    <rect x="220" y="440" width="38" height="45" rx="4" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2" />
+    <rect x="230" y="425" width="4" height="20" rx="2" fill="#2563EB" />
+    <rect x="238" y="420" width="4" height="25" rx="2" fill="#DC2626" />
+
+    <!-- Doctor Badge / ID -->
+    <rect x="340" y="435" width="35" height="48" rx="4" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5" />
+    <rect x="346" y="442" width="23" height="18" rx="2" fill="#38BDF8" />
+    <line x1="346" y1="466" x2="368" y2="466" stroke="#64748B" stroke-width="2" stroke-linecap="round" />
+    <line x1="346" y1="472" x2="362" y2="472" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" />
+  </g>
+
+  <!-- ELEPHANT HEAD -->
+  <g id="head">
+    <!-- Main Head Circle -->
+    <circle cx="300" cy="220" r="115" fill="url(#elephantSkin)" />
+    
+    <!-- Cheeks -->
+    <ellipse cx="230" cy="255" rx="18" ry="12" fill="#FF8095" opacity="0.4" />
+    <ellipse cx="370" cy="255" rx="18" ry="12" fill="#FF8095" opacity="0.4" />
+
+    <!-- EYES -->
+    <!-- Left Eye -->
+    <g id="left-eye">
+      <ellipse cx="250" cy="205" rx="14" ry="18" fill="#1E293B" />
+      <circle cx="254" cy="199" r="6" fill="#FFFFFF" />
+      <circle cx="246" cy="211" r="2.5" fill="#FFFFFF" />
+    </g>
+
+    <!-- Right Eye -->
+    <g id="right-eye">
+      <ellipse cx="350" cy="205" rx="14" ry="18" fill="#1E293B" />
+      <circle cx="354" cy="199" r="6" fill="#FFFFFF" />
+      <circle cx="346" cy="211" r="2.5" fill="#FFFFFF" />
+    </g>
+
+    <!-- Eyebrows (Friendly) -->
+    <path d="M 235 180 Q 250 172 265 180" fill="none" stroke="#475569" stroke-width="4" stroke-linecap="round" />
+    <path d="M 335 180 Q 350 172 365 180" fill="none" stroke="#475569" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Cute Tusks -->
+    <path d="M 245 260 Q 230 280 220 275 Q 235 260 248 252 Z" fill="#FFFDF0" stroke="#E2E8F0" stroke-width="1" />
+    <path d="M 355 260 Q 370 280 380 275 Q 365 260 352 252 Z" fill="#FFFDF0" stroke="#E2E8F0" stroke-width="1" />
+
+    <!-- Happy Trunk (Curved Waving Upwards) -->
+    <path d="M 282 245 
+             C 275 290 260 340 300 350 
+             C 335 360 355 315 340 280 
+             C 332 260 310 260 310 280 
+             C 310 295 322 305 315 315
+             C 300 320 295 285 300 245 Z" 
+          fill="url(#elephantSkin)" stroke="#5B6578" stroke-width="1.5" filter="url(#dropShadow)" />
+    
+    <!-- Trunk folds/wrinkles -->
+    <path d="M 285 270 Q 295 273 300 268" fill="none" stroke="#5B6578" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M 283 290 Q 294 293 298 288" fill="none" stroke="#5B6578" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M 284 310 Q 295 314 302 308" fill="none" stroke="#5B6578" stroke-width="2.5" stroke-linecap="round" />
+  </g>
+
+  <!-- STETHOSCOPE -->
+  <g id="stethoscope" filter="url(#dropShadow)">
+    <!-- Earpieces -->
+    <path d="M 260 160 L 275 145 M 340 160 L 325 145" stroke="url(#metallic)" stroke-width="5" stroke-linecap="round" />
+    <circle cx="260" cy="160" r="4" fill="#1E293B" />
+    <circle cx="340" cy="160" r="4" fill="#1E293B" />
+
+    <!-- Metallic Binaural Tubes around neck -->
+    <path d="M 275 145 C 275 120 325 120 325 145" fill="none" stroke="url(#metallic)" stroke-width="4.5" />
+
+    <!-- Rubber Tubing down over shoulders -->
+    <path d="M 255 310 C 235 340 230 410 270 435 C 310 460 345 425 345 390 C 345 360 330 320 345 310" 
+          fill="none" stroke="url(#stethTubing)" stroke-width="8" stroke-linecap="round" />
+
+    <!-- Chest Piece / Bell -->
+    <circle cx="270" cy="435" r="16" fill="url(#metallic)" stroke="#475569" stroke-width="2" />
+    <circle cx="270" cy="435" r="10" fill="#38BDF8" opacity="0.8" />
+  </g>
+
+  <!-- WAVING HAND / PAW -->
+  <g id="waving-hand" transform="translate(400, 360) rotate(-25)">
+    <path d="M 0 0 C 30 -20 50 -10 60 15 C 65 30 45 45 20 35 Z" fill="url(#elephantSkin)" stroke="#5B6578" stroke-width="1.5" />
+    <!-- White sleeve cuff -->
+    <rect x="-10" y="-5" width="25" height="40" rx="5" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" />
+  </g>
+
+  <!-- SPEECH BUBBLE "Hii" -->
+  <g id="speech-bubble" filter="url(#dropShadow)">
+    <!-- Bubble Tail -->
+    <path d="M 160 140 Q 185 160 205 150 Z" fill="#FFFFFF" stroke="#000000" stroke-width="3" />
+    
+    <!-- Main Bubble -->
+    <rect x="50" y="40" width="165" height="105" rx="35" fill="#FFFFFF" stroke="#000000" stroke-width="4" />
+    
+    <!-- Text "Hii!" -->
+    <text x="132" y="106" font-family="'Comic Sans MS', 'Fredoka', 'Quicksand', 'Nunito', sans-serif" font-size="44" font-weight="900" fill="#0F172A" text-anchor="middle">Hii!</text>
+    
+    <!-- Decorative Heart -->
+    <path d="M 175 60 C 175 54 168 50 162 55 C 156 50 149 54 149 60 C 149 68 162 76 162 76 C 162 76 175 68 175 60 Z" fill="#FF3B30" />
+  </g>
+</svg>
