@@ -37,12 +37,14 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 
 -- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- 2. CHAPTERS TABLE
 -- ----------------------------------------------------------------------------
 create table if not exists public.chapters (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   subject text default 'Biology',
+  class_level text default 'Class 12',
   order_index int default 0,
   is_active boolean default true,
   created_at timestamptz default now()
@@ -54,6 +56,7 @@ create table if not exists public.chapters (
 create table if not exists public.pdfs (
   id uuid primary key default gen_random_uuid(),
   chapter_id uuid references public.chapters(id) on delete set null,
+  sub_heading text, -- Topic / Sub-heading inside Chapter
   title text not null,
   description text,
   thumbnail_url text, -- Public image URL (bucket: pdf-thumbnails)
@@ -70,6 +73,8 @@ create table if not exists public.pdfs (
 );
 
 -- Add columns if table already exists
+alter table public.chapters add column if not exists class_level text default 'Class 12';
+alter table public.pdfs add column if not exists sub_heading text;
 alter table public.pdfs add column if not exists is_recent boolean default false;
 alter table public.pdfs add column if not exists note_type text default 'paid';
 alter table public.pdfs add column if not exists class_level text default 'Class 12';

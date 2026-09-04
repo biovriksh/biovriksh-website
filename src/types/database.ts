@@ -15,14 +15,17 @@ export interface Chapter {
   id: string;
   name: string;
   subject: string;
+  class_level?: ClassLevel;
   order_index: number;
   is_active: boolean;
   created_at: string;
+  pdfs?: PDFNote[];
 }
 
 export interface PDFNote {
   id: string;
   chapter_id: string | null;
+  sub_heading?: string | null;
   title: string;
   description: string | null;
   thumbnail_url: string | null;

@@ -6,11 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Profile } from "@/types/database";
 
 export default function AdminStudentsPage() {
-  const [students, setStudents] = useState<Profile[]>([
-    { id: "s1", full_name: "Rahul Sharma", phone: "+91 9876543210", role: "student", created_at: new Date().toISOString() },
-    { id: "s2", full_name: "Priya Patel", phone: "+91 9876543211", role: "student", created_at: new Date(Date.now() - 86400000 * 2).toISOString() },
-    { id: "s3", full_name: "Aman Verma", phone: "+91 9876543212", role: "student", created_at: new Date(Date.now() - 86400000 * 5).toISOString() },
-  ]);
+  const [students, setStudents] = useState<Profile[]>([]);
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -23,9 +19,9 @@ export default function AdminStudentsPage() {
         .eq("role", "student")
         .order("created_at", { ascending: false });
 
-      if (data && data.length > 0) setStudents(data);
+      if (data) setStudents(data);
     } catch (e) {
-      console.log("Using initial student list");
+      console.log("Error fetching students:", e);
     }
   };
 
@@ -79,32 +75,40 @@ export default function AdminStudentsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-              {filteredStudents.map((s) => (
-                <tr key={s.id} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="py-3 px-3 font-semibold text-slate-900 flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-[#016737]/10 text-[#016737] flex items-center justify-center font-bold text-xs">
-                      {s.full_name?.charAt(0) || "S"}
-                    </div>
-                    <span>{s.full_name || "Aspirant Student"}</span>
-                  </td>
-                  <td className="py-3 px-3 font-mono text-slate-600 font-medium">
-                    {s.phone || "+91 98765XXXXX"}
-                  </td>
-                  <td className="py-3 px-3 font-mono text-slate-400 text-[11px]">
-                    {new Date(s.created_at).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </td>
-                  <td className="py-3 px-3">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">
-                      <UserCheck className="w-3 h-3 text-emerald-600" />
-                      <span>Active Aspirant</span>
-                    </span>
+              {filteredStudents.length > 0 ? (
+                filteredStudents.map((s) => (
+                  <tr key={s.id} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-3 px-3 font-semibold text-slate-900 flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-[#016737]/10 text-[#016737] flex items-center justify-center font-bold text-xs">
+                        {s.full_name?.charAt(0) || "S"}
+                      </div>
+                      <span>{s.full_name || "Aspirant Student"}</span>
+                    </td>
+                    <td className="py-3 px-3 font-mono text-slate-600 font-medium">
+                      {s.phone || "-"}
+                    </td>
+                    <td className="py-3 px-3 font-mono text-slate-400 text-[11px]">
+                      {new Date(s.created_at).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </td>
+                    <td className="py-3 px-3">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">
+                        <UserCheck className="w-3 h-3 text-emerald-600" />
+                        <span>Active Aspirant</span>
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="py-8 text-center text-slate-400 font-medium">
+                    No registered students found in Supabase database.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

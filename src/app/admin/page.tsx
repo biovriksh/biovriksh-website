@@ -19,10 +19,10 @@ import { DashboardStats } from "@/types/database";
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<DashboardStats>({
-    totalRevenue: 4850,
-    totalOrders: 97,
-    activePDFs: 14,
-    totalStudents: 1420,
+    totalRevenue: 0,
+    totalOrders: 0,
+    activePDFs: 0,
+    totalStudents: 0,
     recentPurchases: [],
   });
   const [loading, setLoading] = useState(false);
@@ -48,18 +48,16 @@ export default function AdminDashboardPage() {
         .order("purchased_at", { ascending: false })
         .limit(6);
 
-      if (purchases) {
-        const totalRevenue = purchases.reduce((acc, curr) => acc + (curr.amount_paid || 0), 0);
-        setStats({
-          totalRevenue: totalRevenue || 4850,
-          totalOrders: purchases.length || 97,
-          activePDFs: pdfCount || 14,
-          totalStudents: studentCount || 1420,
-          recentPurchases: purchases as any,
-        });
-      }
+      const totalRevenue = purchases ? purchases.reduce((acc, curr) => acc + (curr.amount_paid || 0), 0) : 0;
+      setStats({
+        totalRevenue: totalRevenue,
+        totalOrders: purchases ? purchases.length : 0,
+        activePDFs: pdfCount || 0,
+        totalStudents: studentCount || 0,
+        recentPurchases: (purchases as any) || [],
+      });
     } catch (e) {
-      console.log("Using initial stats");
+      console.log("Error fetching stats:", e);
     } finally {
       setLoading(false);
     }
@@ -93,7 +91,7 @@ export default function AdminDashboardPage() {
     },
     {
       title: "NEET Aspirants",
-      value: `${stats.totalStudents}+`,
+      value: `${stats.totalStudents}`,
       subtitle: "Registered Users",
       icon: Users,
       iconBg: "bg-purple-50 text-purple-700 border border-purple-200",
@@ -215,29 +213,16 @@ export default function AdminDashboardPage() {
                       </span>
                     </td>
                     <td className="py-3 px-3 font-mono text-slate-500 text-[11px]">
-                      {purchase.payment_gateway_id || "pay_Rzp1098234"}
+                      {purchase.payment_gateway_id || "-"}
                     </td>
                   </tr>
                 ))
               ) : (
-                [
-                  { id: "1", name: "Rahul Sharma", pdf: "Class 12 Genetics & Evolution Note", amount: "49", txn: "pay_Rzp987123" },
-                  { id: "2", name: "Priya Patel", pdf: "Human Reproduction Ultra Revision Note", amount: "49", txn: "pay_Rzp987124" },
-                  { id: "3", name: "Aman Verma", pdf: "Plant Physiology NCERT Mindmaps", amount: "49", txn: "pay_Rzp987125" },
-                ].map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="py-3 px-3 font-semibold text-slate-900">{item.name}</td>
-                    <td className="py-3 px-3 text-[#016737] font-semibold">{item.pdf}</td>
-                    <td className="py-3 px-3 font-mono font-bold text-slate-900">₹{item.amount}</td>
-                    <td className="py-3 px-3">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        <span>Success</span>
-                      </span>
-                    </td>
-                    <td className="py-3 px-3 font-mono text-slate-500 text-[11px]">{item.txn}</td>
-                  </tr>
-                ))
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-slate-400 font-medium">
+                    No order transactions recorded in Supabase yet.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
