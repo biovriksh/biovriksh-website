@@ -8,6 +8,9 @@ export interface Profile {
   full_name: string | null;
   phone: string | null;
   role: UserRole;
+  subscription_plan?: string | null;
+  subscription_status?: "none" | "active" | "expired" | null;
+  subscription_expires_at?: string | null;
   created_at: string;
 }
 

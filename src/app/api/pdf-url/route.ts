@@ -19,6 +19,13 @@ export async function GET(req: Request) {
     const { data: { user } } = await supabaseUser.auth.getUser();
     const activeStudentId = user?.id || studentIdParam;
 
+    if (!activeStudentId) {
+      return NextResponse.json(
+        { error: "Authentication Required. Please log in to access this note." },
+        { status: 401 }
+      );
+    }
+
     // 2. Fetch PDF Metadata
     const { data: pdf, error: pdfError } = await supabaseAdmin
       .from("pdfs")
@@ -34,18 +41,33 @@ export async function GET(req: Request) {
 
     if (pdf.is_free) {
       isAuthorized = true;
-    } else if (activeStudentId) {
-      // 3. Check Purchases table in DB
-      const { data: purchase } = await supabaseAdmin
-        .from("purchases")
-        .select("id")
-        .eq("student_id", activeStudentId)
-        .eq("pdf_id", pdfId)
-        .eq("payment_status", "success")
+    } else {
+      // 3. Check if user has active subscription plan
+      const { data: profile } = await supabaseAdmin
+        .from("profiles")
+        .select("subscription_status, subscription_expires_at")
+        .eq("id", activeStudentId)
         .single();
 
-      if (purchase) {
-        isAuthorized = true;
+      if (profile?.subscription_status === "active" && profile?.subscription_expires_at) {
+        if (new Date(profile.subscription_expires_at).getTime() > Date.now()) {
+          isAuthorized = true;
+        }
+      }
+
+      // 4. Check individual Purchases table in DB
+      if (!isAuthorized) {
+        const { data: purchase } = await supabaseAdmin
+          .from("purchases")
+          .select("id")
+          .eq("student_id", activeStudentId)
+          .eq("pdf_id", pdfId)
+          .eq("payment_status", "success")
+          .single();
+
+        if (purchase) {
+          isAuthorized = true;
+        }
       }
     }
 

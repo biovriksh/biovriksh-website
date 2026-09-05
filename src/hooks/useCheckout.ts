@@ -1,66 +1,137 @@
-/**
- * useCheckout — Razorpay payment gateway hook (stub)
- *
- * PURPOSE: This hook currently logs checkout intent to the console.
- * When you are ready to integrate Razorpay, replace the console.log
- * inside handleCheckout with your Razorpay order-creation API call
- * and the window.Razorpay SDK invocation.
- *
- * INTEGRATION GUIDE:
- * 1. Install Razorpay SDK:          npm install razorpay
- * 2. Add your Razorpay Key to .env: NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_live_xxx
- * 3. Create a backend API route at: /api/create-order  (POST)
- *    — accepts { price, productId }, creates a Razorpay order, returns { orderId }
- * 4. Replace the console.log below with:
- *    a) fetch('/api/create-order', { method: 'POST', body: JSON.stringify({ price, productId }) })
- *    b) const { orderId } = await res.json()
- *    c) Open the Razorpay checkout modal with that orderId
- */
+"use client";
+
+import { useState } from "react";
+import { useStudentAuth } from "@/hooks/useStudentAuth";
+
+interface CheckoutOptions {
+  pdfId?: string;
+  planId?: string;
+  onLoginRequired?: () => void;
+  onSuccess?: () => void;
+}
 
 export function useCheckout() {
-  /**
-   * handleCheckout
-   * @param price     - The price string shown on the button (e.g. "₹49", "₹2400")
-   * @param productId - A unique product/plan identifier (e.g. "paid-pdf-001", "plan-yearly")
-   */
-  function handleCheckout(price: string, productId: string) {
-    // ── STUB: Replace this entire block with Razorpay integration ──
-    console.log("[Bio Vriksha Checkout] Initiating payment:", {
-      price,
-      productId,
-      timestamp: new Date().toISOString(),
-    });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useStudentAuth();
 
-    // TODO: Uncomment and complete when backend is ready:
-    //
-    // try {
-    //   const res = await fetch('/api/create-order', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ price, productId }),
-    //   });
-    //   const { orderId, amount, currency } = await res.json();
-    //
-    //   const options = {
-    //     key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-    //     amount,
-    //     currency,
-    //     name: 'Bio Vriksha',
-    //     description: productId,
-    //     order_id: orderId,
-    //     handler: (response) => {
-    //       console.log('[Razorpay] Payment success:', response);
-    //       // Verify payment signature on server, then grant access
-    //     },
-    //     prefill: { name: '', email: '', contact: '' },
-    //     theme: { color: '#016737' },
-    //   };
-    //   const rzp = new (window as any).Razorpay(options);
-    //   rzp.open();
-    // } catch (err) {
-    //   console.error('[Bio Vriksha Checkout] Error:', err);
-    // }
-  }
+  const handleCheckout = async (options: CheckoutOptions) => {
+    const { pdfId, planId, onLoginRequired, onSuccess } = options;
 
-  return { handleCheckout };
+    // Guard: Require Student Login first!
+    if (!user) {
+      if (onLoginRequired) {
+        onLoginRequired();
+      } else {
+        alert("Please log in to your student account before proceeding with purchase.");
+      }
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // 1. Create Razorpay order on backend
+      const res = await fetch("/api/razorpay/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pdfId, planId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to initialize order");
+      }
+
+      const { orderId, amount, currency, keyId } = data;
+
+      // Check if Razorpay SDK script is loaded
+      if (typeof window !== "undefined" && (window as any).Razorpay) {
+        const razorpayOptions = {
+          key: keyId,
+          amount,
+          currency,
+          name: "Bio Vriksha",
+          description: planId ? `Subscription Plan: ${planId}` : `Note Purchase: ${pdfId}`,
+          order_id: orderId,
+          handler: async (response: any) => {
+            try {
+              // 2. Verify payment on server
+              const verifyRes = await fetch("/api/razorpay/verify-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  student_id: user.id,
+                  pdf_id: pdfId,
+                  plan_id: planId,
+                }),
+              });
+
+              const verifyData = await verifyRes.json();
+
+              if (!verifyRes.ok || !verifyData.success) {
+                throw new Error(verifyData.error || "Payment verification failed");
+              }
+
+              if (onSuccess) {
+                onSuccess();
+              } else {
+                window.location.href = "/profile";
+              }
+            } catch (vErr: any) {
+              console.error("Verification error:", vErr);
+              alert(vErr.message || "Payment completed but verification failed. Please contact support.");
+            }
+          },
+          prefill: {
+            email: user.email || "",
+            name: user.user_metadata?.full_name || "",
+            contact: user.user_metadata?.phone || "",
+          },
+          theme: {
+            color: "#016737",
+          },
+        };
+
+        const rzp = new (window as any).Razorpay(razorpayOptions);
+        rzp.open();
+      } else {
+        // Fallback if Razorpay SDK script is not present in local dev mode
+        console.warn("Razorpay SDK script not loaded on window. Simulating direct dev purchase.");
+        const verifyRes = await fetch("/api/razorpay/verify-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            razorpay_order_id: orderId || "order_simulated",
+            razorpay_payment_id: `pay_${Date.now()}`,
+            razorpay_signature: "simulated_signature",
+            student_id: user.id,
+            pdf_id: pdfId,
+            plan_id: planId,
+          }),
+        });
+
+        const verifyData = await verifyRes.json();
+        if (verifyData.success) {
+          if (onSuccess) onSuccess();
+          else window.location.href = "/profile";
+        } else {
+          throw new Error(verifyData.error || "Dev verification failed");
+        }
+      }
+    } catch (err: any) {
+      console.error("Checkout error:", err);
+      setError(err.message || "Payment initialization failed.");
+      alert(err.message || "Checkout failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { handleCheckout, loading, error };
 }

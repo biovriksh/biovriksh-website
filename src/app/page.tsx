@@ -27,7 +27,7 @@ export default function Home() {
       )}
 
       {/* PHASE 2+: MAIN PAGE CONTENT */}
-      <div className={`transition-opacity duration-700 ${showPreloader ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+      <div className={showPreloader ? "pointer-events-none select-none" : ""}>
         <Navbar />
         <HeroSection />
         <RecentPDFs />

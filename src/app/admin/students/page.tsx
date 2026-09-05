@@ -70,41 +70,70 @@ export default function AdminStudentsPage() {
               <tr className="border-b border-slate-200 text-slate-500 uppercase font-semibold text-[10px] tracking-wider bg-slate-50">
                 <th className="py-2.5 px-3">Student Name</th>
                 <th className="py-2.5 px-3">Phone Number</th>
+                <th className="py-2.5 px-3">Subscription Plan</th>
+                <th className="py-2.5 px-3">Valid Until</th>
                 <th className="py-2.5 px-3">Joined Date</th>
                 <th className="py-2.5 px-3">Account Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
               {filteredStudents.length > 0 ? (
-                filteredStudents.map((s) => (
-                  <tr key={s.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="py-3 px-3 font-semibold text-slate-900 flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-[#016737]/10 text-[#016737] flex items-center justify-center font-bold text-xs">
-                        {s.full_name?.charAt(0) || "S"}
-                      </div>
-                      <span>{s.full_name || "Aspirant Student"}</span>
-                    </td>
-                    <td className="py-3 px-3 font-mono text-slate-600 font-medium">
-                      {s.phone || "-"}
-                    </td>
-                    <td className="py-3 px-3 font-mono text-slate-400 text-[11px]">
-                      {new Date(s.created_at).toLocaleDateString("en-IN", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </td>
-                    <td className="py-3 px-3">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">
-                        <UserCheck className="w-3 h-3 text-emerald-600" />
-                        <span>Active Aspirant</span>
-                      </span>
-                    </td>
-                  </tr>
-                ))
+                filteredStudents.map((s) => {
+                  const isPlanActive =
+                    s.subscription_status === "active" &&
+                    s.subscription_expires_at &&
+                    new Date(s.subscription_expires_at).getTime() > Date.now();
+
+                  return (
+                    <tr key={s.id} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="py-3 px-3 font-semibold text-slate-900 flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-[#016737]/10 text-[#016737] flex items-center justify-center font-bold text-xs">
+                          {s.full_name?.charAt(0) || "S"}
+                        </div>
+                        <span>{s.full_name || "Aspirant Student"}</span>
+                      </td>
+                      <td className="py-3 px-3 font-mono text-slate-600 font-medium">
+                        {s.phone || "-"}
+                      </td>
+                      <td className="py-3 px-3">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                            isPlanActive
+                              ? "bg-green-100 text-green-800 border border-green-300"
+                              : "bg-slate-100 text-slate-600 border border-slate-200"
+                          }`}
+                        >
+                          {s.subscription_plan || "FREE PASS"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 font-mono text-slate-700 font-semibold text-[11px]">
+                        {s.subscription_expires_at
+                          ? new Date(s.subscription_expires_at).toLocaleDateString("en-IN", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })
+                          : "Forever Free"}
+                      </td>
+                      <td className="py-3 px-3 font-mono text-slate-400 text-[11px]">
+                        {new Date(s.created_at).toLocaleDateString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </td>
+                      <td className="py-3 px-3">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">
+                          <UserCheck className="w-3 h-3 text-emerald-600" />
+                          <span>Active Aspirant</span>
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
-                  <td colSpan={4} className="py-8 text-center text-slate-400 font-medium">
+                  <td colSpan={6} className="py-8 text-center text-slate-400 font-medium">
                     No registered students found in Supabase database.
                   </td>
                 </tr>

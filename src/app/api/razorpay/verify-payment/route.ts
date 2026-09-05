@@ -11,9 +11,10 @@ export async function POST(req: Request) {
       razorpay_signature,
       student_id,
       pdf_id,
+      plan_id,
     } = await req.json();
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !pdf_id) {
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || (!pdf_id && !plan_id)) {
       return NextResponse.json(
         { success: false, error: "Missing required payment verification parameters" },
         { status: 400 }
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Identify Authenticated User (Fallback to provided student_id if auth session cookie is matching)
+    // 2. Identify Authenticated User
     const supabaseUserClient = await createServerSupabaseClient();
     const { data: { user } } = await supabaseUserClient.auth.getUser();
     const activeStudentId = user?.id || student_id;
@@ -59,42 +60,73 @@ export async function POST(req: Request) {
       );
     }
 
-    // 3. Fetch exact PDF details from DB for exact amount record
     const supabaseAdmin = createAdminClient();
-    const { data: pdf } = await supabaseAdmin
-      .from("pdfs")
-      .select("price")
-      .eq("id", pdf_id)
-      .single();
 
-    const verifiedAmount = pdf?.price || 0;
+    if (plan_id) {
+      // Handle Subscription Plan Upgrade
+      const normalizedPlan = plan_id.replace("plan-", "");
+      const days = normalizedPlan === "yearly" ? 365 : 30;
+      const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
 
-    // 4. Record verified purchase into Database using Service Role
-    const { error: insertError } = await supabaseAdmin.from("purchases").upsert(
-      {
-        student_id: activeStudentId,
-        pdf_id,
-        amount_paid: verifiedAmount,
-        payment_status: "success",
-        payment_gateway_id: razorpay_payment_id,
-        purchased_at: new Date().toISOString(),
-      },
-      { onConflict: "student_id,pdf_id" }
-    );
+      const { error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .update({
+          subscription_plan: normalizedPlan === "yearly" ? "PREMIUM YEARLY" : "PREMIUM MONTHLY",
+          subscription_status: "active",
+          subscription_expires_at: expiresAt.toISOString(),
+        })
+        .eq("id", activeStudentId);
 
-    if (insertError) {
-      console.error("Failed to record purchase in database:", insertError);
-      return NextResponse.json(
-        { success: false, error: "Payment verified but database record failed. Contact support." },
-        { status: 500 }
+      if (profileError) {
+        console.error("Failed to update profile subscription:", profileError);
+        return NextResponse.json(
+          { success: false, error: "Payment verified but subscription update failed. Contact support." },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: `Subscription plan successfully activated! Valid till ${expiresAt.toLocaleDateString()}`,
+        paymentId: razorpay_payment_id,
+        expiresAt: expiresAt.toISOString(),
+      });
+    } else if (pdf_id) {
+      // Handle Single PDF Purchase
+      const { data: pdf } = await supabaseAdmin
+        .from("pdfs")
+        .select("price")
+        .eq("id", pdf_id)
+        .single();
+
+      const verifiedAmount = pdf?.price || 0;
+
+      const { error: insertError } = await supabaseAdmin.from("purchases").upsert(
+        {
+          student_id: activeStudentId,
+          pdf_id,
+          amount_paid: verifiedAmount,
+          payment_status: "success",
+          payment_gateway_id: razorpay_payment_id,
+          purchased_at: new Date().toISOString(),
+        },
+        { onConflict: "student_id,pdf_id" }
       );
-    }
 
-    return NextResponse.json({
-      success: true,
-      message: "Payment successfully verified and note unlocked",
-      paymentId: razorpay_payment_id,
-    });
+      if (insertError) {
+        console.error("Failed to record purchase in database:", insertError);
+        return NextResponse.json(
+          { success: false, error: "Payment verified but database record failed. Contact support." },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Payment successfully verified and note unlocked",
+        paymentId: razorpay_payment_id,
+      });
+    }
   } catch (error: any) {
     console.error("Razorpay verify-payment error:", error);
     return NextResponse.json(

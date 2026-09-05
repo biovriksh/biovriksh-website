@@ -11,8 +11,16 @@ create table if not exists public.profiles (
   full_name text,
   phone text,
   role text not null default 'student' check (role in ('admin', 'student')),
+  subscription_plan text default 'none',
+  subscription_status text default 'none' check (subscription_status in ('none', 'active', 'expired')),
+  subscription_expires_at timestamptz,
   created_at timestamptz default now()
 );
+
+-- Migration helpers for profiles table if already exists
+alter table public.profiles add column if not exists subscription_plan text default 'none';
+alter table public.profiles add column if not exists subscription_status text default 'none';
+alter table public.profiles add column if not exists subscription_expires_at timestamptz;
 
 -- Auto-create profile trigger on user signup
 create or replace function public.handle_new_user()
