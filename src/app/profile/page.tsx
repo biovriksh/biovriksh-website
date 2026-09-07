@@ -95,7 +95,7 @@ export default function StudentProfilePage() {
           </div>
           <h2 className="text-2xl font-black text-gray-900 mb-2">Student Access Required</h2>
           <p className="text-xs text-gray-600 mb-6">
-            Please log in or sign up for a Bio Vriksha student account to access your personal dashboard and unlocked notes.
+            Please log in or sign up for a Bio Vriksh student account to access your personal dashboard and unlocked notes.
           </p>
           <button
             onClick={() => setAuthModalOpen(true)}

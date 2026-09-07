@@ -53,11 +53,11 @@ export default function Navbar() {
           <a
             href="/#home"
             className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 group flex items-center"
-            title="Bio Vriksha"
+            title="Bio Vriksh"
           >
             <img
               src="/logo_transparent.png"
-              alt="Bio Vriksha Logo"
+              alt="Bio Vriksh Logo"
               className="w-16 h-16 sm:w-22 sm:h-22 md:w-26 md:h-26 object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md -my-3"
             />
           </a>
@@ -70,7 +70,7 @@ export default function Navbar() {
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center group select-none z-20"
             >
               <span className="text-2xl sm:text-3xl font-black tracking-tight font-sans bg-clip-text text-transparent bg-gradient-to-r from-[#00381c] via-[#016737] via-[#359d52] to-[#8BC43F] drop-shadow-[0_2px_5px_rgba(1,103,55,0.20)] group-hover:scale-105 transition-transform duration-300">
-                Bio Vriksha
+                Bio Vriksh
               </span>
             </a>
 

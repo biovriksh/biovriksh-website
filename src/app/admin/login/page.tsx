@@ -91,7 +91,7 @@ export default function AdminLoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@biovriksha.com"
+                placeholder="admin@biovriksh.com"
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-xs font-semibold focus:outline-none focus:border-[#016737] focus:bg-white transition-all"
               />
             </div>
@@ -131,7 +131,7 @@ export default function AdminLoginPage() {
         </form>
 
         <div className="mt-8 pt-6 border-t border-slate-100 text-center text-[11px] font-semibold text-slate-400">
-          Bio Vriksha EdTech Platform • Admin Control CMS
+          Bio Vriksh EdTech Platform • Admin Control CMS
         </div>
       </div>
     </div>

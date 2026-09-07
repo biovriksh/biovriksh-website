@@ -17,7 +17,7 @@ export default function AboutSection() {
           transition={{ duration: 0.5 }}
           className="text-xs font-mono font-bold tracking-widest text-[#016737] uppercase mb-5"
         >
-          About BioVriksha
+          About BioVriksh
         </motion.div>
 
         {/* Hand-drawn Sketch Icon on Left */}
@@ -54,7 +54,7 @@ export default function AboutSection() {
           transition={{ duration: 0.65, delay: 0.1 }}
           className="text-[#4B5563] text-sm sm:text-base max-w-xl mx-auto leading-relaxed mb-8 font-normal"
         >
-          BioVriksha is a premier NEET learning platform designed to make complex concepts simple, visual, and exam-ready. We craft high-precision NCERT chapter summaries and practice sets so every aspirant can study efficiently without getting overwhelmed.
+          BioVriksh is a premier NEET learning platform designed to make complex concepts simple, visual, and exam-ready. We craft high-precision NCERT chapter summaries and practice sets so every aspirant can study efficiently without getting overwhelmed.
         </motion.p>
 
         {/* CTA Button with Doodle */}
@@ -92,47 +92,47 @@ export default function AboutSection() {
       </div>
 
 
-      {/* ── BOTTOM DARK SECTION: SLANTED DIAGONAL CUT WITH HIGHLY HIGHLIGHTED PURE WHITE TEXT ────── */}
-      <div className="relative bg-[#0A0E0B] text-white pt-24 pb-20 px-6 md:px-12 clip-diagonal">
+      {/* ── BOTTOM SECTION: LIGHTER DEEP GREEN BACKGROUND WITH ORIGINAL LIME ACCENTS ────── */}
+      <div className="relative bg-[#214B33] text-white pt-24 pb-20 px-6 md:px-12 clip-diagonal z-10">
         
-        {/* Container inside dark section */}
-        <div className="max-w-5xl mx-auto pt-8 md:pt-12">
+        {/* Container inside section */}
+        <div className="max-w-5xl mx-auto pt-8 md:pt-12 relative z-20">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
             
-            {/* LEFT COLUMN: Number + Headline (Moved slightly toward middle with left padding) */}
+            {/* LEFT COLUMN: Number + Headline */}
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 1, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
+              transition={{ duration: 0.5 }}
               className="lg:col-span-5 flex items-start gap-3 pl-2 sm:pl-6 lg:pl-10"
             >
-              <span className="font-mono text-sm font-bold text-[#8BC43F] opacity-100 mt-1.5">
+              <span className="font-mono text-base font-extrabold text-[#8BC43F] mt-1.5 tracking-wider">
                 01
               </span>
-              <h3 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-[1.08] drop-shadow-md">
+              <h3 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-[1.08] drop-shadow-sm">
                 Deep Clarity <br />
                 = Higher <br />
                 Ranks
               </h3>
             </motion.div>
 
-            {/* RIGHT COLUMN: Tilted Scribble (NO BOX) + Pure White Description */}
+            {/* RIGHT COLUMN: Tilted Marker Scribble (Original Lime Style) + Pure White Description */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 1, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
               className="lg:col-span-7 flex flex-col items-start"
             >
-              {/* CONCEPT OVER CRAMMING - Tilted Marker Style (NO BOX, exact reference style) */}
-              <div className="font-marker text-3xl sm:text-4xl md:text-5xl text-[#8BC43F] transform -rotate-3 mb-5 select-none tracking-wider drop-shadow-[0_2px_12px_rgba(139,196,63,0.45)]">
+              {/* CONCEPT OVER CRAMMING - Original Marker Style in Lime Green #8BC43F (NO BOX, NO BORDER) */}
+              <div className="font-marker text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#8BC43F] transform -rotate-3 mb-5 select-none tracking-wider">
                 CONCEPT OVER CRAMMING
               </div>
 
-              {/* High Contrast Pure White Body Text */}
-              <p className="text-[#F3F4F6] text-base sm:text-lg leading-relaxed font-normal max-w-lg font-sans drop-shadow-sm">
-                Traditional coaching often forces students to memorize endless facts without understanding the core principles. At BioVriksha, we focus on line-by-line NCERT clarity, visual diagrams, and pattern-matched practice questions. Our mission is to transform how you prepare, ensuring every minute of study translates into real NEET exam performance.
+              {/* High Contrast Pure White Body Text for Maximum Readability */}
+              <p className="text-white text-base sm:text-lg md:text-xl leading-relaxed font-medium max-w-lg font-sans drop-shadow-xs">
+                Traditional coaching often forces students to memorize endless facts without understanding the core principles. At BioVriksh, we focus on line-by-line NCERT clarity, visual diagrams, and pattern-matched practice questions. Our mission is to transform how you prepare, ensuring every minute of study translates into real NEET exam performance.
               </p>
             </motion.div>
 

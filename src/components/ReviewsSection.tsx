@@ -11,7 +11,7 @@ const reviews = [
     date: "2 Months Ago",
     rating: 5,
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    text: "BioVriksha completely changed how I prepared for NEET. The notes are super crisp and the MCQs mirror real exam questions. Scored 650+ in NEET 2024!",
+    text: "BioVriksh completely changed how I prepared for NEET. The notes are super crisp and the MCQs mirror real exam questions. Scored 650+ in NEET 2024!",
   },
   {
     id: 2,
@@ -47,7 +47,7 @@ const reviews = [
     date: "2 Weeks Ago",
     rating: 5,
     avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
-    text: "BioVriksha makes NEET prep feel achievable. Structured, clean notes and MCQs that actually test your concepts. I recommend this to every aspirant!",
+    text: "BioVriksh makes NEET prep feel achievable. Structured, clean notes and MCQs that actually test your concepts. I recommend this to every aspirant!",
   },
   {
     id: 6,
@@ -56,7 +56,7 @@ const reviews = [
     date: "3 Months Ago",
     rating: 5,
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
-    text: "The quality of material here is unmatched. BioVriksha has everything in one place. No more hunting for resources across the internet!",
+    text: "The quality of material here is unmatched. BioVriksh has everything in one place. No more hunting for resources across the internet!",
   },
 ];
 
@@ -181,7 +181,7 @@ export default function ReviewsSection() {
 
                 {/* Description */}
                 <p className="text-[#666666] text-sm leading-relaxed mb-8 max-w-md">
-                  Discover how thousands of NEET aspirants use BioVriksha to simplify complex concepts, score higher in practice tests, and crack the exam with confidence.
+                  Discover how thousands of NEET aspirants use BioVriksh to simplify complex concepts, score higher in practice tests, and crack the exam with confidence.
                 </p>
               </div>
 

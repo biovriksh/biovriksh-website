@@ -259,7 +259,7 @@ function SecureReaderContent() {
               key={i}
               className="text-xs sm:text-sm font-black font-sans tracking-widest text-[#016737] rotate-[-30deg] m-16 uppercase whitespace-nowrap"
             >
-              Bio Vriksha Official Reader • Copyright Protected
+              Bio Vriksh Official Reader • Copyright Protected
             </div>
           ))}
         </div>
@@ -280,7 +280,7 @@ function SecureReaderContent() {
           <div className="flex items-center justify-between border-b border-gray-200/40 pb-4 mb-6">
             <div className="flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-[#016737]" />
-              <span className="font-extrabold text-sm text-[#016737]">Bio Vriksha Official Study Notes</span>
+              <span className="font-extrabold text-sm text-[#016737]">Bio Vriksh Official Study Notes</span>
             </div>
             <span className="text-xs font-bold text-gray-400">Page {currentPage} of {pagesCount}</span>
           </div>
@@ -380,7 +380,7 @@ function SecureReaderContent() {
 
           {/* Paper Footer */}
           <div className="mt-12 pt-4 border-t border-gray-200/40 flex items-center justify-between text-xs text-gray-400">
-            <span>Bio Vriksha Digital Learning Platform</span>
+            <span>Bio Vriksh Digital Learning Platform</span>
             <span>Protected DRM • Student Edition</span>
           </div>
         </div>
@@ -395,7 +395,7 @@ function SecureReaderContent() {
         }`}
       >
         <span className="font-semibold">
-          Bio Vriksha DRM Secure Reader
+          Bio Vriksh DRM Secure Reader
         </span>
 
         <div className="flex items-center gap-3">

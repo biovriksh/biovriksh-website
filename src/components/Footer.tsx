@@ -105,7 +105,7 @@ export default function Footer() {
             <ul className="flex flex-col gap-3 font-medium text-sm text-[#2B2F2C]">
               <li>
                 <a
-                  href="https://instagram.com/biovriksha"
+                  href="https://instagram.com/biovriksh"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2.5 hover:text-[#016737] transition-colors group"
@@ -116,7 +116,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://t.me/biovriksha"
+                  href="https://t.me/biovriksh"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2.5 hover:text-[#016737] transition-colors group"
@@ -127,7 +127,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://youtube.com/@biovriksha"
+                  href="https://youtube.com/@biovriksh"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2.5 hover:text-[#016737] transition-colors group"
@@ -147,11 +147,11 @@ export default function Footer() {
             <div className="flex flex-col gap-3 text-sm text-[#2B2F2C] font-medium">
               <p className="font-bold text-[#1A1A1A]">Reach out</p>
               <a
-                href="mailto:support@biovriksha.in"
+                href="mailto:support@biovriksh.in"
                 className="inline-flex items-center gap-2.5 hover:text-[#016737] transition-colors group"
               >
                 <MailLogo className="w-5 h-5 group-hover:scale-110 transition-transform shadow-xs" />
-                <span>support@biovriksha.in</span>
+                <span>support@biovriksh.in</span>
               </a>
               <a
                 href="tel:+919876543210"
@@ -171,7 +171,7 @@ export default function Footer() {
             <div className="text-sm text-[#4B5563] leading-relaxed font-medium">
               <p className="font-bold text-[#1A1A1A] inline-flex items-center gap-2.5 mb-1">
                 <LocationLogo className="w-5 h-5 shadow-xs" />
-                <span>BioVriksha EdTech</span>
+                <span>BioVriksh EdTech</span>
               </p>
               <p className="pl-7">Bangalore, Karnataka</p>
               <p className="pl-7">India — 560001</p>
@@ -189,7 +189,7 @@ export default function Footer() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="text-6xl sm:text-8xl md:text-9xl lg:text-[140px] xl:text-[165px] font-black text-[#1A1A1A] tracking-tighter leading-none uppercase font-sans text-center sm:text-left"
           >
-            BioVriksha
+            BioVriksh
           </motion.h1>
         </div>
 
@@ -206,7 +206,7 @@ export default function Footer() {
           </div>
 
           <p className="text-center sm:text-right">
-            &copy; {new Date().getFullYear()} BioVriksha EdTech. All rights reserved.
+            &copy; {new Date().getFullYear()} BioVriksh EdTech. All rights reserved.
           </p>
         </div>
 

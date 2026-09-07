@@ -27,7 +27,7 @@ const marker = Permanent_Marker({
 });
 
 export const metadata: Metadata = {
-  title: "Bio Vriksha | Ultra-Aesthetic NEET Biology Learning & Practice Platform",
+  title: "Bio Vriksh | Ultra-Aesthetic NEET Biology Learning & Practice Platform",
   description: "Free concept notes for every chapter. Paid practice sets that mirror the NEET exam pattern.",
 };
 

@@ -53,7 +53,7 @@ export function useCheckout() {
           key: keyId,
           amount,
           currency,
-          name: "Bio Vriksha",
+          name: "Bio Vriksh",
           description: planId ? `Subscription Plan: ${planId}` : `Note Purchase: ${pdfId}`,
           order_id: orderId,
           handler: async (response: any) => {

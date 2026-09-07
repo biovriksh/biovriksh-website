@@ -42,7 +42,7 @@ export default function HeroSection() {
         {/* Subtly Faded Soft Tree Visual */}
         <img
           src="/hero_pure_tree_light.png"
-          alt="Bio Vriksha Realistic Tree of Biology"
+          alt="Bio Vriksh Realistic Tree of Biology"
           className="w-full h-full object-contain object-center opacity-75 transition-all duration-700 hover:opacity-90"
           draggable={false}
         />
@@ -144,7 +144,7 @@ export default function HeroSection() {
       <div className="lg:hidden absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
         <img
           src="/hero_pure_tree_light.png"
-          alt="Bio Vriksha Realistic Tree of Biology"
+          alt="Bio Vriksh Realistic Tree of Biology"
           className="w-full h-full object-contain object-center opacity-30 brightness-105"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/60 to-white" />

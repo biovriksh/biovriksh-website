@@ -1,5 +1,5 @@
 -- ============================================================================
--- BIO VRIKSHA — COMPLETE DATABASE SCHEMA, RLS POLICIES & STORAGE BUCKETS
+-- BIO VRIKSH — COMPLETE DATABASE SCHEMA, RLS POLICIES & STORAGE BUCKETS
 -- ============================================================================
 -- Paste this entire SQL file into your Supabase Dashboard -> SQL Editor and click RUN.
 

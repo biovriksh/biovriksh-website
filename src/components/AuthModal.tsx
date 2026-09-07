@@ -125,7 +125,7 @@ export default function AuthModal({
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-white/90">
-                  Bio Vriksha Account
+                  Bio Vriksh Account
                 </span>
               </div>
 
@@ -136,7 +136,7 @@ export default function AuthModal({
                 {customSubtitle ||
                   (mode === "signin"
                     ? "Log in to access your notes, active plans & profile"
-                    : "Join thousands of NEET aspirants preparing with Bio Vriksha")}
+                    : "Join thousands of NEET aspirants preparing with Bio Vriksh")}
               </p>
             </div>
 

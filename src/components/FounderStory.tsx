@@ -11,7 +11,7 @@ export default function FounderStory() {
         <div className="absolute right-4 sm:right-8 md:right-12 top-0 bottom-0 w-[48%] sm:w-[50%] md:w-[52%] z-0 overflow-hidden shadow-sm">
           <img
             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900&auto=format&fit=crop&q=80"
-            alt="Founder - BioVriksha"
+            alt="Founder - BioVriksh"
             className="w-full h-full object-cover grayscale-[10%] contrast-[105%]"
           />
           {/* Subtle blend overlay */}
@@ -34,7 +34,7 @@ export default function FounderStory() {
 
           {/* CHARMING & INSPIRING STORY COPY */}
           <p className="text-[#65574A] text-xs sm:text-sm md:text-base leading-relaxed mb-8 sm:mb-10 max-w-xs sm:max-w-sm font-sans font-normal">
-            Every NEET aspirant carries a dream of wearing that white coat. BioVriksha was born from the exact same passion — to simplify complex concepts into crystal-clear notes and empower every student to crack NEET with confidence.
+            Every NEET aspirant carries a dream of wearing that white coat. BioVriksh was born from the exact same passion — to simplify complex concepts into crystal-clear notes and empower every student to crack NEET with confidence.
           </p>
 
           {/* DELICATE HANDWRITTEN SIGNATURE (Matching Reference Image) */}

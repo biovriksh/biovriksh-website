@@ -48,7 +48,7 @@ export default function IntroVideo() {
                   "linear-gradient(135deg, #016737 0%, #3aaa60 50%, #8BC43F 100%)",
               }}
             >
-              BioVriksha
+              BioVriksh
             </span>{" "}
             Offers
           </h2>
@@ -67,35 +67,17 @@ export default function IntroVideo() {
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
           className="relative rounded-[28px] sm:rounded-[36px] overflow-hidden shadow-[0_24px_60px_rgba(1,103,55,0.14)] border border-gray-200/80 bg-black group cursor-pointer"
           style={{ aspectRatio: "16/9" }}
-          onClick={() => setIsPlaying(true)}
         >
-          {!isPlaying ? (
-            <>
-              {/* Clean Thumbnail */}
-              <img
-                src="/hero_premium_clean.png"
-                alt="BioVriksha Introduction Video"
-                className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500 ease-out"
-              />
-
-              {/* Subtle Dark Overlay */}
-              <div className="absolute inset-0 bg-black/25 group-hover:bg-black/15 transition-colors duration-300" />
-
-              {/* Clean Centered Play Button Overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/90 backdrop-blur-md border border-white/40 shadow-2xl flex items-center justify-center text-[#016737] group-hover:scale-110 group-hover:bg-[#016737] group-hover:text-white transition-all duration-300">
-                  <Play className="w-8 h-8 sm:w-9 sm:h-9 fill-current ml-1" />
-                </div>
-              </div>
-            </>
-          ) : (
-            <video
-              src="/Elephant_bumps_logo_tree_animation.mp4"
-              controls
-              autoPlay
-              className="w-full h-full object-cover"
-            />
-          )}
+          <video
+            src="/intro_video.mp4"
+            controls
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className="w-full h-full object-cover"
+          />
         </motion.div>
 
       </div>
@@ -121,7 +103,7 @@ export default function IntroVideo() {
               onClick={(e) => e.stopPropagation()}
             >
               <video
-                src="/Elephant_bumps_logo_tree_animation.mp4"
+                src="/intro_video.mp4"
                 controls
                 autoPlay
                 className="w-full aspect-video object-contain"

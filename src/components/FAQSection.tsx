@@ -7,7 +7,7 @@ import { Plus, Minus } from "lucide-react";
 const faqs = [
   {
     id: 1,
-    question: "Is BioVriksha free to use?",
+    question: "Is BioVriksh free to use?",
     answer:
       "Yes! The free plan gives you unlimited access to all chapter short notes and NCERT summaries with no login required. Premium unlocks all paid notes and practice question sets.",
   },
@@ -21,7 +21,7 @@ const faqs = [
     id: 3,
     question: "Can I download the paid notes?",
     answer:
-      "Premium notes are unlocked for high-quality, instant viewing directly inside the BioVriksha platform. This keeps content updated, secure, and fresh for all members.",
+      "Premium notes are unlocked for high-quality, instant viewing directly inside the BioVriksh platform. This keeps content updated, secure, and fresh for all members.",
   },
   {
     id: 4,
@@ -112,7 +112,7 @@ export default function FAQSection() {
           className="text-gray-500 text-sm sm:text-base leading-relaxed"
         >
           <p className="font-semibold text-gray-700">Frequently Asked Questions.</p>
-          <p>Here are some common questions about BioVriksha.</p>
+          <p>Here are some common questions about BioVriksh.</p>
         </motion.div>
       </div>
 
@@ -136,7 +136,7 @@ export default function FAQSection() {
         <div className="absolute right-0 top-0 bottom-0 w-full sm:w-[65%] md:w-[55%] pointer-events-none overflow-hidden">
           <img
             src="/hero_biology_no_character.png"
-            alt="BioVriksha 3D Biology Visual"
+            alt="BioVriksh 3D Biology Visual"
             className="w-full h-full object-cover opacity-85"
           />
           {/* Left Fade Overlay to seamlessly blend with background */}
