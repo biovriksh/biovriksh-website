@@ -428,7 +428,7 @@ export default function StudentProfilePage() {
                   </div>
 
                   <a
-                    href={`/secure-reader?id=${pdf.id}&title=${encodeURIComponent(pdf.title)}`}
+                    href={`/secure-reader?pdfId=${pdf.id}&title=${encodeURIComponent(pdf.title)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-4 w-full py-2 rounded-xl bg-[#016737] text-white text-xs font-bold hover:bg-[#014d29] transition-all flex items-center justify-center gap-1.5"
@@ -467,7 +467,7 @@ export default function StudentProfilePage() {
 
                   {item.pdf && (
                     <a
-                      href={`/secure-reader?id=${item.pdf.id}&title=${encodeURIComponent(item.pdf.title)}`}
+                      href={`/secure-reader?pdfId=${item.pdf.id}&title=${encodeURIComponent(item.pdf.title)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="mt-4 w-full py-2 rounded-xl bg-[#016737] text-white text-xs font-bold hover:bg-[#014d29] transition-all flex items-center justify-center gap-1.5"

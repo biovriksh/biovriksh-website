@@ -184,7 +184,7 @@ export default function RecentPDFs() {
                   </div>
 
                   <a
-                    href={`/secure-reader?title=${encodeURIComponent(note.subject)}&subject=${encodeURIComponent(note.chapter)}&pages=${encodeURIComponent(note.pages)}`}
+                    href={`/secure-reader?pdfId=${note.id}&title=${encodeURIComponent(note.subject)}&subject=${encodeURIComponent(note.chapter)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full py-2.5 rounded-xl border border-[#016737] text-[#016737] text-xs font-bold hover:bg-[#016737] hover:text-white transition-all flex items-center justify-center gap-1.5 shadow-2xs"

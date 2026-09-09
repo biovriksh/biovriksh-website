@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const pdfId = searchParams.get("pdfId");
+    const pdfId = searchParams.get("pdfId") || searchParams.get("id");
     const studentIdParam = searchParams.get("studentId");
 
     if (!pdfId) {
@@ -13,23 +13,11 @@ export async function GET(req: Request) {
     }
 
     const supabaseAdmin = createAdminClient();
-    const supabaseUser = await createServerSupabaseClient();
 
-    // 1. Get authenticated user from session cookie
-    const { data: { user } } = await supabaseUser.auth.getUser();
-    const activeStudentId = user?.id || studentIdParam;
-
-    if (!activeStudentId) {
-      return NextResponse.json(
-        { error: "Authentication Required. Please log in to access this note." },
-        { status: 401 }
-      );
-    }
-
-    // 2. Fetch PDF Metadata
+    // 1. Fetch PDF Metadata
     const { data: pdf, error: pdfError } = await supabaseAdmin
       .from("pdfs")
-      .select("file_path, is_free, is_active")
+      .select("id, title, sub_heading, class_level, file_path, is_free, is_active, page_count, price")
       .eq("id", pdfId)
       .single();
 
@@ -42,31 +30,38 @@ export async function GET(req: Request) {
     if (pdf.is_free) {
       isAuthorized = true;
     } else {
-      // 3. Check if user has active subscription plan
-      const { data: profile } = await supabaseAdmin
-        .from("profiles")
-        .select("subscription_status, subscription_expires_at")
-        .eq("id", activeStudentId)
-        .single();
+      // For paid PDFs, check user authentication and subscription/purchase
+      const supabaseUser = await createServerSupabaseClient();
+      const { data: { user } } = await supabaseUser.auth.getUser();
+      const activeStudentId = user?.id || studentIdParam;
 
-      if (profile?.subscription_status === "active" && profile?.subscription_expires_at) {
-        if (new Date(profile.subscription_expires_at).getTime() > Date.now()) {
-          isAuthorized = true;
-        }
-      }
-
-      // 4. Check individual Purchases table in DB
-      if (!isAuthorized) {
-        const { data: purchase } = await supabaseAdmin
-          .from("purchases")
-          .select("id")
-          .eq("student_id", activeStudentId)
-          .eq("pdf_id", pdfId)
-          .eq("payment_status", "success")
+      if (activeStudentId) {
+        // Check active subscription
+        const { data: profile } = await supabaseAdmin
+          .from("profiles")
+          .select("subscription_status, subscription_expires_at")
+          .eq("id", activeStudentId)
           .single();
 
-        if (purchase) {
-          isAuthorized = true;
+        if (profile?.subscription_status === "active" && profile?.subscription_expires_at) {
+          if (new Date(profile.subscription_expires_at).getTime() > Date.now()) {
+            isAuthorized = true;
+          }
+        }
+
+        // Check individual Purchases table in DB
+        if (!isAuthorized) {
+          const { data: purchase } = await supabaseAdmin
+            .from("purchases")
+            .select("id")
+            .eq("student_id", activeStudentId)
+            .eq("pdf_id", pdfId)
+            .eq("payment_status", "success")
+            .maybeSingle();
+
+          if (purchase) {
+            isAuthorized = true;
+          }
         }
       }
     }
@@ -78,12 +73,13 @@ export async function GET(req: Request) {
       );
     }
 
-    // 4. Generate 5-minute Signed URL from private 'pdf-files' bucket
+    // Generate 1-hour Signed URL from private 'pdf-files' bucket
     const { data: signedData, error: signError } = await supabaseAdmin.storage
       .from("pdf-files")
-      .createSignedUrl(pdf.file_path, 300); // 300 seconds = 5 minutes expiry
+      .createSignedUrl(pdf.file_path, 3600); // 3600 seconds = 1 hour expiry
 
     if (signError || !signedData?.signedUrl) {
+      console.error("Storage signError:", signError);
       return NextResponse.json(
         { error: "Failed to generate secure access token for file" },
         { status: 500 }
@@ -93,7 +89,13 @@ export async function GET(req: Request) {
     return NextResponse.json({
       success: true,
       signedUrl: signedData.signedUrl,
-      expiresInSeconds: 300,
+      title: pdf.title,
+      sub_heading: pdf.sub_heading,
+      class_level: pdf.class_level,
+      page_count: pdf.page_count,
+      is_free: pdf.is_free,
+      price: pdf.price,
+      expiresInSeconds: 3600,
     });
   } catch (error: any) {
     console.error("PDF access error:", error);
@@ -103,4 +105,5 @@ export async function GET(req: Request) {
     );
   }
 }
+
 

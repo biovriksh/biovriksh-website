@@ -153,7 +153,7 @@ export default function ShortNotes() {
                     </div>
 
                     <a
-                      href={`/secure-reader?title=${encodeURIComponent(note.title)}&subject=${encodeURIComponent(note.subtitle)}&pages=${encodeURIComponent(note.pages)}`}
+                      href={`/secure-reader?pdfId=${note.id}&title=${encodeURIComponent(note.title)}&subject=${encodeURIComponent(note.subtitle)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full py-2.5 rounded-xl border border-[#016737] text-[#016737] text-xs font-bold hover:bg-[#016737] hover:text-white transition-all flex items-center justify-center gap-1.5 shadow-2xs text-center"

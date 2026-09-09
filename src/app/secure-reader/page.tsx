@@ -16,13 +16,21 @@ import {
   Sparkles,
   CheckCircle2,
   Lock,
+  AlertCircle,
+  RefreshCw,
 } from "lucide-react";
 
 function SecureReaderContent() {
   const searchParams = useSearchParams();
-  const title = searchParams.get("title") || "Class 12 Biology - High Yield NCERT Notes";
-  const subject = searchParams.get("subject") || "NEET / Board Exam Special Edition";
-  const pagesCount = parseInt(searchParams.get("pages") || "18", 10) || 18;
+  const pdfId = searchParams.get("pdfId") || searchParams.get("id");
+  const titleParam = searchParams.get("title") || "Bio Vriksh Study Note";
+  const subjectParam = searchParams.get("subject") || "NEET Biology Series";
+  const pagesCountParam = parseInt(searchParams.get("pages") || "1", 10) || 1;
+
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [loadingPdf, setLoadingPdf] = useState<boolean>(true);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+  const [pdfMeta, setPdfMeta] = useState<any>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [zoom, setZoom] = useState(100);
@@ -30,19 +38,57 @@ function SecureReaderContent() {
   const [isProtected, setIsProtected] = useState(false);
   const readerRef = useRef<HTMLDivElement>(null);
 
+  // 1. Fetch live signed PDF URL from Supabase storage
   useEffect(() => {
-    // 1. Prevent Right Click / Context Menu
+    let isMounted = true;
+
+    async function fetchPdf() {
+      if (!pdfId) {
+        setLoadingPdf(false);
+        setPdfError("No note selected. Please select a note from the Bio Vriksh website.");
+        return;
+      }
+
+      try {
+        setLoadingPdf(true);
+        setPdfError(null);
+
+        const res = await fetch(`/api/pdf-url?pdfId=${encodeURIComponent(pdfId)}`);
+        const json = await res.json();
+
+        if (!isMounted) return;
+
+        if (res.ok && json.signedUrl) {
+          setPdfUrl(json.signedUrl);
+          setPdfMeta(json);
+        } else {
+          setPdfError(json.error || "Unable to open PDF document.");
+        }
+      } catch (err: any) {
+        if (isMounted) setPdfError("Network error while connecting to secure PDF server.");
+      } finally {
+        if (isMounted) setLoadingPdf(false);
+      }
+    }
+
+    fetchPdf();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [pdfId]);
+
+  // 2. DRM Security Protections (Screenshot blackout, Right click disable, Print lock)
+  useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
     document.addEventListener("contextmenu", handleContextMenu);
 
-    // 2. Prevent Copy / Cut / Drag
     const handleCopy = (e: ClipboardEvent) => e.preventDefault();
     const handleDrag = (e: DragEvent) => e.preventDefault();
     document.addEventListener("copy", handleCopy);
     document.addEventListener("cut", handleCopy);
     document.addEventListener("dragstart", handleDrag);
 
-    // 3. Detect Screenshot & Recording Shortcuts (PrintScreen, Win+Shift+S, Cmd+Shift+4, Ctrl+P, F12)
     const handleKeyDown = (e: KeyboardEvent) => {
       const isPrintScreen = e.key === "PrintScreen";
       const isMacScreenshot = e.metaKey && e.shiftKey && (e.key === "3" || e.key === "4" || e.key === "5" || e.key === "s");
@@ -69,7 +115,6 @@ function SecureReaderContent() {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
 
-    // 4. Blur / Blackout when window loses focus (Snipping tool / OS screenshot capture mode)
     const handleMouseLeave = () => setIsProtected(true);
     const handleMouseEnter = () => setIsProtected(false);
     const handleBlur = () => setIsProtected(true);
@@ -99,13 +144,17 @@ function SecureReaderContent() {
     };
   }, []);
 
+  const displayTitle = pdfMeta?.title || titleParam;
+  const displaySubject = pdfMeta?.sub_heading || pdfMeta?.class_level || subjectParam;
+  const displayPagesCount = pdfMeta?.page_count || pagesCountParam;
+
   return (
     <div
       className={`min-h-screen flex flex-col select-none relative overflow-x-hidden font-sans transition-colors duration-300 ${
         isDarkMode ? "bg-[#0B0F17] text-gray-100" : "bg-[#F4F5F7] text-gray-900"
       }`}
     >
-      {/* ═══ PRINT LOCK CSS STYLES (Blanks output if printed or screen-dumped) ═══ */}
+      {/* ═══ PRINT LOCK CSS STYLES ═══ */}
       <style jsx global>{`
         @media print {
           body {
@@ -127,8 +176,8 @@ function SecureReaderContent() {
         <div className="w-full flex items-center justify-between gap-3 border-b border-gray-200/50 dark:border-gray-800 pb-2">
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
             <BookOpen className="w-5 h-5 text-[#016737] shrink-0" />
-            <h1 className="text-base sm:text-lg md:text-xl font-black text-[#016737] dark:text-[#8BC43F] leading-tight font-sans tracking-tight">
-              {title}
+            <h1 className="text-base sm:text-lg md:text-xl font-black text-[#016737] dark:text-[#8BC43F] leading-tight font-sans tracking-tight truncate">
+              {displayTitle}
             </h1>
           </div>
 
@@ -143,56 +192,23 @@ function SecureReaderContent() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => window.close()}
-              className="px-3.5 py-1.5 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white transition-colors flex items-center gap-1.5 text-xs font-bold shrink-0 shadow-xs"
+              className="px-3.5 py-1.5 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white transition-colors flex items-center gap-1.5 text-xs font-bold shrink-0 shadow-xs cursor-pointer"
               title="Close Reader"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Close Reader</span>
             </button>
             <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-              {subject}
+              {displaySubject}
             </span>
           </div>
 
-          {/* Right: Page Selector, Theme & Zoom */}
+          {/* Right: Theme & Zoom */}
           <div className="flex items-center gap-3 ml-auto">
-            {/* Pages Indicator - 100% Theme Synced */}
-            <div
-              className={`flex items-center gap-2 border px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
-                isDarkMode
-                  ? "bg-[#1E293B] border-gray-700 text-gray-200"
-                  : "bg-gray-100 border-gray-200 text-gray-800"
-              }`}
-            >
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className={`p-1 rounded disabled:opacity-30 transition-colors ${
-                  isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"
-                }`}
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-
-              <span className="px-2 font-mono">
-                Page {currentPage} / {pagesCount}
-              </span>
-
-              <button
-                onClick={() => setCurrentPage((p) => Math.min(pagesCount, p + 1))}
-                disabled={currentPage === pagesCount}
-                className={`p-1 rounded disabled:opacity-30 transition-colors ${
-                  isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"
-                }`}
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-
             {/* Dark / Light Toggle */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className={`p-2 rounded-xl border transition-colors ${
+              className={`p-2 rounded-xl border transition-colors cursor-pointer ${
                 isDarkMode
                   ? "bg-[#1E293B] border-gray-700 text-amber-400 hover:bg-gray-800"
                   : "bg-gray-100 border-gray-200 text-[#016737] hover:bg-gray-200"
@@ -250,7 +266,7 @@ function SecureReaderContent() {
       {/* ═══ MAIN DOCUMENT VIEWER CANVAS ═══ */}
       <main
         ref={readerRef}
-        className="flex-1 p-4 sm:p-8 flex justify-center items-start relative overflow-y-auto"
+        className="flex-1 p-4 sm:p-6 flex justify-center items-start relative overflow-y-auto"
       >
         {/* Sleek Watermark Overlay */}
         <div className="absolute inset-0 pointer-events-none z-20 opacity-[0.035] overflow-hidden flex flex-wrap justify-around p-12 select-none">
@@ -264,129 +280,58 @@ function SecureReaderContent() {
           ))}
         </div>
 
-        {/* ═══ ELEGANT HIGH-QUALITY PDF PAPER ═══ */}
-        <div
-          className={`w-full max-w-4xl rounded-2xl shadow-xl p-6 sm:p-12 transition-all duration-300 relative border ${
-            isDarkMode
-              ? "bg-[#131B2A] border-gray-800 text-gray-100 shadow-emerald-950/20"
-              : "bg-white border-gray-200 text-gray-900 shadow-gray-200/80"
-          }`}
-          style={{
-            transform: `scale(${zoom / 100})`,
-            transformOrigin: "top center",
-          }}
-        >
-          {/* Header Bar inside Paper */}
-          <div className="flex items-center justify-between border-b border-gray-200/40 pb-4 mb-6">
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-[#016737]" />
-              <span className="font-extrabold text-sm text-[#016737]">Bio Vriksh Official Study Notes</span>
-            </div>
-            <span className="text-xs font-bold text-gray-400">Page {currentPage} of {pagesCount}</span>
-          </div>
-
-          {/* Chapter Header */}
-          <div className="mb-8">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#016737]/10 text-[#016737] text-xs font-bold mb-3">
-              <Sparkles className="w-3.5 h-3.5 text-[#8BC43F]" />
-              <span>{subject}</span>
-            </div>
-
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 text-[#016737] dark:text-[#8BC43F]">
-              {title}
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-500 font-medium">
-              NEET / Board High-Yield Summary • Fully NCERT Aligned
+        {/* DOCUMENT CONTAINER */}
+        {loadingPdf ? (
+          <div className="flex flex-col items-center justify-center my-auto py-24 gap-3">
+            <div className="w-12 h-12 border-4 border-[#016737] border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm font-black text-[#016737] dark:text-[#8BC43F]">
+              Decrypting &amp; Loading Secure Note...
             </p>
+            <p className="text-xs text-gray-500">Preparing DRM protected document viewer</p>
           </div>
-
-          {/* Beautiful Document Content */}
-          <div className="space-y-6 text-sm leading-relaxed">
-            {/* High-Yield Alert Box */}
-            <div className="p-4 rounded-xl bg-emerald-50/80 border border-emerald-200/80 text-[#016737] font-medium text-xs flex items-center gap-2.5">
-              <CheckCircle2 className="w-5 h-5 text-[#016737] shrink-0" />
-              <span>NCERT Exam Priority: Chapter key concepts &amp; diagrammatic flowcharts carefully structured for quick revision.</span>
+        ) : pdfError ? (
+          <div className="flex flex-col items-center justify-center my-auto max-w-md mx-auto text-center p-8 bg-white dark:bg-[#131B2A] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-xl">
+            <div className="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-4 text-amber-600">
+              <Lock className="w-8 h-8" />
             </div>
-
-            {/* Concept Section 1 */}
-            <section className="space-y-3">
-              <h3 className="text-base font-bold text-[#016737] border-b border-emerald-100/60 pb-1.5 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-[#016737] text-white text-xs flex items-center justify-center font-bold">1</span>
-                <span>Core Biological Principles</span>
-              </h3>
-              <p className={isDarkMode ? "text-gray-300" : "text-gray-700"}>
-                Biological organization exhibits structural hierarchy ranging from sub-atomic particles to complex biomes. Cellular metabolism is governed by enzymatic kinetics and precise genetic regulation.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-4">
-                <div className={`p-4 rounded-xl border ${isDarkMode ? "bg-[#1C2638] border-gray-700" : "bg-gray-50 border-gray-200"}`}>
-                  <h4 className="font-bold text-xs text-[#016737] mb-1">Mendelian Genetics Ratio</h4>
-                  <p className="text-xs text-gray-500 mb-2">Monohybrid phenotypic ratio 3:1, Genotypic ratio 1:2:1.</p>
-                  <span className="inline-block text-[11px] font-mono font-bold bg-[#016737]/10 text-[#016737] px-2 py-0.5 rounded">
-                    Dihybrid = 9 : 3 : 3 : 1
-                  </span>
-                </div>
-
-                <div className={`p-4 rounded-xl border ${isDarkMode ? "bg-[#1C2638] border-gray-700" : "bg-gray-50 border-gray-200"}`}>
-                  <h4 className="font-bold text-xs text-[#016737] mb-1">Cell Cycle Checkpoints</h4>
-                  <p className="text-xs text-gray-500 mb-2">G₁/S transition is the primary restriction point controlled by Cyclin D-CDK4.</p>
-                  <span className="inline-block text-[11px] font-mono font-bold bg-[#016737]/10 text-[#016737] px-2 py-0.5 rounded">
-                    G₁ → S → G₂ → M
-                  </span>
-                </div>
-              </div>
-            </section>
-
-            {/* Concept Section 2 */}
-            <section className="space-y-3">
-              <h3 className="text-base font-bold text-[#016737] border-b border-emerald-100/60 pb-1.5 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-[#016737] text-white text-xs flex items-center justify-center font-bold">2</span>
-                <span>Important Exam Diagrams &amp; Flowcharts</span>
-              </h3>
-
-              <div className={`p-5 rounded-xl border flex flex-col items-center justify-center text-center ${isDarkMode ? "bg-[#1C2638] border-gray-700" : "bg-emerald-50/40 border-emerald-200/60"}`}>
-                <div className="w-14 h-14 rounded-2xl bg-[#016737]/15 flex items-center justify-center text-[#016737] mb-3">
-                  <BookOpen className="w-7 h-7" />
-                </div>
-                <h4 className="font-bold text-sm text-gray-900 dark:text-gray-100 mb-1">NCERT Figure 8.4 — Ultra-Structure of Plant Cell</h4>
-                <p className="text-xs text-gray-500 max-w-md">
-                  Demonstrates Chloroplast thylakoid stacking (Grana), Plasmodesmata cell wall junctions, and Central Vacuole membrane (Tonoplast).
-                </p>
-              </div>
-            </section>
-
-            {/* Concept Section 3 */}
-            <section className="space-y-3">
-              <h3 className="text-base font-bold text-[#016737] border-b border-emerald-100/60 pb-1.5 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-[#016737] text-white text-xs flex items-center justify-center font-bold">3</span>
-                <span>High-Yield Revision Points</span>
-              </h3>
-              <ul className="space-y-2 text-xs">
-                <li className="flex items-start gap-2">
-                  <span className="text-[#016737] font-bold">•</span>
-                  <span className={isDarkMode ? "text-gray-300" : "text-gray-700"}>
-                    <strong className="text-[#016737]">RuBisCO:</strong> Most abundant enzyme on Earth. Possesses both oxygenase and carboxylase activity.
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#016737] font-bold">•</span>
-                  <span className={isDarkMode ? "text-gray-300" : "text-gray-700"}>
-                    <strong className="text-[#016737]">C₄ Plants:</strong> Possess Kranz Anatomy. Avoid photorespiration and show higher temperature tolerance.
-                  </span>
-                </li>
-              </ul>
-            </section>
+            <h2 className="text-xl font-extrabold mb-2 text-gray-900 dark:text-white">Note Access Locked</h2>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+              {pdfError}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 w-full">
+              <button
+                onClick={() => window.close()}
+                className="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-xs font-bold transition-all cursor-pointer"
+              >
+                Close Reader
+              </button>
+              <a
+                href="/#pricing"
+                className="flex-1 py-2.5 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#8BC43F]" />
+                <span>Unlock Note</span>
+              </a>
+            </div>
           </div>
-
-          {/* Paper Footer */}
-          <div className="mt-12 pt-4 border-t border-gray-200/40 flex items-center justify-between text-xs text-gray-400">
-            <span>Bio Vriksh Digital Learning Platform</span>
-            <span>Protected DRM • Student Edition</span>
+        ) : (
+          <div
+            className="w-full max-w-5xl rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800 relative bg-white"
+            style={{
+              transform: `scale(${zoom / 100})`,
+              transformOrigin: "top center",
+            }}
+          >
+            <iframe
+              src={`${pdfUrl}#toolbar=0&navpanes=0&view=FitH`}
+              className="w-full h-[78vh] sm:h-[84vh] border-0"
+              title={displayTitle}
+            />
           </div>
-        </div>
+        )}
       </main>
 
-      {/* ═══ BOTTOM NAVIGATION BAR — 100% Theme Synced ═══ */}
+      {/* ═══ BOTTOM NAVIGATION BAR ═══ */}
       <footer
         className={`px-4 py-2.5 flex items-center justify-between shadow-xs sticky bottom-0 z-40 text-xs border-t transition-colors duration-300 ${
           isDarkMode
@@ -398,25 +343,9 @@ function SecureReaderContent() {
           Bio Vriksh DRM Secure Reader
         </span>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="px-3.5 py-1.5 rounded-lg bg-[#016737] text-white disabled:opacity-40 font-bold transition-colors shadow-xs"
-          >
-            ← Previous Page
-          </button>
-          <span className="font-mono font-bold text-[#016737] dark:text-[#8BC43F]">
-            {currentPage} / {pagesCount}
-          </span>
-          <button
-            onClick={() => setCurrentPage((p) => Math.min(pagesCount, p + 1))}
-            disabled={currentPage === pagesCount}
-            className="px-3.5 py-1.5 rounded-lg bg-[#016737] text-white disabled:opacity-40 font-bold transition-colors shadow-xs"
-          >
-            Next Page →
-          </button>
-        </div>
+        <span className="font-mono font-bold text-[#016737] dark:text-[#8BC43F]">
+          {displayTitle}
+        </span>
       </footer>
     </div>
   );
@@ -435,3 +364,4 @@ export default function SecureReaderPage() {
     </Suspense>
   );
 }
+

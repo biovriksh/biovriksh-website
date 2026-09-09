@@ -344,7 +344,7 @@ export default function ChaptersPage() {
                           Chapter High-Yield Overview
                         </h4>
                         <a
-                          href={`/secure-reader?title=${encodeURIComponent(activeChapter.title)}&subject=${encodeURIComponent(activeChapter.classLevel + " · " + activeChapter.unit)}`}
+                          href={`/secure-reader?pdfId=${activeChapter.id}&title=${encodeURIComponent(activeChapter.title)}&subject=${encodeURIComponent(activeChapter.classLevel + " · " + activeChapter.unit)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-[11px] font-extrabold px-3 py-1.5 rounded-full bg-[#016737] text-white hover:bg-[#014d29] transition-colors flex items-center gap-1 shadow-2xs"
