@@ -13,6 +13,7 @@ import {
   Trash2,
   Flame,
   Search,
+  Pencil,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { PDFNote, NoteType, ClassLevel } from "@/types/database";
@@ -28,6 +29,7 @@ export default function AdminPDFsPage() {
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPdf, setEditingPdf] = useState<PDFNote | null>(null);
 
   // Form State
   const [targetSection, setTargetSection] = useState<NoteType>("paid"); // "paid" | "short"
@@ -61,19 +63,49 @@ export default function AdminPDFsPage() {
     fetchData();
   }, []);
 
-  // Upload PDF Handler
-  const handleUploadPDF = async (e: React.FormEvent) => {
+  const handleOpenUploadModal = () => {
+    setEditingPdf(null);
+    setTitle("");
+    setDescription("");
+    setTargetSection("paid");
+    setClassLevel("Class 12");
+    setPrice(49);
+    setPageCount(12);
+    setIsRecent(false);
+    setPdfFile(null);
+    setThumbnailFile(null);
+    setStatusMessage("");
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (pdf: PDFNote) => {
+    setEditingPdf(pdf);
+    setTitle(pdf.title || "");
+    setDescription(pdf.description || "");
+    setTargetSection(pdf.note_type === "short" || pdf.is_free ? "short" : "paid");
+    setClassLevel((pdf.class_level as ClassLevel) || "Class 12");
+    setPrice(pdf.price || (pdf.is_free ? 0 : 49));
+    setPageCount(pdf.page_count || 12);
+    setIsRecent(pdf.is_recent || false);
+    setPdfFile(null);
+    setThumbnailFile(null);
+    setStatusMessage("");
+    setIsModalOpen(true);
+  };
+
+  // Upload or Update PDF Handler
+  const handleSavePDF = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
 
     setLoading(true);
-    setStatusMessage("Preparing secure upload...");
+    setStatusMessage("Preparing secure file upload...");
 
     try {
-      let thumbnailUrl = "/hero_premium_clean.png";
-      let filePath = `notes_${Date.now()}.pdf`;
+      let thumbnailUrl: string | undefined = undefined;
+      let filePath: string | undefined = undefined;
 
-      // 1. Upload Cover Image / Thumbnail via Signed Upload URL
+      // 1. Upload Cover Image if new file selected
       if (thumbnailFile) {
         setStatusMessage("Uploading Cover Image...");
         const urlRes = await fetch("/api/admin/create-upload-url", {
@@ -96,12 +128,12 @@ export default function AdminPDFsPage() {
           if (uploadRes.ok) {
             thumbnailUrl = urlJson.publicUrl;
           } else {
-            console.warn("Thumbnail signed upload failed, status:", uploadRes.status);
+            console.warn("Thumbnail upload failed, status:", uploadRes.status);
           }
         }
       }
 
-      // 2. Upload PDF Document via Signed Upload URL (Bypasses Vercel payload limits completely)
+      // 2. Upload PDF Document if new file selected
       if (pdfFile) {
         setStatusMessage("Uploading PDF Document to Storage...");
         const urlRes = await fetch("/api/admin/create-upload-url", {
@@ -124,49 +156,92 @@ export default function AdminPDFsPage() {
           if (uploadRes.ok) {
             filePath = urlJson.path;
           } else {
-            console.warn("PDF signed upload failed, status:", uploadRes.status);
+            console.warn("PDF upload failed, status:", uploadRes.status);
           }
         }
       }
 
-      setStatusMessage("Saving Note Record to Database...");
+      if (editingPdf) {
+        // UPDATE EXISTING NOTE RECORD
+        setStatusMessage("Updating Note Record in Database...");
+        const res = await fetch("/api/admin/manage-pdf", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "update",
+            id: editingPdf.id,
+            title,
+            description,
+            targetSection,
+            classLevel,
+            price: targetSection === "short" ? 0 : price,
+            pageCount,
+            isRecent,
+            thumbnailUrl: thumbnailUrl || editingPdf.thumbnail_url,
+            filePath: filePath || editingPdf.file_path,
+          }),
+        });
 
-      // 3. Send small 1KB JSON payload to Server API Route
-      const res = await fetch("/api/admin/upload-pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          description,
-          targetSection,
-          classLevel,
-          price,
-          pageCount,
-          isRecent,
-          thumbnailUrl,
-          filePath,
-        }),
-      });
+        const text = await res.text();
+        let result: any = {};
+        try {
+          result = JSON.parse(text);
+        } catch (parseErr) {
+          throw new Error(text || "Server update error occurred");
+        }
 
-      const text = await res.text();
-      let result: any = {};
-      try {
-        result = JSON.parse(text);
-      } catch (parseErr) {
-        throw new Error(text || "Server upload error occurred");
-      }
+        if (!res.ok || !result.success) {
+          throw new Error(result.error || "Failed to update note");
+        }
 
-      if (!res.ok || !result.success) {
-        throw new Error(result.error || "Failed to upload note");
-      }
+        if (result.pdf) {
+          setPdfs((prev) => prev.map((p) => (p.id === result.pdf.id ? result.pdf : p)));
+          alert("PDF Note Updated Successfully!");
+        }
+      } else {
+        // CREATE NEW NOTE RECORD
+        if (!pdfFile && !filePath) {
+          throw new Error("Please select a PDF document file to upload.");
+        }
 
-      if (result.pdf) {
-        setPdfs((prev) => [result.pdf, ...prev]);
-        alert("PDF Note & Cover Image Uploaded Successfully!");
+        setStatusMessage("Saving Note Record to Database...");
+        const res = await fetch("/api/admin/upload-pdf", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title,
+            description,
+            targetSection,
+            classLevel,
+            price: targetSection === "short" ? 0 : price,
+            pageCount,
+            isRecent,
+            thumbnailUrl: thumbnailUrl || "/hero_premium_clean.png",
+            filePath: filePath || `notes_${Date.now()}.pdf`,
+          }),
+        });
+
+        const text = await res.text();
+        let result: any = {};
+        try {
+          result = JSON.parse(text);
+        } catch (parseErr) {
+          throw new Error(text || "Server upload error occurred");
+        }
+
+        if (!res.ok || !result.success) {
+          throw new Error(result.error || "Failed to upload note");
+        }
+
+        if (result.pdf) {
+          setPdfs((prev) => [result.pdf, ...prev]);
+          alert("PDF Note & Cover Image Uploaded Successfully!");
+        }
       }
 
       // Reset Form & Close Modal
       setIsModalOpen(false);
+      setEditingPdf(null);
       setTitle("");
       setDescription("");
       setPdfFile(null);
@@ -174,9 +249,9 @@ export default function AdminPDFsPage() {
       setIsRecent(false);
       setStatusMessage("");
     } catch (e: any) {
-      console.error("Upload failed:", e);
-      setStatusMessage(`Error: ${e.message || "Failed to upload note"}`);
-      alert(`Upload Failed: ${e.message || "Unknown error"}`);
+      console.error("Save failed:", e);
+      setStatusMessage(`Error: ${e.message || "Failed to save note"}`);
+      alert(`Save Failed: ${e.message || "Unknown error"}`);
     } finally {
       setLoading(false);
     }
@@ -231,11 +306,9 @@ export default function AdminPDFsPage() {
 
   // Filtered PDFs List according to Website Section Tabs
   const filteredPdfs = pdfs.filter((pdf) => {
-    // 1. Search Query filter
     const matchesSearch = pdf.title.toLowerCase().includes(searchQuery.toLowerCase());
     if (!matchesSearch) return false;
 
-    // 2. Website Section Tab filter
     if (activeSectionTab === "all") return true;
     if (activeSectionTab === "paid") return pdf.note_type === "paid" && !pdf.is_free;
     if (activeSectionTab === "short") return pdf.note_type === "short" || pdf.is_free;
@@ -254,13 +327,13 @@ export default function AdminPDFsPage() {
             <span>Study Notes &amp; PDF Manager</span>
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Manage Paid PDF Notes, Free Short Notes &amp; Mindmaps, and toggle Trending items.
+            Upload, edit, manage Paid PDF Notes, Free Short Notes &amp; Mindmaps, and toggle Trending items.
           </p>
         </div>
 
         <button
-          onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2.5 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-bold transition-all flex items-center gap-2 shadow-md shadow-[#016737]/20 shrink-0"
+          onClick={handleOpenUploadModal}
+          className="px-4 py-2.5 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-bold transition-all flex items-center gap-2 shadow-md shadow-[#016737]/20 shrink-0 cursor-pointer"
         >
           <Plus className="w-4 h-4 text-[#8BC43F]" />
           <span>Upload New PDF Note</span>
@@ -298,7 +371,7 @@ export default function AdminPDFsPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveSectionTab(tab.id)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
                   isActive
                     ? "bg-[#016737] text-white shadow-xs"
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
@@ -388,12 +461,12 @@ export default function AdminPDFsPage() {
                 </div>
               </div>
 
-              {/* Action Controls Footer with Quick Recent Toggle */}
+              {/* Action Controls Footer */}
               <div className="p-3 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs">
-                {/* Single Click Recent/Trending Button */}
+                {/* Recent / Trending Button */}
                 <button
                   onClick={() => toggleRecentStatus(pdf.id, pdf.is_recent)}
-                  className={`px-2.5 py-1 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1 border ${
+                  className={`px-2 py-1 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1 border cursor-pointer ${
                     pdf.is_recent
                       ? "bg-rose-500 text-white border-rose-600 shadow-xs"
                       : "bg-white text-slate-600 border-slate-200 hover:bg-rose-50 hover:text-rose-600"
@@ -401,14 +474,23 @@ export default function AdminPDFsPage() {
                   title={pdf.is_recent ? "Remove from Recent/Trending" : "Feature in Recent/Trending on Homepage"}
                 >
                   <Flame className={`w-3 h-3 ${pdf.is_recent ? "fill-white" : ""}`} />
-                  <span>{pdf.is_recent ? "Trending Active" : "+ Add to Recent"}</span>
+                  <span>{pdf.is_recent ? "Trending" : "+ Trending"}</span>
                 </button>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1">
+                  {/* Edit Button */}
+                  <button
+                    onClick={() => handleOpenEditModal(pdf)}
+                    className="p-1.5 rounded-lg text-slate-600 hover:text-[#016737] hover:bg-[#016737]/10 transition-colors border border-slate-200 bg-white cursor-pointer"
+                    title="Edit Note Details / Replace File"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+
                   {/* Active Toggle */}
                   <button
                     onClick={() => toggleActiveStatus(pdf.id, pdf.is_active)}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all ${
+                    className={`px-2 py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
                       pdf.is_active
                         ? "bg-emerald-50 text-emerald-800 border-emerald-200"
                         : "bg-slate-100 text-slate-500 border-slate-200"
@@ -417,9 +499,10 @@ export default function AdminPDFsPage() {
                     {pdf.is_active ? "Published" : "Hidden"}
                   </button>
 
+                  {/* Delete Button */}
                   <button
                     onClick={() => handleDeletePdf(pdf.id)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                     title="Delete Note"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -439,7 +522,7 @@ export default function AdminPDFsPage() {
         )}
       </div>
 
-      {/* ═══ UPLOAD MODAL ═══ */}
+      {/* ═══ UPLOAD & EDIT MODAL ═══ */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-xl w-full max-h-[92vh] flex flex-col shadow-2xl">
@@ -447,26 +530,26 @@ export default function AdminPDFsPage() {
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div>
                 <span className="text-[10px] font-bold text-[#016737] bg-[#016737]/10 px-2.5 py-0.5 rounded-md uppercase font-mono">
-                  Website Upload Manager
+                  {editingPdf ? "Edit Note Record" : "Website Upload Manager"}
                 </span>
                 <h2 className="text-base font-bold text-slate-900 mt-1 flex items-center gap-2">
                   <FileText className="w-4.5 h-4.5 text-[#016737]" />
-                  <span>Upload PDF Study Note</span>
+                  <span>{editingPdf ? `Edit Note: ${editingPdf.title}` : "Upload PDF Study Note"}</span>
                 </h2>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-900"
+                className="p-1.5 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-900 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Scrollable Form */}
-            <form id="pdf-upload-form" onSubmit={handleUploadPDF} className="flex-1 overflow-y-auto py-5 space-y-5">
+            <form id="pdf-upload-form" onSubmit={handleSavePDF} className="flex-1 overflow-y-auto py-5 space-y-5">
               {/* STEP 1: Choose Target Website Section */}
               <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-900 uppercase tracking-wider text-slate-500">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500">
                   1. Target Website Section
                 </label>
 
@@ -475,7 +558,7 @@ export default function AdminPDFsPage() {
                   <button
                     type="button"
                     onClick={() => setTargetSection("paid")}
-                    className={`p-3 rounded-xl border text-left transition-all ${
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       targetSection === "paid"
                         ? "border-[#016737] bg-[#016737]/5 shadow-xs"
                         : "border-slate-200 hover:border-slate-300 bg-white"
@@ -497,7 +580,7 @@ export default function AdminPDFsPage() {
                   <button
                     type="button"
                     onClick={() => setTargetSection("short")}
-                    className={`p-3 rounded-xl border text-left transition-all ${
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       targetSection === "short"
                         ? "border-[#016737] bg-[#016737]/5 shadow-xs"
                         : "border-slate-200 hover:border-slate-300 bg-white"
@@ -519,7 +602,7 @@ export default function AdminPDFsPage() {
 
               {/* STEP 2: General Information */}
               <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3.5">
-                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider text-slate-500">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
                   2. Note Title &amp; Details
                 </h4>
 
@@ -611,7 +694,7 @@ export default function AdminPDFsPage() {
                   <button
                     type="button"
                     onClick={() => setIsRecent(!isRecent)}
-                    className={`w-11 h-6 rounded-full transition-colors relative p-0.5 shrink-0 ${
+                    className={`w-11 h-6 rounded-full transition-colors relative p-0.5 shrink-0 cursor-pointer ${
                       isRecent ? "bg-rose-500" : "bg-slate-300"
                     }`}
                   >
@@ -626,7 +709,7 @@ export default function AdminPDFsPage() {
 
               {/* STEP 3: File Upload Zones */}
               <div className="space-y-3">
-                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider text-slate-500">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
                   3. Select Files (PDF Document &amp; Cover Image)
                 </h4>
 
@@ -635,17 +718,25 @@ export default function AdminPDFsPage() {
                   <div className="bg-slate-50 border-2 border-dashed border-slate-300 p-4 rounded-xl text-center space-y-2 hover:border-[#016737] transition-all">
                     <Upload className="w-6 h-6 text-[#016737] mx-auto" />
                     <div>
-                      <span className="text-xs font-bold text-slate-800 block">
-                        {pdfFile ? pdfFile.name : "Choose PDF Document"}
+                      <span className="text-xs font-bold text-slate-800 block truncate">
+                        {pdfFile
+                          ? pdfFile.name
+                          : editingPdf
+                          ? "Replace PDF File (Optional)"
+                          : "Choose PDF Document"}
                       </span>
                       <span className="text-[10px] text-slate-400">
-                        {pdfFile ? `${(pdfFile.size / 1024 / 1024).toFixed(2)} MB` : ".pdf files up to 50MB"}
+                        {pdfFile
+                          ? `${(pdfFile.size / 1024 / 1024).toFixed(2)} MB`
+                          : editingPdf
+                          ? "Leave blank to keep existing PDF"
+                          : ".pdf files up to 50MB"}
                       </span>
                     </div>
                     <input
                       type="file"
                       accept=".pdf"
-                      required
+                      required={!editingPdf}
                       onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
                       className="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#016737] file:text-white hover:file:bg-[#014d29] cursor-pointer"
                     />
@@ -655,11 +746,17 @@ export default function AdminPDFsPage() {
                   <div className="bg-slate-50 border-2 border-dashed border-slate-300 p-4 rounded-xl text-center space-y-2 hover:border-[#016737] transition-all">
                     <ImageIcon className="w-6 h-6 text-slate-400 mx-auto" />
                     <div>
-                      <span className="text-xs font-bold text-slate-800 block">
-                        {thumbnailFile ? thumbnailFile.name : "Cover Thumbnail Image"}
+                      <span className="text-xs font-bold text-slate-800 block truncate">
+                        {thumbnailFile
+                          ? thumbnailFile.name
+                          : editingPdf
+                          ? "Replace Thumbnail Image (Optional)"
+                          : "Cover Thumbnail Image"}
                       </span>
                       <span className="text-[10px] text-slate-400">
-                        .jpg, .png, .webp (Optional)
+                        {thumbnailFile
+                          ? `${(thumbnailFile.size / 1024 / 1024).toFixed(2)} MB`
+                          : "Leave blank to keep existing cover"}
                       </span>
                     </div>
                     <input
@@ -683,14 +780,14 @@ export default function AdminPDFsPage() {
             {/* Modal Controls Footer */}
             <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
               <span className="text-[11px] text-slate-400 font-medium">
-                Note will be published directly to website.
+                Changes will reflect live on website instantly.
               </span>
 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition-all"
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -698,9 +795,9 @@ export default function AdminPDFsPage() {
                   type="submit"
                   form="pdf-upload-form"
                   disabled={loading}
-                  className="px-5 py-2 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-bold transition-all shadow-md shadow-[#016737]/20 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-bold transition-all shadow-md shadow-[#016737]/20 disabled:opacity-50 cursor-pointer"
                 >
-                  Publish PDF Note
+                  {editingPdf ? "Save & Update Note" : "Publish PDF Note"}
                 </button>
               </div>
             </div>
@@ -710,3 +807,4 @@ export default function AdminPDFsPage() {
     </div>
   );
 }
+
