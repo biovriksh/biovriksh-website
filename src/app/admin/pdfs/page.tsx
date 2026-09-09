@@ -45,15 +45,13 @@ export default function AdminPDFsPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { data: pdfsData } = await supabase
-        .from("pdfs")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (pdfsData) setPdfs(pdfsData as any);
+      const res = await fetch("/api/admin/manage-pdf");
+      const json = await res.json();
+      if (json.success && json.pdfs) {
+        setPdfs(json.pdfs as any);
+      }
     } catch (e) {
-      console.log("Error fetching PDFs:", e);
+      console.error("Error fetching PDFs:", e);
     } finally {
       setLoading(false);
     }
@@ -72,68 +70,32 @@ export default function AdminPDFsPage() {
     setStatusMessage("Uploading PDF to Supabase...");
 
     try {
-      const supabase = createClient();
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("targetSection", targetSection);
+      formData.append("classLevel", classLevel);
+      formData.append("price", String(price));
+      formData.append("pageCount", String(pageCount));
+      formData.append("isRecent", String(isRecent));
 
-      let thumbnailUrl = "/hero_biology_ultra_wow.png";
-      let filePath = `notes_${Date.now()}.pdf`;
+      if (pdfFile) formData.append("pdfFile", pdfFile);
+      if (thumbnailFile) formData.append("thumbnailFile", thumbnailFile);
 
-      // 1. Upload Thumbnail Image if selected
-      if (thumbnailFile) {
-        const thumbName = `thumb_${Date.now()}_${thumbnailFile.name.replace(/\s+/g, "_")}`;
-        const { data: thumbData } = await supabase.storage
-          .from("pdf-thumbnails")
-          .upload(thumbName, thumbnailFile);
+      const res = await fetch("/api/admin/upload-pdf", {
+        method: "POST",
+        body: formData,
+      });
 
-        if (thumbData) {
-          const { data: publicUrlData } = supabase.storage
-            .from("pdf-thumbnails")
-            .getPublicUrl(thumbName);
-          thumbnailUrl = publicUrlData.publicUrl;
-        }
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        throw new Error(result.error || "Failed to upload note");
       }
 
-      // 2. Upload Private PDF File if selected
-      if (pdfFile) {
-        const pdfFileName = `pdf_${Date.now()}_${pdfFile.name.replace(/\s+/g, "_")}`;
-        const { data: pdfUploadData } = await supabase.storage
-          .from("pdf-files")
-          .upload(pdfFileName, pdfFile);
-
-        if (pdfUploadData) {
-          filePath = pdfUploadData.path;
-        }
-      }
-
-      const isActuallyFree = targetSection === "short";
-      const finalPrice = isActuallyFree ? 0 : Number(price);
-
-      // 3. Insert Row in Database
-      const newPdfRow = {
-        chapter_id: null,
-        sub_heading: null,
-        title,
-        description,
-        thumbnail_url: thumbnailUrl,
-        file_path: filePath,
-        is_free: isActuallyFree,
-        price: finalPrice,
-        is_active: true,
-        is_recent: isRecent,
-        note_type: targetSection,
-        class_level: classLevel,
-        page_count: Number(pageCount),
-      };
-
-      const { data, error } = await supabase
-        .from("pdfs")
-        .insert(newPdfRow)
-        .select("*")
-        .single();
-
-      if (data) {
-        setPdfs((prev) => [data as any, ...prev]);
-      } else if (error) {
-        console.error("Database insert error:", error);
+      if (result.pdf) {
+        setPdfs((prev) => [result.pdf, ...prev]);
+        alert("PDF Uploaded Successfully!");
       }
 
       // Reset Form & Close Modal
@@ -145,8 +107,9 @@ export default function AdminPDFsPage() {
       setIsRecent(false);
       setStatusMessage("");
     } catch (e: any) {
-      console.error(e);
+      console.error("Upload failed:", e);
       setStatusMessage(`Error: ${e.message || "Failed to upload note"}`);
+      alert(`Upload Failed: ${e.message || "Unknown error"}`);
     } finally {
       setLoading(false);
     }
@@ -158,8 +121,11 @@ export default function AdminPDFsPage() {
       prev.map((p) => (p.id === id ? { ...p, is_recent: !currentStatus } : p))
     );
     try {
-      const supabase = createClient();
-      await supabase.from("pdfs").update({ is_recent: !currentStatus }).eq("id", id);
+      await fetch("/api/admin/manage-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_recent", id, currentStatus }),
+      });
     } catch (e) {
       console.error(e);
     }
@@ -171,8 +137,11 @@ export default function AdminPDFsPage() {
       prev.map((p) => (p.id === id ? { ...p, is_active: !currentStatus } : p))
     );
     try {
-      const supabase = createClient();
-      await supabase.from("pdfs").update({ is_active: !currentStatus }).eq("id", id);
+      await fetch("/api/admin/manage-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_active", id, currentStatus }),
+      });
     } catch (e) {
       console.error(e);
     }
@@ -183,8 +152,11 @@ export default function AdminPDFsPage() {
     if (!confirm("Are you sure you want to delete this PDF note?")) return;
     setPdfs((prev) => prev.filter((p) => p.id !== id));
     try {
-      const supabase = createClient();
-      await supabase.from("pdfs").delete().eq("id", id);
+      await fetch("/api/admin/manage-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete", id }),
+      });
     } catch (e) {
       console.error(e);
     }

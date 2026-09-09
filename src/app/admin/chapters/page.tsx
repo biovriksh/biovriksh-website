@@ -50,29 +50,15 @@ export default function AdminChaptersPage() {
   const fetchChaptersAndPdfs = async () => {
     setLoading(true);
     try {
-      const supabase = createClient();
+      const res = await fetch("/api/admin/manage-chapter");
+      const json = await res.json();
 
-      // 1. Fetch chapters with linked PDFs
-      const { data: chaptersData } = await supabase
-        .from("chapters")
-        .select("*, pdfs(*)")
-        .order("order_index", { ascending: true });
-
-      if (chaptersData) {
-        setChapters(chaptersData);
-      }
-
-      // 2. Fetch all published PDFs for dropdown selection
-      const { data: pdfsData } = await supabase
-        .from("pdfs")
-        .select("*")
-        .order("title", { ascending: true });
-
-      if (pdfsData) {
-        setAvailablePdfs(pdfsData);
+      if (json.success) {
+        if (json.chapters) setChapters(json.chapters);
+        if (json.pdfs) setAvailablePdfs(json.pdfs);
       }
     } catch (e) {
-      console.log("Error fetching chapters or PDFs:", e);
+      console.error("Error fetching chapters or PDFs:", e);
     } finally {
       setLoading(false);
     }
@@ -98,8 +84,11 @@ export default function AdminChaptersPage() {
     );
 
     try {
-      const supabase = createClient();
-      await supabase.from("pdfs").update({ is_recent: !currentStatus }).eq("id", pdfId);
+      await fetch("/api/admin/manage-chapter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_pdf_recent", id: pdfId, currentStatus }),
+      });
     } catch (e) {
       console.error(e);
     }
@@ -210,62 +199,31 @@ export default function AdminChaptersPage() {
 
     setLoading(true);
     try {
-      const supabase = createClient();
+      const res = await fetch("/api/admin/manage-chapter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "save_chapter",
+          name,
+          subject,
+          classLevel,
+          orderIndex: Number(orderIndex),
+          editingChapterId,
+          subHeadings,
+        }),
+      });
 
-      let targetChapterId = editingChapterId;
-
-      if (!editingChapterId) {
-        // Create new chapter
-        const { data: newCh, error } = await supabase
-          .from("chapters")
-          .insert({
-            name,
-            subject,
-            class_level: classLevel,
-            order_index: Number(orderIndex),
-            is_active: true,
-          })
-          .select()
-          .single();
-
-        if (error || !newCh) {
-          console.error(error);
-          setLoading(false);
-          return;
-        }
-        targetChapterId = newCh.id;
-      } else {
-        // Update existing chapter details
-        await supabase
-          .from("chapters")
-          .update({
-            name,
-            subject,
-            class_level: classLevel,
-            order_index: Number(orderIndex),
-          })
-          .eq("id", editingChapterId);
-      }
-
-      if (targetChapterId) {
-        // Update PDF records: Assign chapter_id and sub_heading for all selected PDFs
-        for (const sub of subHeadings) {
-          if (sub.pdfIds.length > 0) {
-            await supabase
-              .from("pdfs")
-              .update({
-                chapter_id: targetChapterId,
-                sub_heading: sub.title,
-              })
-              .in("id", sub.pdfIds);
-          }
-        }
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        alert(`Error saving chapter: ${json.error || "Unknown error"}`);
+        return;
       }
 
       setIsModalOpen(false);
       fetchChaptersAndPdfs();
-    } catch (e) {
+    } catch (e: any) {
       console.error("Error saving chapter structure:", e);
+      alert(`Error saving chapter: ${e.message || "Failed"}`);
     } finally {
       setLoading(false);
     }
@@ -278,10 +236,13 @@ export default function AdminChaptersPage() {
     );
 
     try {
-      const supabase = createClient();
-      await supabase.from("chapters").update({ is_active: !currentStatus }).eq("id", id);
+      await fetch("/api/admin/manage-chapter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_active", id, currentStatus }),
+      });
     } catch (e) {
-      // Ignored
+      console.error(e);
     }
   };
 
