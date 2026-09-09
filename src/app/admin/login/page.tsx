@@ -18,18 +18,35 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
+      const targetEmail = email.trim().toLowerCase();
+      const targetPassword = password;
+
+      // 1. Check Master Admin Fixed Credentials
+      const fixedAdminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "workwithbiovriksh@gmail.com";
+      const fixedAdminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "biovriksh@234";
+
+      if (targetEmail === fixedAdminEmail.toLowerCase() && targetPassword === fixedAdminPassword) {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("biovriksh_admin_token", "admin_authenticated_master_key");
+          localStorage.setItem("biovriksh_admin_email", fixedAdminEmail);
+        }
+        router.push("/admin");
+        router.refresh();
+        return;
+      }
+
+      // 2. Fallback to Supabase Database Role Authentication
       const supabase = createClient();
       const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: targetEmail,
+        password: targetPassword,
       });
 
       if (authError) {
-        throw new Error(authError.message);
+        throw new Error("Invalid admin email or password credentials.");
       }
 
       if (data?.user) {
-        // Verify role in profiles
         const { data: profile } = await supabase
           .from("profiles")
           .select("role")
@@ -38,7 +55,11 @@ export default function AdminLoginPage() {
 
         if (profile?.role !== "admin") {
           await supabase.auth.signOut();
-          throw new Error("Access Denied: You do not have administrator permissions.");
+          throw new Error("Access Denied: Account does not have administrator permissions.");
+        }
+
+        if (typeof window !== "undefined") {
+          localStorage.setItem("biovriksh_admin_token", "admin_authenticated_supabase");
         }
 
         router.push("/admin");
@@ -58,13 +79,17 @@ export default function AdminLoginPage() {
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#016737]/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-md bg-white border border-slate-200 p-8 rounded-3xl shadow-xl relative z-10">
-        {/* Header - Logo Only */}
+        {/* Header */}
         <div className="text-center mb-6">
           <img
             src="/logo_transparent.png"
             alt="Logo"
             className="h-20 w-auto object-contain mx-auto mb-2 drop-shadow-sm"
           />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#016737] text-xs font-extrabold uppercase tracking-wider mb-2">
+            <ShieldCheck className="w-4 h-4 text-[#8BC43F]" />
+            <span>Master Admin Portal</span>
+          </div>
           <p className="text-xs text-slate-500 font-semibold mt-1">
             Sign in with administrator credentials to access the CMS Control Panel.
           </p>
@@ -99,7 +124,7 @@ export default function AdminLoginPage() {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-              Password
+              Admin Password
             </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -117,7 +142,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-extrabold transition-all duration-300 flex items-center justify-center gap-2 shadow-md disabled:opacity-50"
+            className="w-full py-3.5 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-extrabold transition-all duration-300 flex items-center justify-center gap-2 shadow-md disabled:opacity-50 cursor-pointer"
           >
             {loading ? (
               <span>Authenticating...</span>
@@ -131,7 +156,7 @@ export default function AdminLoginPage() {
         </form>
 
         <div className="mt-8 pt-6 border-t border-slate-100 text-center text-[11px] font-semibold text-slate-400">
-          Bio Vriksh EdTech Platform • Admin Control CMS
+          Bio Vriksh EdTech Platform • Protected CMS Control Panel
         </div>
       </div>
     </div>

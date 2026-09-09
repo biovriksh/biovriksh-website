@@ -7,36 +7,42 @@ import { Plus, Minus } from "lucide-react";
 const faqs = [
   {
     id: 1,
+    question: "Is BioVriksh NEET Oriented?",
+    answer:
+      "Yes, 100%! BioVriksh is crafted specifically for NEET aspirants. Every short note, NCERT line-by-line summary, diagram explanation, and practice question set is strictly aligned with the latest NTA NEET Class 11 & 12 Biology syllabus.",
+  },
+  {
+    id: 2,
     question: "Is BioVriksh free to use?",
     answer:
       "Yes! The free plan gives you unlimited access to all chapter short notes and NCERT summaries with no login required. Premium unlocks all paid notes and practice question sets.",
   },
   {
-    id: 2,
+    id: 3,
     question: "Monthly vs Yearly Premium — what's the difference?",
     answer:
-      "Both plans unlock identical content. Premium Monthly is ₹249/month with cancel-anytime flexibility. Premium Yearly is ₹199/month (billed ₹2,388 annually), saving you ₹600 for full NEET preparation.",
+      "Both plans unlock identical content. Monthly Pass is ₹249/month with cancel-anytime flexibility. Premium Yearly is ₹199/month (billed ₹2,388 annually), saving you ₹600 for full NEET preparation.",
   },
   {
-    id: 3,
+    id: 4,
     question: "Can I download the paid notes?",
     answer:
       "Premium notes are unlocked for high-quality, instant viewing directly inside the BioVriksh platform. This keeps content updated, secure, and fresh for all members.",
   },
   {
-    id: 4,
+    id: 5,
     question: "Can I cancel anytime?",
     answer:
-      "Yes. Premium Monthly can be cancelled at any time from your account settings — no questions asked. Your access remains active until the end of the billing cycle.",
+      "Yes. Monthly Pass can be cancelled at any time from your account settings — no questions asked. Your access remains active until the end of the billing cycle.",
   },
   {
-    id: 5,
+    id: 6,
     question: "Is the content aligned with the latest NEET syllabus?",
     answer:
       "Absolutely. All notes and practice sets are strictly aligned with the latest NTA NEET Class 11 & 12 NCERT Biology syllabus.",
   },
   {
-    id: 6,
+    id: 7,
     question: "What payment methods are accepted?",
     answer:
       "We accept all major payment options via Razorpay — UPI (Google Pay, PhonePe, Paytm), Credit/Debit cards, Net Banking, and Wallets.",

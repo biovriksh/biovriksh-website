@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Preloader from "@/components/Preloader";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
@@ -17,13 +17,31 @@ import ReviewsSection from "@/components/ReviewsSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
 export default function Home() {
-  const [showPreloader, setShowPreloader] = useState(true);
+  const [showPreloader, setShowPreloader] = useState(false);
+  const [checkedSession, setCheckedSession] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hasSeen = sessionStorage.getItem("biovriksh_preloader_seen");
+      if (!hasSeen) {
+        setShowPreloader(true);
+      }
+      setCheckedSession(true);
+    }
+  }, []);
+
+  const handlePreloaderComplete = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("biovriksh_preloader_seen", "true");
+    }
+    setShowPreloader(false);
+  };
 
   return (
     <main className="min-h-screen bg-white text-[#2B2F2C] overflow-x-hidden font-sans">
-      {/* PHASE 1: PRE-LOADER ANIMATION */}
-      {showPreloader && (
-        <Preloader onComplete={() => setShowPreloader(false)} />
+      {/* PHASE 1: PRE-LOADER ANIMATION (Only shown once per browser session) */}
+      {checkedSession && showPreloader && (
+        <Preloader onComplete={handlePreloaderComplete} />
       )}
 
       {/* PHASE 2+: MAIN PAGE CONTENT */}
@@ -45,6 +63,3 @@ export default function Home() {
     </main>
   );
 }
-
-
-

@@ -139,68 +139,85 @@ export default function StudentProfilePage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-28 pb-20">
         
         {/* HEADER WELCOME BANNER */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#00381c] via-[#016737] to-[#128a4c] p-6 sm:p-8 text-white shadow-xl mb-8"
-        >
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#8BC43F]/15 rounded-full blur-3xl pointer-events-none" />
+        {(() => {
+          const rawName = profile?.full_name || user.user_metadata?.full_name || (user.email ? user.email.split("@")[0] : "Future Doctor");
+          
+          // Clean & capitalize student display name dynamically
+          const cleanName = rawName.replace(/[0-9_]/g, " ").trim();
+          const displayName = cleanName
+            .split(" ")
+            .filter(Boolean)
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+            .join(" ") || "Student";
 
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-[#8BC43F] font-black text-2xl sm:text-3xl shrink-0 shadow-inner">
-                {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : "S"}
-              </div>
+          const initialLetter = displayName.charAt(0).toUpperCase() || "S";
 
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-white/15 px-2.5 py-0.5 rounded-full border border-white/10">
-                    NEET Aspirant
-                  </span>
-                  <span className="text-[10px] font-medium text-white/70">
-                    ID: {user.id.slice(0, 8)}
-                  </span>
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#00381c] via-[#016737] to-[#014d29] p-6 sm:p-8 text-white shadow-xl mb-8 border border-emerald-800/40"
+            >
+              <div className="absolute top-0 right-0 w-96 h-96 bg-[#8BC43F]/15 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  {/* Avatar Icon */}
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#8BC43F] to-[#016737] text-white font-black text-2xl sm:text-3xl shrink-0 flex items-center justify-center shadow-lg border-2 border-white/40">
+                    {initialLetter}
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-3 py-0.5 rounded-full border border-white/20 shadow-xs" style={{ color: "#ffffff" }}>
+                        NEET Aspirant
+                      </span>
+                      <span className="text-[10px] font-mono text-emerald-200" style={{ color: "#a7f3d0" }}>
+                        ID: {user.id.slice(0, 8)}
+                      </span>
+                    </div>
+
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight" style={{ color: "#ffffff", textShadow: "0 2px 4px rgba(0,0,0,0.4)" }}>
+                      Welcome, Future Doctor {displayName}! 👨‍⚕️
+                    </h1>
+
+                    <p className="text-xs sm:text-sm text-emerald-100 mt-1 flex items-center gap-3 flex-wrap font-semibold" style={{ color: "#e2e8f0" }}>
+                      <span className="flex items-center gap-1.5">
+                        <Mail className="w-4 h-4 text-[#8BC43F]" />
+                        <span style={{ color: "#ffffff" }}>{user.email}</span>
+                      </span>
+                      {profile?.phone && (
+                        <span className="flex items-center gap-1.5">
+                          <Phone className="w-4 h-4 text-[#8BC43F]" />
+                          <span style={{ color: "#ffffff" }}>{profile.phone}</span>
+                        </span>
+                      )}
+                    </p>
+                  </div>
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl font-black text-white">
-                  Welcome, {profile?.full_name || "Student"}!
-                </h1>
+                <div className="flex items-center gap-2.5 self-start md:self-auto">
+                  <button
+                    onClick={refreshProfile}
+                    title="Refresh Profile Data"
+                    className="p-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition-colors border border-white/20 cursor-pointer shadow-xs"
+                  >
+                    <RefreshCw className="w-4 h-4 text-white" />
+                  </button>
 
-                <p className="text-xs text-white/80 mt-1 flex items-center gap-3 flex-wrap">
-                  <span className="flex items-center gap-1">
-                    <Mail className="w-3.5 h-3.5 text-[#8BC43F]" />
-                    {user.email}
-                  </span>
-                  {profile?.phone && (
-                    <span className="flex items-center gap-1">
-                      <Phone className="w-3.5 h-3.5 text-[#8BC43F]" />
-                      {profile.phone}
-                    </span>
-                  )}
-                </p>
+                  <button
+                    onClick={signOut}
+                    className="px-4 py-2.5 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white text-xs font-bold transition-all border border-rose-400/40 flex items-center gap-1.5 cursor-pointer shadow-md"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span style={{ color: "#ffffff" }}>Log Out</span>
+                  </button>
+                </div>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2 self-start md:self-auto">
-              <button
-                onClick={refreshProfile}
-                title="Refresh Profile Data"
-                className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/10"
-              >
-                <RefreshCw className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={signOut}
-                className="px-4 py-2.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-white text-xs font-bold transition-colors border border-red-500/30 flex items-center gap-1.5"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Log Out</span>
-              </button>
-            </div>
-          </div>
-        </motion.div>
+            </motion.div>
+          );
+        })()}
 
         {/* 2-COLUMN DASHBOARD GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">

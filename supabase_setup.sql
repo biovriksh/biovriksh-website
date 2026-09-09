@@ -98,8 +98,11 @@ create table if not exists public.purchases (
   payment_status text default 'success' check (payment_status in ('success', 'failed', 'pending')),
   payment_gateway_id text, -- Razorpay Transaction / Payment ID
   purchased_at timestamptz default now(),
+  expires_at timestamptz default (now() + interval '90 days'), -- 3 Months Validity
   constraint unique_student_pdf unique (student_id, pdf_id)
 );
+
+alter table public.purchases add column if not exists expires_at timestamptz default (now() + interval '90 days');
 
 -- ----------------------------------------------------------------------------
 -- 5. ROW LEVEL SECURITY (RLS) POLICIES

@@ -15,10 +15,20 @@ export default function Preloader({ onComplete }: PreloaderProps) {
     const video = videoRef.current;
     if (!video) return;
 
+    // Speed up video slightly to finish in ~4 seconds
+    video.playbackRate = 1.3;
+
     // Immediately play muted video
     video.play().catch((err) => {
       console.log("Autoplay note:", err);
     });
+
+    // Safety fallback timer to ensure transition completes in ~4s
+    const timer = setTimeout(() => {
+      handleFinish();
+    }, 4200);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const handleFinish = () => {
@@ -50,7 +60,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
         }
       }}
     >
-      <div className="relative w-full h-full flex items-center justify-center bg-white">
+      <div className="relative w-full h-full flex items-center justify-center bg-white px-4">
         <video
           ref={videoRef}
           src="/Elephant_bumps_logo_tree_animation.mp4"
@@ -59,12 +69,9 @@ export default function Preloader({ onComplete }: PreloaderProps) {
           muted
           preload="auto"
           onEnded={handleFinish}
-          className="w-full h-full object-cover select-none"
+          className="max-w-2xl md:max-w-3xl w-full h-auto object-contain bg-white mix-blend-multiply select-none"
         />
       </div>
     </motion.div>
   );
 }
-
-
-

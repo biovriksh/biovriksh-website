@@ -1,118 +1,69 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { Play, Sparkles, X } from "lucide-react";
-import { useState } from "react";
+import { motion } from "framer-motion";
+import { Sparkles, Compass } from "lucide-react";
 
 export default function IntroVideo() {
-  const [isPlaying, setIsPlaying] = useState(false);
-
   return (
     <section
       id="intro-video"
-      className="py-24 bg-white relative overflow-hidden"
+      className="py-20 bg-white relative overflow-hidden"
     >
-      {/* Background ambient lighting */}
+      {/* Ambient background lighting */}
       <div
         className="absolute inset-0 pointer-events-none"
         aria-hidden="true"
         style={{
           backgroundImage:
-            "radial-gradient(ellipse 60% 50% at 50% 20%, rgba(139,196,63,0.08) 0%, transparent 70%), radial-gradient(ellipse 40% 40% at 80% 80%, rgba(1,103,55,0.05) 0%, transparent 65%)",
+            "radial-gradient(ellipse 70% 60% at 50% 30%, rgba(139,196,63,0.09) 0%, transparent 70%), radial-gradient(ellipse 50% 50% at 80% 80%, rgba(1,103,55,0.06) 0%, transparent 65%)",
         }}
       />
 
-      <div className="max-w-5xl mx-auto px-6 md:px-12 relative z-10">
-        
-        {/* ── HEADER ─────────────────────────────────────────────────── */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
+        {/* ── PREMIUM WIDE FRAME CARD CONTAINER ──────────────── */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center mb-14"
-        >
-          {/* Tagline Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#f6fdf0] border border-[#8BC43F]/40 text-[#016737] text-xs md:text-sm font-semibold tracking-wider uppercase mb-5 shadow-sm">
-            <Sparkles className="w-4 h-4 text-[#8BC43F]" />
-            Introduction
-          </div>
-
-          {/* Main Headline */}
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-[#111827] tracking-tight leading-[1.1] mb-5">
-            See What{" "}
-            <span
-              className="bg-clip-text text-transparent"
-              style={{
-                backgroundImage:
-                  "linear-gradient(135deg, #016737 0%, #3aaa60 50%, #8BC43F 100%)",
-              }}
-            >
-              BioVriksh
-            </span>{" "}
-            Offers
-          </h2>
-
-          {/* Subtitle */}
-          <p className="text-[#6B7280] text-base md:text-lg max-w-2xl mx-auto leading-relaxed font-normal">
-            Watch our quick walkthrough to understand how our structured syllabus helps NEET aspirants score higher — faster.
-          </p>
-        </motion.div>
-
-        {/* ── VIDEO CONTAINER ──────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 32, scale: 0.97 }}
+          initial={{ opacity: 0, y: 28, scale: 0.98 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-          className="relative rounded-[28px] sm:rounded-[36px] overflow-hidden shadow-[0_24px_60px_rgba(1,103,55,0.14)] border border-gray-200/80 bg-black group cursor-pointer"
-          style={{ aspectRatio: "16/9" }}
+          className="rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 md:p-12 bg-gradient-to-b from-[#f4faf0] via-white to-white border border-[#8BC43F]/35 shadow-[0_24px_70px_rgba(1,103,55,0.1)] text-center relative overflow-hidden"
         >
-          <video
-            src="/intro_video.mp4"
-            controls
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className="w-full h-full object-cover"
-          />
-        </motion.div>
+          {/* Subtle Corner Accent Glow */}
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#8BC43F]/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-[#016737]/10 rounded-full blur-3xl pointer-events-none" />
 
-      </div>
+          <div className="relative z-10">
+            {/* Top Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-[#8BC43F]/40 text-[#016737] text-xs sm:text-sm font-extrabold tracking-wider uppercase mb-4 shadow-xs backdrop-blur-md">
+              <Sparkles className="w-4 h-4 text-[#8BC43F]" />
+              <span>BioVriksh Ecosystem</span>
+            </div>
 
-      {/* Fullscreen Video Modal */}
-      <AnimatePresence>
-        {isPlaying && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
-            onClick={() => setIsPlaying(false)}
-          >
-            <button
-              onClick={() => setIsPlaying(false)}
-              className="absolute top-6 right-6 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-transform hover:scale-110 cursor-pointer"
-            >
-              <X className="w-7 h-7" />
-            </button>
-            <div
-              className="relative w-full max-w-5xl rounded-2xl overflow-hidden shadow-2xl bg-black"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <video
-                src="/intro_video.mp4"
-                controls
-                autoPlay
-                className="w-full aspect-video object-contain"
+            {/* Main Headline */}
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#111827] tracking-tight leading-[1.15] mb-8">
+              Introduction{" "}
+              <span
+                className="bg-clip-text text-transparent"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(135deg, #016737 0%, #3aaa60 50%, #8BC43F 100%)",
+                }}
+              >
+                Overview
+              </span>
+            </h2>
+
+            {/* Inner Showcase Frame */}
+            <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-white aspect-[848/478] border border-gray-200/80 shadow-[0_12px_40px_rgba(1,103,55,0.06)] flex items-center justify-center p-2 sm:p-4 group">
+              <img
+                src="/intro_frame_sample.png"
+                alt="Introduction Overview"
+                className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-[1.01]"
               />
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 }
-

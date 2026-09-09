@@ -92,7 +92,7 @@ export async function POST(req: Request) {
         expiresAt: expiresAt.toISOString(),
       });
     } else if (pdf_id) {
-      // Handle Single PDF Purchase
+      // Handle Single PDF Purchase (3 Months / 90 Days Validity)
       const { data: pdf } = await supabaseAdmin
         .from("pdfs")
         .select("price")
@@ -100,6 +100,7 @@ export async function POST(req: Request) {
         .single();
 
       const verifiedAmount = pdf?.price || 0;
+      const expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 3 months validity
 
       const { error: insertError } = await supabaseAdmin.from("purchases").upsert(
         {
@@ -109,6 +110,7 @@ export async function POST(req: Request) {
           payment_status: "success",
           payment_gateway_id: razorpay_payment_id,
           purchased_at: new Date().toISOString(),
+          expires_at: expiresAt.toISOString(),
         },
         { onConflict: "student_id,pdf_id" }
       );
@@ -123,8 +125,9 @@ export async function POST(req: Request) {
 
       return NextResponse.json({
         success: true,
-        message: "Payment successfully verified and note unlocked",
+        message: `Payment verified! Note unlocked with 3-month validity (Valid till ${expiresAt.toLocaleDateString()})`,
         paymentId: razorpay_payment_id,
+        expiresAt: expiresAt.toISOString(),
       });
     }
   } catch (error: any) {

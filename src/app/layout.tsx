@@ -26,6 +26,8 @@ const marker = Permanent_Marker({
   variable: "--font-marker",
 });
 
+import Script from "next/script";
+
 export const metadata: Metadata = {
   title: "Bio Vriksh | Ultra-Aesthetic NEET Biology Learning & Practice Platform",
   description: "Free concept notes for every chapter. Paid practice sets that mirror the NEET exam pattern.",
@@ -38,6 +40,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`light ${poppins.variable} ${bodoni.variable} ${alexBrush.variable} ${marker.variable} font-sans h-full antialiased`} style={{ colorScheme: "light" }} suppressHydrationWarning>
+      <head>
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
+      </head>
       <body className="min-h-full flex flex-col font-sans bg-white text-[#111827] selection:bg-[#8BC43F] selection:text-[#016737]" suppressHydrationWarning>
         {children}
       </body>

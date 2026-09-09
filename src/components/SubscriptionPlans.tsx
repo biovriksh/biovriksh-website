@@ -5,7 +5,7 @@ import { useCheckout } from "@/hooks/useCheckout";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
 import AuthModal from "@/components/AuthModal";
 import { motion } from "framer-motion";
-import { CheckCircle2, Zap, ShieldCheck } from "lucide-react";
+import { CheckCircle2, ShieldCheck } from "lucide-react";
 
 const plans = [
   {
@@ -28,7 +28,7 @@ const plans = [
   {
     id: "yearly",
     name: "PREMIUM YEARLY",
-    badge: "BEST VALUE • SAVE 60%",
+    badge: "BEST VALUE • SAVE ₹600 (60%)",
     price: "₹199",
     period: "per month (billed ₹2,388/yr)",
     description: "Unlimited access to all paid notes & test series.",
@@ -46,7 +46,7 @@ const plans = [
   },
   {
     id: "monthly",
-    name: "PREMIUM MONTHLY",
+    name: "MONTHLY PASS",
     badge: "FLEXIBLE PASS",
     price: "₹249",
     period: "per month (cancel anytime)",
@@ -140,12 +140,6 @@ export default function SubscriptionPlans() {
                     >
                       {plan.badge}
                     </span>
-                    {plan.isHighlighted && (
-                      <span className="flex items-center gap-1 text-[10px] font-bold text-[#016737]">
-                        <Zap className="w-3 h-3 fill-[#016737]" />
-                        Popular
-                      </span>
-                    )}
                   </div>
 
                   <h3 className="text-base font-extrabold text-gray-900 tracking-tight mb-2">

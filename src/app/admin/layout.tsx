@@ -13,30 +13,99 @@ import {
   ShieldCheck,
   Menu,
   X,
-  Sparkles,
+  Loader2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // If on admin login page, render without sidebar shell
-  if (pathname === "/admin/login") {
+  // Exclude auth check on login page
+  const isLoginPage = pathname === "/admin/login";
+
+  useEffect(() => {
+    if (isLoginPage) {
+      setIsCheckingAuth(false);
+      return;
+    }
+
+    async function checkAdminAuth() {
+      if (typeof window !== "undefined") {
+        // 1. Check local admin token
+        const localToken = localStorage.getItem("biovriksh_admin_token");
+        if (localToken) {
+          setIsAuthorized(true);
+          setIsCheckingAuth(false);
+          return;
+        }
+
+        // 2. Fallback check Supabase Auth admin role
+        try {
+          const supabase = createClient();
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("role")
+              .eq("id", user.id)
+              .single();
+
+            if (profile?.role === "admin") {
+              setIsAuthorized(true);
+              setIsCheckingAuth(false);
+              return;
+            }
+          }
+        } catch (e) {
+          console.error("Admin auth verification error:", e);
+        }
+
+        // Not authorized -> Redirect to /admin/login
+        setIsAuthorized(false);
+        setIsCheckingAuth(false);
+        router.push("/admin/login");
+      }
+    }
+
+    checkAdminAuth();
+  }, [pathname, isLoginPage, router]);
+
+  // Render Login page directly without sidebar shell
+  if (isLoginPage) {
     return <>{children}</>;
   }
 
+  // Loading spinner while verifying security
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4">
+        <Loader2 className="w-8 h-8 animate-spin text-[#016737] mb-3" />
+        <p className="text-xs font-bold text-slate-600">Verifying Admin Security Permissions...</p>
+      </div>
+    );
+  }
+
+  // Block unauthorized rendering
+  if (!isAuthorized) {
+    return null;
+  }
+
   const handleLogout = async () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("biovriksh_admin_token");
+      localStorage.removeItem("biovriksh_admin_email");
+    }
     try {
       const supabase = createClient();
       await supabase.auth.signOut();
-      router.push("/admin/login");
-      router.refresh();
-    } catch (e) {
-      router.push("/admin/login");
-    }
+    } catch (e) {}
+    router.push("/admin/login");
+    router.refresh();
   };
 
   const navItems = [
@@ -52,7 +121,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* ═══ DESKTOP LIGHT SIDEBAR ═══ */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r border-slate-200 p-5 shrink-0 justify-between shadow-xs">
         <div>
-          {/* Brand Logo - Logo Only */}
+          {/* Brand Logo */}
           <div className="flex items-center justify-center pb-4 border-b border-slate-100 mb-6">
             <img
               src="/logo_transparent.png"
@@ -97,9 +166,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <button
             onClick={handleLogout}
-            className="flex items-center justify-between w-full px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-colors border border-rose-200"
+            className="flex items-center justify-between w-full px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-colors border border-rose-200 cursor-pointer"
           >
-            <span>Sign Out</span>
+            <span>Sign Out Admin</span>
             <LogOut className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -167,7 +236,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Top Header Bar */}
         <header className="hidden md:flex items-center justify-between px-8 py-4 bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500 font-semibold">Admin Panel</span>
+            <span className="text-xs text-slate-500 font-semibold">Admin Portal</span>
             <span className="text-slate-300">/</span>
             <span className="text-xs font-extrabold text-[#016737] capitalize">
               {pathname === "/admin" ? "Dashboard Overview" : pathname.replace("/admin/", "").replace("-", " ")}
@@ -176,8 +245,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <div className="flex items-center gap-3">
             <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full flex items-center gap-2 shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>System Live & Connected</span>
+              <ShieldCheck className="w-4 h-4 text-[#8BC43F]" />
+              <span>Protected Master Admin</span>
             </span>
           </div>
         </header>

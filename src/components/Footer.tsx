@@ -194,18 +194,30 @@ export default function Footer() {
         </div>
 
         {/* ── BOTTOM LEGAL & COPYRIGHT BAR ──────────────────────────── */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 text-xs text-gray-500 font-medium border-t border-gray-200">
-          <div className="flex items-center gap-4">
-            <a href="#privacy" className="hover:text-[#1A1A1A] transition-colors">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 text-xs text-gray-500 font-medium border-t border-gray-200">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2">
+            <a href="/privacy-policy" className="hover:text-[#016737] transition-colors">
               Privacy Policy
             </a>
             <span>•</span>
-            <a href="#terms" className="hover:text-[#1A1A1A] transition-colors">
+            <a href="/terms-and-conditions" className="hover:text-[#016737] transition-colors">
               Terms &amp; Conditions
+            </a>
+            <span>•</span>
+            <a href="/refund-policy" className="hover:text-[#016737] transition-colors">
+              Refund &amp; Cancellation Policy
+            </a>
+            <span>•</span>
+            <a href="/shipping-policy" className="hover:text-[#016737] transition-colors">
+              Shipping &amp; Delivery
+            </a>
+            <span>•</span>
+            <a href="/contact-us" className="hover:text-[#016737] transition-colors">
+              Contact Us
             </a>
           </div>
 
-          <p className="text-center sm:text-right">
+          <p className="text-center md:text-right shrink-0">
             &copy; {new Date().getFullYear()} BioVriksh EdTech. All rights reserved.
           </p>
         </div>

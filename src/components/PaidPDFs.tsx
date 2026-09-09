@@ -140,7 +140,7 @@ export default function PaidPDFs() {
   return (
     <>
       <section
-        id="pricing"
+        id="paid-notes"
         ref={sectionRef}
         className="py-32 bg-white relative overflow-hidden"
       >
@@ -264,31 +264,6 @@ export default function PaidPDFs() {
                 </div>
               </motion.div>
             ))}
-          </motion.div>
-
-          {/* Bottom strip */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-12 rounded-2xl bg-gradient-to-r from-[#016737]/[0.04] to-[#8BC43F]/[0.06] border border-[#8BC43F]/20 px-6 md:px-10 py-6 flex flex-col md:flex-row items-center justify-between gap-6"
-          >
-            <div className="text-center md:text-left">
-              <p className="font-bold text-[#2B2F2C] text-lg">
-                Not sure yet?{" "}
-                <span className="text-[#016737]">Try a free sample first.</span>
-              </p>
-              <p className="text-sm text-[#687269] mt-1">
-                Every paid note set comes with a free 20-question preview — no login required.
-              </p>
-            </div>
-            <a
-              href="/chapters"
-              className="btn-shimmer px-7 py-3 rounded-full bg-[#8BC43F] text-[#2B2F2C] font-semibold text-sm whitespace-nowrap shadow-md"
-            >
-              View Free Samples
-            </a>
           </motion.div>
         </div>
       </section>
