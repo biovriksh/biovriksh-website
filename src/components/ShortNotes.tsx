@@ -11,6 +11,7 @@ interface ShortNoteItem {
   subtitle: string;
   pages: string;
   readTime: string;
+  image?: string;
 }
 
 const containerVariants = {
