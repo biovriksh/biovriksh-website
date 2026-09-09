@@ -67,24 +67,85 @@ export default function AdminPDFsPage() {
     if (!title.trim()) return;
 
     setLoading(true);
-    setStatusMessage("Uploading PDF & Thumbnail to Supabase...");
+    setStatusMessage("Preparing secure upload...");
 
     try {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("targetSection", targetSection);
-      formData.append("classLevel", classLevel);
-      formData.append("price", String(price));
-      formData.append("pageCount", String(pageCount));
-      formData.append("isRecent", String(isRecent));
+      let thumbnailUrl = "/hero_premium_clean.png";
+      let filePath = `notes_${Date.now()}.pdf`;
 
-      if (pdfFile) formData.append("pdfFile", pdfFile);
-      if (thumbnailFile) formData.append("thumbnailFile", thumbnailFile);
+      // 1. Upload Cover Image / Thumbnail via Signed Upload URL
+      if (thumbnailFile) {
+        setStatusMessage("Uploading Cover Image...");
+        const urlRes = await fetch("/api/admin/create-upload-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: thumbnailFile.name,
+            bucket: "pdf-thumbnails",
+          }),
+        });
 
+        const urlJson = await urlRes.json();
+        if (urlJson.success && urlJson.signedUrl) {
+          const uploadRes = await fetch(urlJson.signedUrl, {
+            method: "PUT",
+            headers: { "Content-Type": thumbnailFile.type || "image/png" },
+            body: thumbnailFile,
+          });
+
+          if (uploadRes.ok) {
+            thumbnailUrl = urlJson.publicUrl;
+          } else {
+            console.warn("Thumbnail signed upload failed, status:", uploadRes.status);
+          }
+        }
+      }
+
+      // 2. Upload PDF Document via Signed Upload URL (Bypasses Vercel payload limits completely)
+      if (pdfFile) {
+        setStatusMessage("Uploading PDF Document to Storage...");
+        const urlRes = await fetch("/api/admin/create-upload-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: pdfFile.name,
+            bucket: "pdf-files",
+          }),
+        });
+
+        const urlJson = await urlRes.json();
+        if (urlJson.success && urlJson.signedUrl) {
+          const uploadRes = await fetch(urlJson.signedUrl, {
+            method: "PUT",
+            headers: { "Content-Type": pdfFile.type || "application/pdf" },
+            body: pdfFile,
+          });
+
+          if (uploadRes.ok) {
+            filePath = urlJson.path;
+          } else {
+            console.warn("PDF signed upload failed, status:", uploadRes.status);
+          }
+        }
+      }
+
+      setStatusMessage("Saving Note Record to Database...");
+
+      // 3. Send small 1KB JSON payload to Server API Route
       const res = await fetch("/api/admin/upload-pdf", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          description,
+          targetSection,
+          classLevel,
+          price,
+          pageCount,
+          isRecent,
+          thumbnailUrl,
+          filePath,
+        }),
       });
 
       const text = await res.text();
@@ -101,7 +162,7 @@ export default function AdminPDFsPage() {
 
       if (result.pdf) {
         setPdfs((prev) => [result.pdf, ...prev]);
-        alert("PDF Note & Thumbnail Uploaded Successfully!");
+        alert("PDF Note & Cover Image Uploaded Successfully!");
       }
 
       // Reset Form & Close Modal
