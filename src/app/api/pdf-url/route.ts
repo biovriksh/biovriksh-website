@@ -68,7 +68,14 @@ export async function GET(req: Request) {
 
     if (!isAuthorized) {
       return NextResponse.json(
-        { error: "Access Denied: Payment required to unlock this PDF note." },
+        {
+          error: "Access Denied: Payment required to unlock this PDF note.",
+          title: pdf.title,
+          price: pdf.price,
+          is_free: pdf.is_free,
+          class_level: pdf.class_level,
+          sub_heading: pdf.sub_heading,
+        },
         { status: 403 }
       );
     }

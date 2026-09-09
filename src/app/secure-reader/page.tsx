@@ -9,16 +9,14 @@ import {
   ZoomOut,
   EyeOff,
   BookOpen,
-  ChevronLeft,
-  ChevronRight,
   Sun,
   Moon,
   Sparkles,
-  CheckCircle2,
   Lock,
-  AlertCircle,
-  RefreshCw,
 } from "lucide-react";
+import { useCheckout } from "@/hooks/useCheckout";
+import { useStudentAuth } from "@/hooks/useStudentAuth";
+import AuthModal from "@/components/AuthModal";
 
 function SecureReaderContent() {
   const searchParams = useSearchParams();
@@ -32,53 +30,65 @@ function SecureReaderContent() {
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfMeta, setPdfMeta] = useState<any>(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
   const [zoom, setZoom] = useState(100);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isProtected, setIsProtected] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
   const readerRef = useRef<HTMLDivElement>(null);
 
+  const { handleCheckout, loading: checkoutLoading } = useCheckout();
+  const { user } = useStudentAuth();
+
   // 1. Fetch live signed PDF URL from Supabase storage
-  useEffect(() => {
-    let isMounted = true;
-
-    async function fetchPdf() {
-      if (!pdfId) {
-        setLoadingPdf(false);
-        setPdfError("No note selected. Please select a note from the Bio Vriksh website.");
-        return;
-      }
-
-      try {
-        setLoadingPdf(true);
-        setPdfError(null);
-
-        const res = await fetch(`/api/pdf-url?pdfId=${encodeURIComponent(pdfId)}`);
-        const json = await res.json();
-
-        if (!isMounted) return;
-
-        if (res.ok && json.signedUrl) {
-          setPdfUrl(json.signedUrl);
-          setPdfMeta(json);
-        } else {
-          setPdfError(json.error || "Unable to open PDF document.");
-        }
-      } catch (err: any) {
-        if (isMounted) setPdfError("Network error while connecting to secure PDF server.");
-      } finally {
-        if (isMounted) setLoadingPdf(false);
-      }
+  const fetchPdf = async () => {
+    if (!pdfId) {
+      setLoadingPdf(false);
+      setPdfError("No note selected. Please select a note from the Bio Vriksh website.");
+      return;
     }
 
-    fetchPdf();
+    try {
+      setLoadingPdf(true);
+      setPdfError(null);
 
-    return () => {
-      isMounted = false;
-    };
+      const res = await fetch(`/api/pdf-url?pdfId=${encodeURIComponent(pdfId)}`);
+      const json = await res.json();
+
+      if (res.ok && json.signedUrl) {
+        setPdfUrl(json.signedUrl);
+        setPdfMeta(json);
+      } else {
+        setPdfError(json.error || "Unable to open PDF document.");
+        if (json.price !== undefined || json.title) {
+          setPdfMeta(json);
+        }
+      }
+    } catch (err: any) {
+      setPdfError("Network error while connecting to secure PDF server.");
+    } finally {
+      setLoadingPdf(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPdf();
   }, [pdfId]);
 
-  // 2. DRM Security Protections (Screenshot blackout, Right click disable, Print lock)
+  // 2. Direct Razorpay Checkout handler for this specific PDF note
+  const onUnlockClick = () => {
+    if (!pdfId) return;
+    handleCheckout({
+      pdfId: pdfId,
+      onLoginRequired: () => setAuthModalOpen(true),
+      onSuccess: () => {
+        // Payment successful! Immediately reload signed URL to display unlocked PDF
+        fetchPdf();
+      },
+    });
+  };
+
+  // 3. DRM Security Protections (Screenshot blackout, Right click disable, Print lock)
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
     document.addEventListener("contextmenu", handleContextMenu);
@@ -146,7 +156,6 @@ function SecureReaderContent() {
 
   const displayTitle = pdfMeta?.title || titleParam;
   const displaySubject = pdfMeta?.sub_heading || pdfMeta?.class_level || subjectParam;
-  const displayPagesCount = pdfMeta?.page_count || pagesCountParam;
 
   return (
     <div
@@ -301,17 +310,24 @@ function SecureReaderContent() {
             <div className="flex flex-col sm:flex-row gap-3 w-full">
               <button
                 onClick={() => window.close()}
-                className="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-xs font-bold transition-all cursor-pointer"
+                className="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-xs font-bold transition-all cursor-pointer text-gray-700 dark:text-gray-300"
               >
                 Close Reader
               </button>
-              <a
-                href="/#pricing"
-                className="flex-1 py-2.5 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md"
+              <button
+                onClick={onUnlockClick}
+                disabled={checkoutLoading}
+                className="flex-1 py-2.5 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer disabled:opacity-50"
               >
                 <Sparkles className="w-3.5 h-3.5 text-[#8BC43F]" />
-                <span>Unlock Note</span>
-              </a>
+                <span>
+                  {checkoutLoading
+                    ? "Opening Razorpay..."
+                    : pdfMeta?.price
+                    ? `Unlock Note (₹${pdfMeta.price})`
+                    : "Unlock Note"}
+                </span>
+              </button>
             </div>
           </div>
         ) : (
@@ -347,6 +363,14 @@ function SecureReaderContent() {
           {displayTitle}
         </span>
       </footer>
+
+      {/* Student Auth Modal for Reader */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        customTitle="Student Login Required"
+        customSubtitle="Please log in to your student account to unlock and view this note."
+      />
     </div>
   );
 }
@@ -364,4 +388,5 @@ export default function SecureReaderPage() {
     </Suspense>
   );
 }
+
 
