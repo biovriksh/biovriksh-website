@@ -157,7 +157,20 @@ drop policy if exists "Allow upload to pdf-thumbnails" on storage.objects;
 create policy "Allow upload to pdf-thumbnails" on storage.objects
   for insert with check (bucket_id = 'pdf-thumbnails');
 
-drop policy if exists "Allow upload to pdf-files" on storage.objects;
+-- Trigger for automatic updated_at timestamp on pdf edits
+create or replace function public.update_pdfs_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists trigger_update_pdfs_updated_at on public.pdfs;
+create trigger trigger_update_pdfs_updated_at
+  before update on public.pdfs
+  for each row execute function public.update_pdfs_updated_at();
+
 create policy "Allow upload to pdf-files" on storage.objects
   for insert with check (bucket_id = 'pdf-files');
 
