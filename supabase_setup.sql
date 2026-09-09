@@ -152,21 +152,16 @@ insert into storage.buckets (id, name, public)
 values ('pdf-files', 'pdf-files', false)
 on conflict (id) do nothing;
 
-create policy "Public view pdf-thumbnails" on storage.objects
-  for select using (bucket_id = 'pdf-thumbnails');
+-- Storage Upload Policies (Allows uploading files of any size directly from admin panel)
+drop policy if exists "Allow upload to pdf-thumbnails" on storage.objects;
+create policy "Allow upload to pdf-thumbnails" on storage.objects
+  for insert with check (bucket_id = 'pdf-thumbnails');
 
-create policy "Admin upload pdf-thumbnails" on storage.objects
-  for insert with check (bucket_id = 'pdf-thumbnails' and exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
-
-create policy "Admin update pdf-thumbnails" on storage.objects
-  for update using (bucket_id = 'pdf-thumbnails' and exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
-
-create policy "Admin delete pdf-thumbnails" on storage.objects
-  for delete using (bucket_id = 'pdf-thumbnails' and exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
-
-create policy "Admin manage pdf-files" on storage.objects
-  for all using (bucket_id = 'pdf-files' and exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+drop policy if exists "Allow upload to pdf-files" on storage.objects;
+create policy "Allow upload to pdf-files" on storage.objects
+  for insert with check (bucket_id = 'pdf-files');
 
 -- ============================================================================
 -- SETUP COMPLETE
 -- ============================================================================
+

@@ -67,27 +67,74 @@ export default function AdminPDFsPage() {
     if (!title.trim()) return;
 
     setLoading(true);
-    setStatusMessage("Uploading PDF to Supabase...");
+    setStatusMessage("Uploading PDF & Thumbnail to Supabase...");
 
     try {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("targetSection", targetSection);
-      formData.append("classLevel", classLevel);
-      formData.append("price", String(price));
-      formData.append("pageCount", String(pageCount));
-      formData.append("isRecent", String(isRecent));
+      const supabase = createClient();
+      let thumbnailUrl = "/hero_premium_clean.png";
+      let filePath = `notes_${Date.now()}.pdf`;
 
-      if (pdfFile) formData.append("pdfFile", pdfFile);
-      if (thumbnailFile) formData.append("thumbnailFile", thumbnailFile);
+      // 1. Direct Client Upload for Thumbnail (No size limit on Vercel)
+      if (thumbnailFile) {
+        setStatusMessage("Uploading Thumbnail Image...");
+        const thumbExt = thumbnailFile.name.split(".").pop() || "png";
+        const thumbName = `thumb_${Date.now()}_${Math.random().toString(36).substring(7)}.${thumbExt}`;
+        const { data: thumbData, error: thumbErr } = await supabase.storage
+          .from("pdf-thumbnails")
+          .upload(thumbName, thumbnailFile, { upsert: true });
 
+        if (thumbData) {
+          const { data: publicUrlData } = supabase.storage
+            .from("pdf-thumbnails")
+            .getPublicUrl(thumbName);
+          thumbnailUrl = publicUrlData.publicUrl;
+        } else if (thumbErr) {
+          console.warn("Thumbnail upload warning:", thumbErr);
+        }
+      }
+
+      // 2. Direct Client Upload for Large PDF File (Bypasses Vercel 4.5MB limit completely)
+      if (pdfFile) {
+        setStatusMessage("Uploading PDF Document to Secure Storage...");
+        const pdfExt = pdfFile.name.split(".").pop() || "pdf";
+        const pdfName = `pdf_${Date.now()}_${Math.random().toString(36).substring(7)}.${pdfExt}`;
+        const { data: pdfData, error: pdfErr } = await supabase.storage
+          .from("pdf-files")
+          .upload(pdfName, pdfFile, { upsert: true });
+
+        if (pdfData) {
+          filePath = pdfData.path;
+        } else if (pdfErr) {
+          console.warn("PDF file storage warning:", pdfErr);
+        }
+      }
+
+      setStatusMessage("Saving Note Record to Database...");
+
+      // 3. Send small JSON payload to Server API Route
       const res = await fetch("/api/admin/upload-pdf", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          description,
+          targetSection,
+          classLevel,
+          price,
+          pageCount,
+          isRecent,
+          thumbnailUrl,
+          filePath,
+        }),
       });
 
-      const result = await res.json();
+      const text = await res.text();
+      let result: any = {};
+      try {
+        result = JSON.parse(text);
+      } catch (parseErr) {
+        throw new Error(text || "Server error occurred during upload");
+      }
 
       if (!res.ok || !result.success) {
         throw new Error(result.error || "Failed to upload note");
