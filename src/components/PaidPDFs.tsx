@@ -3,103 +3,57 @@
 import { useCheckout } from "@/hooks/useCheckout";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
 import AuthModal from "@/components/AuthModal";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import { Lock, Target, Timer, BarChart2, CheckCircle, Sparkles, Flame } from "lucide-react";
-import { useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Lock, Sparkles } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
-const paidPDFs = [
+const defaultPaidPDFs = [
   {
-    id: 1,
+    id: "paid-1",
+    rawId: "1",
     subject: "Cell Division & Cell Cycle",
     chapter: "Chapter 10 · Class 11",
     questions: 120,
     difficulty: "Medium",
-    difficultyColor: "#F59E0B",
-    time: "90 min",
     price: "₹49",
     topics: ["Mitosis", "Meiosis", "Checkpoints"],
-    tag: "Bestseller",
-    tagColor: "bg-amber-500",
-    gradient: "from-amber-50 to-orange-50",
+    image: "/hero_premium_clean.png",
   },
   {
-    id: 2,
+    id: "paid-2",
+    rawId: "2",
     subject: "Human Reproduction",
     chapter: "Chapter 3 · Class 12",
     questions: 150,
     difficulty: "Hard",
-    difficultyColor: "#EF4444",
-    time: "110 min",
     price: "₹49",
     topics: ["Gametogenesis", "Fertilisation", "Implantation"],
-    tag: "Most Tested",
-    tagColor: "bg-red-500",
-    gradient: "from-red-50 to-rose-50",
+    image: "/hero_premium_clean.png",
   },
   {
-    id: 3,
+    id: "paid-3",
+    rawId: "3",
     subject: "Ecology & Environment",
     chapter: "Chapter 13 & 14 · Class 12",
     questions: 200,
     difficulty: "Medium",
-    difficultyColor: "#F59E0B",
-    time: "120 min",
     price: "₹79",
     topics: ["Ecosystem", "Biodiversity", "Pollution"],
-    tag: "High Weightage",
-    tagColor: "bg-[#016737]",
-    gradient: "from-green-50 to-emerald-50",
+    image: "/hero_premium_clean.png",
   },
   {
-    id: 4,
+    id: "paid-4",
+    rawId: "4",
     subject: "Genetics & Evolution Mega Pack",
     chapter: "Ch. 5–7 · Class 12",
     questions: 300,
     difficulty: "Hard",
-    difficultyColor: "#EF4444",
-    time: "180 min",
     price: "₹129",
     topics: ["Mendel's Laws", "DNA Replication", "Evolution"],
-    tag: "🔥 Combo Pack",
-    tagColor: "bg-[#8BC43F]",
-    gradient: "from-lime-50 to-green-50",
+    image: "/hero_premium_clean.png",
   },
 ];
-
-// 3D tilt card
-function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [hovered, setHovered] = useState(false);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 16;
-    const y = -((e.clientY - rect.top) / rect.height - 0.5) * 16;
-    setTilt({ x, y });
-  };
-
-  return (
-    <div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => { setTilt({ x: 0, y: 0 }); setHovered(false); }}
-      style={{
-        transform: hovered
-          ? `perspective(900px) rotateY(${tilt.x}deg) rotateX(${tilt.y}deg) scale(1.03)`
-          : "perspective(900px) rotateY(0deg) rotateX(0deg) scale(1)",
-        transition: hovered ? "transform 0.08s linear" : "transform 0.5s ease",
-        willChange: "transform",
-      }}
-      className={className}
-    >
-      {children}
-    </div>
-  );
-}
 
 const containerVariants = {
   hidden: {},
@@ -121,7 +75,40 @@ export default function PaidPDFs() {
   const { handleCheckout } = useCheckout();
   const { user } = useStudentAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [paidList, setPaidList] = useState(defaultPaidPDFs);
   const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    async function loadLivePaidPDFs() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("pdfs")
+          .select("*")
+          .eq("is_active", true)
+          .eq("is_free", false)
+          .order("created_at", { ascending: false });
+
+        if (data && data.length > 0) {
+          const mapped = data.map((pdf: any) => ({
+            id: pdf.id,
+            rawId: pdf.id,
+            subject: pdf.title,
+            chapter: pdf.sub_heading || `${pdf.class_level || 'NEET'} Paid Note`,
+            questions: 150,
+            difficulty: "Medium",
+            price: `₹${pdf.price || 49}`,
+            topics: [pdf.class_level || "NEET", "NCERT High Yield"],
+            image: pdf.thumbnail_url || "/hero_premium_clean.png",
+          }));
+          setPaidList(mapped);
+        }
+      } catch (err) {
+        console.error("Error fetching paid PDFs:", err);
+      }
+    }
+    loadLivePaidPDFs();
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -130,9 +117,9 @@ export default function PaidPDFs() {
 
   const blobY = useTransform(scrollYProgress, [0, 1], [80, -80]);
 
-  const onUnlockClick = (pdfId: number) => {
+  const onUnlockClick = (pdfId: string) => {
     handleCheckout({
-      pdfId: `paid-pdf-${pdfId}`,
+      pdfId: pdfId,
       onLoginRequired: () => setAuthModalOpen(true),
     });
   };
@@ -206,7 +193,7 @@ export default function PaidPDFs() {
             viewport={{ once: true, margin: "-60px" }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
           >
-            {paidPDFs.map((pdf) => (
+            {paidList.map((pdf) => (
               <motion.div
                 key={pdf.id}
                 variants={cardVariants}
@@ -217,7 +204,7 @@ export default function PaidPDFs() {
                 {/* TOP 50% */}
                 <div className="h-40 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
                   <img
-                    src="/hero_premium_clean.png"
+                    src={pdf.image}
                     alt={pdf.subject}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -256,7 +243,7 @@ export default function PaidPDFs() {
 
                   <button
                     onClick={() => onUnlockClick(pdf.id)}
-                    className="w-full py-2.5 rounded-xl bg-[#016737] text-white text-xs font-bold hover:bg-[#014d29] transition-all flex items-center justify-center gap-1.5 shadow-2xs"
+                    className="w-full py-2.5 rounded-xl bg-[#016737] text-white text-xs font-bold hover:bg-[#014d29] transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
                   >
                     <Lock className="w-3.5 h-3.5" />
                     <span>Unlock Note ({pdf.price})</span>
@@ -277,3 +264,4 @@ export default function PaidPDFs() {
     </>
   );
 }
+

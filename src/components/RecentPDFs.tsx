@@ -2,11 +2,12 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { FileText, Eye, Lock, ShieldCheck, X, BookOpen } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
-const recentNotesList = [
+const defaultRecentNotes = [
   {
-    id: 1,
+    id: "1",
     subject: "Cell: The Unit of Life",
     chapter: "Chapter 8 · Class 11",
     pages: "18 pages",
@@ -17,7 +18,7 @@ const recentNotesList = [
     accent: "#8BC43F",
   },
   {
-    id: 2,
+    id: "2",
     subject: "Photosynthesis in Higher Plants",
     chapter: "Chapter 13 · Class 11",
     pages: "22 pages",
@@ -28,7 +29,7 @@ const recentNotesList = [
     accent: "#016737",
   },
   {
-    id: 3,
+    id: "3",
     subject: "Reproduction in Organisms",
     chapter: "Chapter 1 · Class 12",
     pages: "14 pages",
@@ -39,7 +40,7 @@ const recentNotesList = [
     accent: "#8BC43F",
   },
   {
-    id: 4,
+    id: "4",
     subject: "Molecular Basis of Inheritance",
     chapter: "Chapter 6 · Class 12",
     pages: "28 pages",
@@ -70,14 +71,44 @@ const cardVariants = {
 
 export default function RecentPDFs() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [selectedNote, setSelectedNote] = useState<(typeof recentNotesList)[0] | null>(null);
+  const [notesList, setNotesList] = useState(defaultRecentNotes);
+
+  useEffect(() => {
+    async function loadLivePDFs() {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("pdfs")
+          .select("*")
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
+          .limit(8);
+
+        if (data && data.length > 0) {
+          const liveNotes = data.map((pdf: any) => ({
+            id: pdf.id,
+            subject: pdf.title,
+            chapter: pdf.sub_heading || `${pdf.class_level || 'NEET'} Note`,
+            pages: `${pdf.page_count || 12} pages`,
+            views: "Live Note",
+            isPaid: !pdf.is_free,
+            price: pdf.is_free ? "FREE" : `₹${pdf.price || 49}`,
+            image: pdf.thumbnail_url || "/hero_premium_clean.png",
+            accent: pdf.is_free ? "#8BC43F" : "#016737",
+          }));
+          setNotesList(liveNotes);
+        }
+      } catch (err) {
+        console.error("Error fetching live PDFs:", err);
+      }
+    }
+    loadLivePDFs();
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-  
-  const titleOpacity = useTransform(scrollYProgress, [0, 0.35], [0, 1]);
 
   return (
     <section
@@ -132,7 +163,7 @@ export default function RecentPDFs() {
           viewport={{ once: true, margin: "-60px" }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {recentNotesList.map((note) => (
+          {notesList.map((note) => (
             <motion.div
               key={note.id}
               variants={cardVariants}
@@ -199,3 +230,4 @@ export default function RecentPDFs() {
     </section>
   );
 }
+
