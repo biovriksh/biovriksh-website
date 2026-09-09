@@ -147,7 +147,7 @@ export default function StudentProfilePage() {
           const displayName = cleanName
             .split(" ")
             .filter(Boolean)
-            .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+            .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
             .join(" ") || "Student";
 
           const initialLetter = displayName.charAt(0).toUpperCase() || "S";
