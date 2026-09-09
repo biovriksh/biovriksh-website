@@ -3,6 +3,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(req: Request) {
   try {
+    const supabaseAdmin = createAdminClient();
+    const contentType = req.headers.get("content-type") || "";
+
     let title = "";
     let description = "";
     let noteType = "paid";
@@ -13,20 +16,7 @@ export async function POST(req: Request) {
     let thumbnailUrl = "/hero_premium_clean.png";
     let filePath = "";
 
-    const contentType = req.headers.get("content-type") || "";
-
-    if (contentType.includes("application/json")) {
-      const body = await req.json();
-      title = body.title || "";
-      description = body.description || "";
-      noteType = body.targetSection || body.noteType || "paid";
-      classLevel = body.classLevel || "Class 12";
-      price = Number(body.price || 0);
-      pageCount = Number(body.pageCount || 12);
-      isRecent = Boolean(body.isRecent);
-      thumbnailUrl = body.thumbnailUrl || "/hero_premium_clean.png";
-      filePath = body.filePath || `notes_${Date.now()}.pdf`;
-    } else {
+    if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
       title = (formData.get("title") as string) || "";
       description = (formData.get("description") as string) || "";
@@ -36,18 +26,16 @@ export async function POST(req: Request) {
       pageCount = Number(formData.get("pageCount") || 12);
       isRecent = formData.get("isRecent") === "true";
 
-      const pdfFile = formData.get("pdfFile") as File | null;
       const thumbnailFile = formData.get("thumbnailFile") as File | null;
+      const pdfFile = formData.get("pdfFile") as File | null;
 
-      const supabaseAdmin = createAdminClient();
-
-      // 1. Upload Thumbnail to Storage Bucket
+      // 1. Upload Thumbnail Image on Server using Service Role Key
       if (thumbnailFile && thumbnailFile.size > 0) {
         const thumbExt = thumbnailFile.name.split(".").pop() || "png";
         const thumbName = `thumb_${Date.now()}_${Math.random().toString(36).substring(7)}.${thumbExt}`;
         const thumbBuffer = Buffer.from(await thumbnailFile.arrayBuffer());
 
-        const { data: thumbUpload } = await supabaseAdmin.storage
+        const { data: thumbUpload, error: thumbErr } = await supabaseAdmin.storage
           .from("pdf-thumbnails")
           .upload(thumbName, thumbBuffer, {
             contentType: thumbnailFile.type || "image/png",
@@ -59,10 +47,12 @@ export async function POST(req: Request) {
             .from("pdf-thumbnails")
             .getPublicUrl(thumbName);
           thumbnailUrl = publicUrlData.publicUrl;
+        } else {
+          console.error("Server thumbnail upload error:", thumbErr);
         }
       }
 
-      // 2. Upload Private PDF File to Storage Bucket
+      // 2. Upload Private PDF Document on Server using Service Role Key
       if (pdfFile && pdfFile.size > 0) {
         const pdfExt = pdfFile.name.split(".").pop() || "pdf";
         const pdfName = `pdf_${Date.now()}_${Math.random().toString(36).substring(7)}.${pdfExt}`;
@@ -75,10 +65,24 @@ export async function POST(req: Request) {
             upsert: true,
           });
 
-        if (!pdfErr && pdfUpload) {
+        if (pdfUpload) {
           filePath = pdfUpload.path;
+        } else {
+          console.error("Server PDF file upload error:", pdfErr);
         }
       }
+    } else {
+      // JSON Payload handling fallback
+      const body = await req.json();
+      title = body.title || "";
+      description = body.description || "";
+      noteType = body.targetSection || body.noteType || "paid";
+      classLevel = body.classLevel || "Class 12";
+      price = Number(body.price || 0);
+      pageCount = Number(body.pageCount || 12);
+      isRecent = Boolean(body.isRecent);
+      thumbnailUrl = body.thumbnailUrl || "/hero_premium_clean.png";
+      filePath = body.filePath || `notes_${Date.now()}.pdf`;
     }
 
     if (!title.trim()) {
@@ -86,7 +90,6 @@ export async function POST(req: Request) {
     }
 
     const isActuallyFree = noteType === "short" || price === 0;
-    const supabaseAdmin = createAdminClient();
 
     // 3. Insert PDF record into Supabase Database
     const newPdfRow = {

@@ -42,16 +42,11 @@ export default function RecentPDFs() {
   useEffect(() => {
     async function loadLivePDFs() {
       try {
-        const supabase = createClient();
-        const { data } = await supabase
-          .from("pdfs")
-          .select("*")
-          .eq("is_active", true)
-          .order("created_at", { ascending: false })
-          .limit(8);
+        const res = await fetch("/api/public/pdfs", { cache: "no-store" });
+        const json = await res.json();
 
-        if (data && data.length > 0) {
-          const liveNotes = data.map((pdf: any) => ({
+        if (json.success && json.pdfs && json.pdfs.length > 0) {
+          const liveNotes = json.pdfs.map((pdf: any) => ({
             id: pdf.id,
             subject: pdf.title,
             chapter: pdf.sub_heading || `${pdf.class_level || 'NEET'} Note`,

@@ -47,23 +47,19 @@ export default function PaidPDFs() {
   useEffect(() => {
     async function loadLivePaidPDFs() {
       try {
-        const supabase = createClient();
-        const { data } = await supabase
-          .from("pdfs")
-          .select("*")
-          .eq("is_active", true)
-          .eq("is_free", false)
-          .order("created_at", { ascending: false });
+        const res = await fetch("/api/public/pdfs", { cache: "no-store" });
+        const json = await res.json();
 
-        if (data && data.length > 0) {
-          const mapped = data.map((pdf: any) => ({
+        if (json.success && json.pdfs && json.pdfs.length > 0) {
+          const paidOnly = json.pdfs.filter((p: any) => !p.is_free);
+          const mapped = (paidOnly.length > 0 ? paidOnly : json.pdfs).map((pdf: any) => ({
             id: pdf.id,
             rawId: pdf.id,
             subject: pdf.title,
             chapter: pdf.sub_heading || `${pdf.class_level || 'NEET'} Paid Note`,
             questions: 150,
             difficulty: "Medium",
-            price: `₹${pdf.price || 49}`,
+            price: pdf.is_free ? "FREE" : `₹${pdf.price || 49}`,
             topics: [pdf.class_level || "NEET", "NCERT High Yield"],
             image: pdf.thumbnail_url || "/hero_premium_clean.png",
           }));

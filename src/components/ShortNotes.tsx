@@ -31,21 +31,18 @@ export default function ShortNotes() {
   useEffect(() => {
     async function loadShortNotes() {
       try {
-        const supabase = createClient();
-        const { data } = await supabase
-          .from("pdfs")
-          .select("*")
-          .eq("is_active", true)
-          .eq("note_type", "short")
-          .order("created_at", { ascending: false });
+        const res = await fetch("/api/public/pdfs", { cache: "no-store" });
+        const json = await res.json();
 
-        if (data && data.length > 0) {
-          const mapped = data.map((pdf: any) => ({
+        if (json.success && json.pdfs && json.pdfs.length > 0) {
+          const shortOnly = json.pdfs.filter((p: any) => p.note_type === "short" || p.is_free);
+          const mapped = (shortOnly.length > 0 ? shortOnly : json.pdfs).map((pdf: any) => ({
             id: pdf.id,
             title: pdf.title,
             subtitle: pdf.sub_heading || `${pdf.class_level || 'Biology'} Short Note`,
             pages: `${pdf.page_count || 1} page`,
             readTime: "5 min",
+            image: pdf.thumbnail_url || "/hero_premium_clean.png",
           }));
           setShortList(mapped);
         } else {
@@ -121,7 +118,7 @@ export default function ShortNotes() {
                   {/* TOP 50% — THUMBNAIL IMAGE BANNER */}
                   <div className="h-40 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
                     <img
-                      src="/hero_premium_clean.png"
+                      src={note.image || "/hero_premium_clean.png"}
                       alt={note.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

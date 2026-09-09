@@ -65,15 +65,11 @@ export default function ChaptersPage() {
   useEffect(() => {
     async function loadLiveChapters() {
       try {
-        const supabase = createClient();
-        const { data: pdfsData } = await supabase
-          .from("pdfs")
-          .select("*")
-          .eq("is_active", true)
-          .order("created_at", { ascending: false });
+        const res = await fetch("/api/public/pdfs", { cache: "no-store" });
+        const json = await res.json();
 
-        if (pdfsData && pdfsData.length > 0) {
-          const mappedChapters: Chapter[] = pdfsData.map((pdf: any, idx: number) => ({
+        if (json.success && json.pdfs && json.pdfs.length > 0) {
+          const mappedChapters: (Chapter & { image?: string })[] = json.pdfs.map((pdf: any, idx: number) => ({
             id: pdf.id,
             title: pdf.title,
             classLevel: pdf.class_level === "Class 11" ? "Class 11" : "Class 12",
@@ -85,6 +81,7 @@ export default function ChaptersPage() {
             pdfPages: pdf.page_count || 14,
             summary: pdf.description || `${pdf.title} — High yield study notes for NEET exam preparation.`,
             keyTopics: [pdf.class_level || "NEET", "NCERT High Yield", "Revision Notes"],
+            image: pdf.thumbnail_url || "/hero_premium_clean.png",
             notes: [
               {
                 title: "1. Chapter Overview & Concepts",
@@ -202,7 +199,7 @@ export default function ChaptersPage() {
                 {/* TOP 50% — THUMBNAIL IMAGE BANNER */}
                 <div className="h-44 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
                   <img
-                    src="/hero_premium_clean.png"
+                    src={(ch as any).image || "/hero_premium_clean.png"}
                     alt={ch.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
