@@ -1,116 +1,16 @@
 "use client";
 
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import { FileText, Clock, BookOpen, Sparkles } from "lucide-react";
-import { useRef, useState } from "react";
+import { motion, useScroll } from "framer-motion";
+import { FileText, BookOpen } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
-const shortNotes = [
-  {
-    id: 1,
-    title: "Botany One-Pager",
-    subtitle: "Cell Biology",
-    pages: "1 page",
-    readTime: "5 min",
-    color: "bg-emerald-50",
-    accent: "#016737",
-  },
-  {
-    id: 2,
-    title: "Photosynthesis Cheatsheet",
-    subtitle: "Plant Physiology",
-    pages: "1 page",
-    readTime: "4 min",
-    color: "bg-lime-50",
-    accent: "#8BC43F",
-  },
-  {
-    id: 3,
-    title: "DNA Replication Flowchart",
-    subtitle: "Molecular Biology",
-    pages: "1 page",
-    readTime: "6 min",
-    color: "bg-green-50",
-    accent: "#016737",
-  },
-  {
-    id: 4,
-    title: "Human Heart Diagram",
-    subtitle: "Zoology",
-    pages: "1 page",
-    readTime: "5 min",
-    color: "bg-teal-50",
-    accent: "#8BC43F",
-  },
-  {
-    id: 5,
-    title: "Mendel's Laws Quick Ref",
-    subtitle: "Genetics",
-    pages: "1 page",
-    readTime: "4 min",
-    color: "bg-emerald-50",
-    accent: "#016737",
-  },
-  {
-    id: 6,
-    title: "Ecosystem Summary",
-    subtitle: "Ecology",
-    pages: "1 page",
-    readTime: "5 min",
-    color: "bg-lime-50",
-    accent: "#8BC43F",
-  },
-  {
-    id: 7,
-    title: "Respiration at a Glance",
-    subtitle: "Biochemistry",
-    pages: "1 page",
-    readTime: "4 min",
-    color: "bg-green-50",
-    accent: "#016737",
-  },
-  {
-    id: 8,
-    title: "Reproduction Flowchart",
-    subtitle: "Human Physiology",
-    pages: "1 page",
-    readTime: "5 min",
-    color: "bg-teal-50",
-    accent: "#8BC43F",
-  },
-];
-
-function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [hovered, setHovered] = useState(false);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 14;
-    const y = -((e.clientY - rect.top) / rect.height - 0.5) * 14;
-    setTilt({ x, y });
-  };
-
-  return (
-    <div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => { setTilt({ x: 0, y: 0 }); setHovered(false); }}
-      style={{
-        transform: hovered
-          ? `perspective(900px) rotateY(${tilt.x}deg) rotateX(${tilt.y}deg) scale(1.03)`
-          : "perspective(900px) rotateY(0deg) rotateX(0deg) scale(1)",
-        transition: hovered ? "transform 0.08s linear" : "transform 0.5s ease",
-        willChange: "transform",
-      }}
-      className={className}
-    >
-      {children}
-    </div>
-  );
+interface ShortNoteItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  pages: string;
+  readTime: string;
 }
 
 const containerVariants = {
@@ -125,14 +25,45 @@ const cardVariants = {
 
 export default function ShortNotes() {
   const sectionRef = useRef<HTMLElement>(null);
+  const [shortList, setShortList] = useState<ShortNoteItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadShortNotes() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("pdfs")
+          .select("*")
+          .eq("is_active", true)
+          .eq("note_type", "short")
+          .order("created_at", { ascending: false });
+
+        if (data && data.length > 0) {
+          const mapped = data.map((pdf: any) => ({
+            id: pdf.id,
+            title: pdf.title,
+            subtitle: pdf.sub_heading || `${pdf.class_level || 'Biology'} Short Note`,
+            pages: `${pdf.page_count || 1} page`,
+            readTime: "5 min",
+          }));
+          setShortList(mapped);
+        } else {
+          setShortList([]);
+        }
+      } catch (err) {
+        console.error("Error fetching short notes:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadShortNotes();
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-
-  const titleX = useTransform(scrollYProgress, [0, 0.35], [-70, 0]);
-  const titleOpacity = useTransform(scrollYProgress, [0, 0.35], [0, 1]);
-  const smoothTitleX = useSpring(titleX, { stiffness: 80, damping: 18 });
 
   return (
     <section ref={sectionRef} className="py-32 bg-white relative overflow-hidden">
@@ -171,17 +102,21 @@ export default function ShortNotes() {
           </div>
         </motion.div>
 
-        {/* GRID — 50/50 Image Top Half & Details Bottom Half */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
-          {shortNotes.map((note) => (
-            <motion.div key={note.id} variants={cardVariants}>
-              <TiltCard className="h-full">
+        {/* GRID — Live Short Notes or Clean Empty State */}
+        {loading ? (
+          <div className="py-12 text-center text-sm font-medium text-gray-500">
+            Loading short notes...
+          </div>
+        ) : shortList.length > 0 ? (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
+            {shortList.map((note) => (
+              <motion.div key={note.id} variants={cardVariants}>
                 <div className="bg-white rounded-2xl border border-gray-200 hover:border-[#016737]/40 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full group">
                   {/* TOP 50% — THUMBNAIL IMAGE BANNER */}
                   <div className="h-40 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
@@ -230,11 +165,20 @@ export default function ShortNotes() {
                     </a>
                   </div>
                 </div>
-              </TiltCard>
-            </motion.div>
-          ))}
-        </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : (
+          <div className="p-12 rounded-3xl bg-gray-50 border border-gray-200 text-center max-w-lg mx-auto">
+            <FileText className="w-10 h-10 text-[#016737] mx-auto mb-3 opacity-60" />
+            <h3 className="text-lg font-bold text-gray-900 mb-1">No Short Notes Uploaded Yet</h3>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Short revision notes added from the Admin Panel will appear here instantly.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );
 }
+

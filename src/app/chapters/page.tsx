@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -50,252 +51,6 @@ interface Chapter {
   pdfPages: number;
 }
 
-const chaptersData: Chapter[] = [
-  {
-    id: "cell-unit-life",
-    title: "Cell: The Unit of Life",
-    classLevel: "Class 11",
-    unit: "Unit 3 · Cell Structure and Function",
-    chapterNumber: 8,
-    weightage: "High (3-4 Qs)",
-    isPaid: false,
-    pdfPages: 18,
-    summary:
-      "All living organisms are composed of cells. Unicellular organisms are capable of independent existence and performing essential functions of life.",
-    keyTopics: ["Prokaryotic vs Eukaryotic", "Endomembrane System", "Mitochondria & Chloroplasts", "Ribosomes & Inclusion Bodies"],
-    notes: [
-      {
-        title: "1. Cell Theory & Overview",
-        content: [
-          "Schleiden (botanist, 1838) & Schwann (zoologist, 1839) formulated Cell Theory.",
-          "Rudolf Virchow (1855) added 'Omnis cellula-e-cellula' (cells arise from pre-existing cells).",
-          "Mycoplasma (PPLO) is the smallest cell (0.3 µm); Ostrich egg is the largest isolated single cell.",
-        ],
-      },
-      {
-        title: "2. Organelles & Membranes",
-        content: [
-          "Fluid Mosaic Model proposed by Singer & Nicolson (1972).",
-          "Mitochondria and Chloroplasts are semi-autonomous with 70S ribosomes & circular DNA.",
-          "Lysosomes contain hydrolytic enzymes active at acidic pH (hydrolases).",
-        ],
-      },
-    ],
-    questions: [
-      {
-        id: 1,
-        question: "Which of the following cellular organelle is called semi-autonomous?",
-        options: ["Ribosome", "Mitochondria", "Golgi Apparatus", "Lysosome"],
-        correctIndex: 1,
-        explanation: "Mitochondria contain their own circular DNA and 70S ribosomes, allowing them to synthesize some of their own proteins.",
-      },
-      {
-        id: 2,
-        question: "Who modified the cell theory to include 'Omnis cellula-e-cellula'?",
-        options: ["Matthias Schleiden", "Theodor Schwann", "Rudolf Virchow", "Robert Hooke"],
-        correctIndex: 2,
-        explanation: "Rudolf Virchow in 1855 explained that cells divide and new cells are formed from pre-existing cells.",
-      },
-    ],
-  },
-  {
-    id: "human-reproduction",
-    title: "Human Reproduction",
-    classLevel: "Class 12",
-    unit: "Unit 6 · Reproduction",
-    chapterNumber: 3,
-    weightage: "High (4-5 Qs)",
-    isPaid: true,
-    price: "₹49",
-    pdfPages: 24,
-    summary:
-      "Comprehensive coverage of male and female reproductive systems, gametogenesis, menstrual cycle, fertilisation, implantation, pregnancy, and parturition.",
-    keyTopics: ["Spermatogenesis vs Oogenesis", "Menstrual Cycle Hormones", "Fertilisation & Blastocyst", "Parturition & Lactation"],
-    notes: [
-      {
-        title: "1. Male & Female Reproductive System",
-        content: [
-          "Sertoli cells provide nutrition to germ cells; Leydig cells secrete androgen (Testosterone).",
-          "Graafian follicle ruptures during ovulation under peak LH surge (day 14).",
-          "Corpus luteum secretes progesterone to maintain the endometrium layer.",
-        ],
-      },
-      {
-        title: "2. Fertilisation & Embryo Development",
-        content: [
-          "Acrosomal reaction releases hyaluronidase to penetrate Zona Pellucida.",
-          "Implantation of Blastocyst occurs in endometrium around day 7 post fertilisation.",
-          "hCG, hPL, and relaxin are produced only during pregnancy.",
-        ],
-      },
-    ],
-    questions: [
-      {
-        id: 101,
-        question: "Ovulation in human female is induced by a surge of which hormone?",
-        options: ["FSH", "LH", "Progesterone", "Estrogen"],
-        correctIndex: 1,
-        explanation: "A rapid secretion of LH leading to its maximum level during the mid-cycle (LH surge) induces rupture of Graafian follicle and release of ovum.",
-      },
-      {
-        id: 102,
-        question: "Secretory phase of human menstrual cycle is also known as:",
-        options: ["Follicular phase", "Luteal phase", "Menstrual phase", "Proliferative phase"],
-        correctIndex: 1,
-        explanation: "The luteal phase is also known as the secretory phase, dominated by progesterone secreted by the corpus luteum.",
-      },
-    ],
-  },
-  {
-    id: "photosynthesis",
-    title: "Photosynthesis in Higher Plants",
-    classLevel: "Class 11",
-    unit: "Unit 4 · Plant Physiology",
-    chapterNumber: 13,
-    weightage: "Medium (3 Qs)",
-    isPaid: false,
-    pdfPages: 22,
-    summary:
-      "Photosynthesis is a physico-chemical process by which plants use light energy to drive the synthesis of organic compounds.",
-    keyTopics: ["Light Reaction & Z-Scheme", "C3 Calvin Cycle", "C4 Hatch-Slack Pathway", "Photorespiration (C2 Cycle)"],
-    notes: [
-      {
-        title: "1. Light-Dependent Reactions",
-        content: [
-          "PS II absorbs at 680 nm (P680); PS I absorbs at 700 nm (P700).",
-          "Splitting of water (photolysis) is associated with PS II on the inner side of thylakoid membrane.",
-          "Non-cyclic photophosphorylation produces ATP and NADPH + H+.",
-        ],
-      },
-      {
-        title: "2. C3 & C4 Carbon Fixation",
-        content: [
-          "Primary CO2 acceptor in C3 plants is RuBP (5-carbon ketose sugar).",
-          "Primary CO2 acceptor in C4 plants is PEP (phosphoenolpyruvate, 3-carbon).",
-          "Kranz anatomy is characteristic of C4 plants (dimorphic chloroplasts).",
-        ],
-      },
-    ],
-    questions: [
-      {
-        id: 201,
-        question: "Which of the following is the primary CO2 acceptor in C4 plants?",
-        options: ["RuBP", "PEP", "PGA", "OAA"],
-        correctIndex: 1,
-        explanation: "In C4 plants, the primary CO2 acceptor is phosphoenolpyruvate (PEP), present in mesophyll cells.",
-      },
-    ],
-  },
-  {
-    id: "molecular-inheritance",
-    title: "Molecular Basis of Inheritance",
-    classLevel: "Class 12",
-    unit: "Unit 7 · Genetics and Evolution",
-    chapterNumber: 6,
-    weightage: "High (5-6 Qs)",
-    isPaid: true,
-    price: "₹79",
-    pdfPages: 28,
-    summary:
-      "Detailed molecular structure of DNA, RNA, Meselson-Stahl replication, transcription, genetic code, translation, and Lac Operon regulation.",
-    keyTopics: ["DNA Double Helix Structure", "Replication & Transcription", "Genetic Code & tRNA", "Lac Operon Model"],
-    notes: [
-      {
-        title: "1. DNA Structure & Transformation Experiments",
-        content: [
-          "Watson & Crick proposed DNA double helix model in 1953.",
-          "Griffith's experiment (1928) proved transforming principle; Hershey & Chase (1952) proved DNA as genetic material using 32P and 35S.",
-          "Chargaff's Rule: A+G = T+C (purines equal pyrimidines).",
-        ],
-      },
-      {
-        title: "2. Lac Operon",
-        content: [
-          "Lac operon consists of 1 regulatory gene (i gene) and 3 structural genes (z, y, a).",
-          "z gene codes for beta-galactosidase, y gene for permease, a gene for transacetylase.",
-          "Lactose acts as the inducer for the lac operon.",
-        ],
-      },
-    ],
-    questions: [
-      {
-        id: 301,
-        question: "In the lac operon, the 'z' structural gene codes for:",
-        options: ["Permease", "Transacetylase", "Beta-galactosidase", "Repressor protein"],
-        correctIndex: 2,
-        explanation: "The z gene codes for beta-galactosidase which breaks down lactose into glucose and galactose.",
-      },
-    ],
-  },
-  {
-    id: "cell-cycle-division",
-    title: "Cell Cycle & Cell Division",
-    classLevel: "Class 11",
-    unit: "Unit 3 · Cell Structure",
-    chapterNumber: 10,
-    weightage: "Medium (3 Qs)",
-    isPaid: false,
-    pdfPages: 16,
-    summary:
-      "Mitosis and Meiosis cell division cycles, interphase stages (G1, S, G2), prophase I sub-stages, and significance of crossing over.",
-    keyTopics: ["Interphase (G1, S, G2)", "Mitosis Stages", "Prophase I Sub-stages", "Significance of Meiosis"],
-    notes: [
-      {
-        title: "1. Stages of Prophase I (Meiosis I)",
-        content: [
-          "Leptotene: Chromosomes become visible under light microscope.",
-          "Zygotene: Synapsis occurs; formation of bivalents / tetrads with synaptonemal complex.",
-          "Pachytene: Crossing over between non-sister chromatids mediated by Recombinase enzyme.",
-          "Diplotene: Dissolution of synaptonemal complex; formation of Chiasmata.",
-          "Diakinesis: Terminalisation of chiasmata.",
-        ],
-      },
-    ],
-    questions: [
-      {
-        id: 401,
-        question: "Crossing over takes place during which stage of prophase I?",
-        options: ["Leptotene", "Zygotene", "Pachytene", "Diplotene"],
-        correctIndex: 2,
-        explanation: "Crossing over between non-sister chromatids occurs during the Pachytene stage of Meiosis I.",
-      },
-    ],
-  },
-  {
-    id: "ecology-environment",
-    title: "Ecology & Environment Mega Pack",
-    classLevel: "Class 12",
-    unit: "Unit 10 · Ecology",
-    chapterNumber: 13,
-    weightage: "High (5-6 Qs)",
-    isPaid: true,
-    price: "₹79",
-    pdfPages: 32,
-    summary:
-      "Ecosystem dynamics, energy flow, ecological pyramids, biodiversity conservation strategies (In-situ & Ex-situ), and environmental protocols.",
-    keyTopics: ["Energy Flow & Pyramids", "In-situ vs Ex-situ Conservation", "Biodiversity Hotspots", "Environmental Protocols"],
-    notes: [
-      {
-        title: "1. Biodiversity & Conservation",
-        content: [
-          "In-situ conservation: National Parks, Wildlife Sanctuaries, Biosphere Reserves, Sacred Groves.",
-          "Ex-situ conservation: Zoological Parks, Botanical Gardens, Cryopreservation (-196°C in liquid N2), Seed Banks.",
-          "Earth Summit held in Rio de Janeiro (1992); World Summit held in Johannesburg (2002).",
-        ],
-      },
-    ],
-    questions: [
-      {
-        id: 501,
-        question: "Cryopreservation of gametes at -196°C is an example of:",
-        options: ["In-situ conservation", "Ex-situ conservation", "In-vitro fertilisation", "Sacred grove"],
-        correctIndex: 1,
-        explanation: "Cryopreservation preserves biological samples outside their natural habitat, making it an Ex-situ conservation technique.",
-      },
-    ],
-  },
-];
-
 export default function ChaptersPage() {
   const { handleCheckout } = useCheckout();
   const { user } = useStudentAuth();
@@ -304,6 +59,55 @@ export default function ChaptersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
   const [activeTab, setActiveTab] = useState<"NOTES" | "MCQS">("NOTES");
+  const [chaptersList, setChaptersList] = useState<Chapter[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadLiveChapters() {
+      try {
+        const supabase = createClient();
+        const { data: pdfsData } = await supabase
+          .from("pdfs")
+          .select("*")
+          .eq("is_active", true)
+          .order("created_at", { ascending: false });
+
+        if (pdfsData && pdfsData.length > 0) {
+          const mappedChapters: Chapter[] = pdfsData.map((pdf: any, idx: number) => ({
+            id: pdf.id,
+            title: pdf.title,
+            classLevel: pdf.class_level === "Class 11" ? "Class 11" : "Class 12",
+            unit: pdf.sub_heading || `Unit ${idx + 1} · Biology`,
+            chapterNumber: idx + 1,
+            weightage: "High Weightage",
+            isPaid: !pdf.is_free,
+            price: pdf.is_free ? "FREE" : `₹${pdf.price || 49}`,
+            pdfPages: pdf.page_count || 14,
+            summary: pdf.description || `${pdf.title} — High yield study notes for NEET exam preparation.`,
+            keyTopics: [pdf.class_level || "NEET", "NCERT High Yield", "Revision Notes"],
+            notes: [
+              {
+                title: "1. Chapter Overview & Concepts",
+                content: [
+                  pdf.description || "Comprehensive NCERT key points and summary.",
+                  "Key formulas, diagrams, and memory tricks included.",
+                ],
+              },
+            ],
+            questions: [],
+          }));
+          setChaptersList(mappedChapters);
+        } else {
+          setChaptersList([]);
+        }
+      } catch (err) {
+        console.error("Error fetching live chapters:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadLiveChapters();
+  }, []);
 
   const onCheckoutClick = (price: string, chapterId: string) => {
     handleCheckout({
@@ -316,7 +120,7 @@ export default function ChaptersPage() {
   const [selectedAnswers, setSelectedAnswers] = useState<{ [qId: number]: number }>({});
   const [submittedQuiz, setSubmittedQuiz] = useState<boolean>(false);
 
-  const filteredChapters = chaptersData.filter((ch) => {
+  const filteredChapters = chaptersList.filter((ch) => {
     const matchesClass = selectedClass === "ALL" || ch.classLevel === selectedClass;
     const matchesQuery =
       ch.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -327,16 +131,6 @@ export default function ChaptersPage() {
   const handleSelectOption = (qId: number, optionIdx: number) => {
     if (submittedQuiz) return;
     setSelectedAnswers((prev) => ({ ...prev, [qId]: optionIdx }));
-  };
-
-  const calculateScore = (questions: Question[]) => {
-    let score = 0;
-    questions.forEach((q) => {
-      if (selectedAnswers[q.id] === q.correctIndex) {
-        score++;
-      }
-    });
-    return score;
   };
 
   return (
@@ -356,7 +150,6 @@ export default function ChaptersPage() {
 
           {/* SEARCH & CLASS FILTERS */}
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            {/* Search Input */}
             <div className="relative w-full sm:w-80">
               <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
@@ -368,7 +161,6 @@ export default function ChaptersPage() {
               />
             </div>
 
-            {/* Class Pill Filters */}
             <div className="flex items-center gap-1.5 bg-gray-100/80 p-1 rounded-full border border-gray-200">
               {(["ALL", "Class 11", "Class 12"] as const).map((cls) => (
                 <button
@@ -387,75 +179,89 @@ export default function ChaptersPage() {
           </div>
         </div>
 
-        {/* CHAPTERS GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredChapters.map((ch) => (
-            <motion.div
-              key={ch.id}
-              whileHover={{ y: -4 }}
-              transition={{ duration: 0.2 }}
-              onClick={() => {
-                setActiveChapter(ch);
-                setActiveTab("NOTES");
-                setSelectedAnswers({});
-                setSubmittedQuiz(false);
-              }}
-              className="bg-white rounded-2xl border border-gray-200 hover:border-[#016737]/40 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full group cursor-pointer"
-            >
-              {/* TOP 50% — BIOLOGY THUMBNAIL IMAGE BANNER */}
-              <div className="h-44 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
-                <img
-                  src="/hero_premium_clean.png"
-                  alt={ch.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                
-                {/* Header Badge */}
-                <div className="absolute top-3 left-3 flex items-center gap-2">
-                  <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-[#016737] text-white shadow-xs">
-                    {ch.classLevel}
-                  </span>
+        {/* CHAPTERS GRID — Live Chapters or Clean Empty State */}
+        {loading ? (
+          <div className="py-12 text-center text-sm font-medium text-gray-500">
+            Loading chapters...
+          </div>
+        ) : filteredChapters.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredChapters.map((ch) => (
+              <motion.div
+                key={ch.id}
+                whileHover={{ y: -4 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => {
+                  setActiveChapter(ch);
+                  setActiveTab("NOTES");
+                  setSelectedAnswers({});
+                  setSubmittedQuiz(false);
+                }}
+                className="bg-white rounded-2xl border border-gray-200 hover:border-[#016737]/40 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full group cursor-pointer"
+              >
+                {/* TOP 50% — THUMBNAIL IMAGE BANNER */}
+                <div className="h-44 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
+                  <img
+                    src="/hero_premium_clean.png"
+                    alt={ch.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  
+                  {/* Header Badge */}
+                  <div className="absolute top-3 left-3 flex items-center gap-2">
+                    <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-[#016737] text-white shadow-xs">
+                      {ch.classLevel}
+                    </span>
+                  </div>
+
+                  <div className="absolute top-3 right-3">
+                    <span className="inline-flex items-center gap-1 text-xs font-bold bg-[#8BC43F] text-[#111827] px-2.5 py-1 rounded-full shadow-xs">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      {ch.isPaid ? ch.price : "Free Notes"}
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <span className="text-[11px] font-bold text-white/90 uppercase tracking-wider bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-md">
+                      {ch.unit}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="absolute top-3 right-3">
-                  <span className="inline-flex items-center gap-1 text-xs font-bold bg-[#8BC43F] text-[#111827] px-2.5 py-1 rounded-full shadow-xs">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Free Notes
-                  </span>
-                </div>
+                {/* BOTTOM 50% — DETAILS */}
+                <div className="p-5 flex flex-col justify-between flex-1 gap-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-[#111827] leading-snug group-hover:text-[#016737] transition-colors">
+                      {ch.title}
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed">
+                      {ch.summary}
+                    </p>
+                  </div>
 
-                <div className="absolute bottom-3 left-3 right-3">
-                  <span className="text-[11px] font-bold text-white/90 uppercase tracking-wider bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-md">
-                    {ch.unit}
-                  </span>
+                  <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500 font-medium">
+                    <span className="flex items-center gap-1">
+                      <FileText className="w-3.5 h-3.5 text-[#016737]" />
+                      {ch.pdfPages} Pages
+                    </span>
+                    <span className="flex items-center gap-1 text-[#016737] font-bold group-hover:translate-x-1 transition-transform">
+                      View Chapter Notes &rarr;
+                    </span>
+                  </div>
                 </div>
-              </div>
-
-              {/* BOTTOM 50% — DETAILS */}
-              <div className="p-5 flex flex-col justify-between flex-1 gap-4">
-                <div>
-                  <h3 className="text-lg font-bold text-[#111827] leading-snug group-hover:text-[#016737] transition-colors">
-                    {ch.title}
-                  </h3>
-                  <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed">
-                    {ch.summary}
-                  </p>
-                </div>
-
-                <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500 font-medium">
-                  <span className="flex items-center gap-1">
-                    <FileText className="w-3.5 h-3.5 text-[#016737]" />
-                    {ch.pdfPages} Pages
-                  </span>
-                  <span className="flex items-center gap-1 text-[#016737] font-bold group-hover:translate-x-1 transition-transform">
-                    View Chapter Notes &rarr;
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-12 rounded-3xl bg-gray-50 border border-gray-200 text-center max-w-lg mx-auto">
+            <BookOpen className="w-10 h-10 text-[#016737] mx-auto mb-3 opacity-60" />
+            <h3 className="text-lg font-bold text-gray-900 mb-1">No Chapters Uploaded Yet</h3>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              When you upload PDFs or create chapters from the Admin Panel, they will appear here automatically.
+            </p>
+          </div>
+        )}
       </main>
 
       {/* FULL-SCREEN SLIDING CHAPTER MODAL / DRAWER */}

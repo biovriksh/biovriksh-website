@@ -4,56 +4,21 @@ import { useCheckout } from "@/hooks/useCheckout";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
 import AuthModal from "@/components/AuthModal";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Lock, Sparkles } from "lucide-react";
+import { Lock, Sparkles, FileText } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-const defaultPaidPDFs = [
-  {
-    id: "paid-1",
-    rawId: "1",
-    subject: "Cell Division & Cell Cycle",
-    chapter: "Chapter 10 · Class 11",
-    questions: 120,
-    difficulty: "Medium",
-    price: "₹49",
-    topics: ["Mitosis", "Meiosis", "Checkpoints"],
-    image: "/hero_premium_clean.png",
-  },
-  {
-    id: "paid-2",
-    rawId: "2",
-    subject: "Human Reproduction",
-    chapter: "Chapter 3 · Class 12",
-    questions: 150,
-    difficulty: "Hard",
-    price: "₹49",
-    topics: ["Gametogenesis", "Fertilisation", "Implantation"],
-    image: "/hero_premium_clean.png",
-  },
-  {
-    id: "paid-3",
-    rawId: "3",
-    subject: "Ecology & Environment",
-    chapter: "Chapter 13 & 14 · Class 12",
-    questions: 200,
-    difficulty: "Medium",
-    price: "₹79",
-    topics: ["Ecosystem", "Biodiversity", "Pollution"],
-    image: "/hero_premium_clean.png",
-  },
-  {
-    id: "paid-4",
-    rawId: "4",
-    subject: "Genetics & Evolution Mega Pack",
-    chapter: "Ch. 5–7 · Class 12",
-    questions: 300,
-    difficulty: "Hard",
-    price: "₹129",
-    topics: ["Mendel's Laws", "DNA Replication", "Evolution"],
-    image: "/hero_premium_clean.png",
-  },
-];
+interface PaidNoteItem {
+  id: string;
+  rawId: string;
+  subject: string;
+  chapter: string;
+  questions: number;
+  difficulty: string;
+  price: string;
+  topics: string[];
+  image: string;
+}
 
 const containerVariants = {
   hidden: {},
@@ -75,7 +40,8 @@ export default function PaidPDFs() {
   const { handleCheckout } = useCheckout();
   const { user } = useStudentAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [paidList, setPaidList] = useState(defaultPaidPDFs);
+  const [paidList, setPaidList] = useState<PaidNoteItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -102,9 +68,13 @@ export default function PaidPDFs() {
             image: pdf.thumbnail_url || "/hero_premium_clean.png",
           }));
           setPaidList(mapped);
+        } else {
+          setPaidList([]);
         }
       } catch (err) {
         console.error("Error fetching paid PDFs:", err);
+      } finally {
+        setLoading(false);
       }
     }
     loadLivePaidPDFs();
@@ -186,72 +156,86 @@ export default function PaidPDFs() {
           </motion.div>
 
           {/* CARDS GRID */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {paidList.map((pdf) => (
-              <motion.div
-                key={pdf.id}
-                variants={cardVariants}
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.2 }}
-                className="bg-white rounded-2xl border border-gray-200 hover:border-[#016737]/40 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full group"
-              >
-                {/* TOP 50% */}
-                <div className="h-40 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
-                  <img
-                    src={pdf.image}
-                    alt={pdf.subject}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  
-                  <div className="absolute top-3 right-3">
-                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#016737] text-white shadow-xs">
-                      {pdf.price}
-                    </span>
-                  </div>
+          {loading ? (
+            <div className="py-12 text-center text-sm font-medium text-gray-500">
+              Loading premium notes...
+            </div>
+          ) : paidList.length > 0 ? (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            >
+              {paidList.map((pdf) => (
+                <motion.div
+                  key={pdf.id}
+                  variants={cardVariants}
+                  whileHover={{ y: -4 }}
+                  transition={{ duration: 0.2 }}
+                  className="bg-white rounded-2xl border border-gray-200 hover:border-[#016737]/40 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full group"
+                >
+                  {/* TOP 50% */}
+                  <div className="h-40 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
+                    <img
+                      src={pdf.image}
+                      alt={pdf.subject}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    
+                    <div className="absolute top-3 right-3">
+                      <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#016737] text-white shadow-xs">
+                        {pdf.price}
+                      </span>
+                    </div>
 
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <span className="text-[11px] font-bold text-white/90 uppercase tracking-wider bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-md">
-                      {pdf.chapter}
-                    </span>
-                  </div>
-                </div>
-
-                {/* BOTTOM 50% */}
-                <div className="p-5 flex flex-col justify-between flex-1 gap-4">
-                  <div>
-                    <h3 className="text-base font-bold text-[#111827] leading-snug group-hover:text-[#016737] transition-colors">
-                      {pdf.subject}
-                    </h3>
-                    <div className="flex flex-wrap gap-1.5 mt-2.5">
-                      {pdf.topics.map((topic) => (
-                        <span
-                          key={topic}
-                          className="text-[10px] font-medium text-gray-600 bg-gray-100 px-2.5 py-0.5 rounded-full"
-                        >
-                          {topic}
-                        </span>
-                      ))}
+                    <div className="absolute bottom-3 left-3 right-3">
+                      <span className="text-[11px] font-bold text-white/90 uppercase tracking-wider bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-md">
+                        {pdf.chapter}
+                      </span>
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => onUnlockClick(pdf.id)}
-                    className="w-full py-2.5 rounded-xl bg-[#016737] text-white text-xs font-bold hover:bg-[#014d29] transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
-                  >
-                    <Lock className="w-3.5 h-3.5" />
-                    <span>Unlock Note ({pdf.price})</span>
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                  {/* BOTTOM 50% */}
+                  <div className="p-5 flex flex-col justify-between flex-1 gap-4">
+                    <div>
+                      <h3 className="text-base font-bold text-[#111827] leading-snug group-hover:text-[#016737] transition-colors">
+                        {pdf.subject}
+                      </h3>
+                      <div className="flex flex-wrap gap-1.5 mt-2.5">
+                        {pdf.topics.map((topic) => (
+                          <span
+                            key={topic}
+                            className="text-[10px] font-medium text-gray-600 bg-gray-100 px-2.5 py-0.5 rounded-full"
+                          >
+                            {topic}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => onUnlockClick(pdf.id)}
+                      className="w-full py-2.5 rounded-xl bg-[#016737] text-white text-xs font-bold hover:bg-[#014d29] transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                    >
+                      <Lock className="w-3.5 h-3.5" />
+                      <span>Unlock Note ({pdf.price})</span>
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <div className="p-12 rounded-3xl bg-gray-50 border border-gray-200 text-center max-w-lg mx-auto">
+              <FileText className="w-10 h-10 text-[#016737] mx-auto mb-3 opacity-60" />
+              <h3 className="text-lg font-bold text-gray-900 mb-1">No Premium Notes Uploaded Yet</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Premium notes added from the Admin Panel will appear here instantly.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -264,4 +248,5 @@ export default function PaidPDFs() {
     </>
   );
 }
+
 

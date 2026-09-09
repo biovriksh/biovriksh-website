@@ -1,56 +1,21 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { FileText, Eye, Lock, ShieldCheck, X, BookOpen } from "lucide-react";
+import { motion, useScroll } from "framer-motion";
+import { BookOpen, FileText } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-const defaultRecentNotes = [
-  {
-    id: "1",
-    subject: "Cell: The Unit of Life",
-    chapter: "Chapter 8 · Class 11",
-    pages: "18 pages",
-    views: "4.2k views",
-    isPaid: false,
-    price: "FREE",
-    image: "/hero_premium_clean.png",
-    accent: "#8BC43F",
-  },
-  {
-    id: "2",
-    subject: "Photosynthesis in Higher Plants",
-    chapter: "Chapter 13 · Class 11",
-    pages: "22 pages",
-    views: "3.8k views",
-    isPaid: true,
-    price: "₹49",
-    image: "/hero_premium_clean.png",
-    accent: "#016737",
-  },
-  {
-    id: "3",
-    subject: "Reproduction in Organisms",
-    chapter: "Chapter 1 · Class 12",
-    pages: "14 pages",
-    views: "5.1k views",
-    isPaid: false,
-    price: "FREE",
-    image: "/hero_premium_clean.png",
-    accent: "#8BC43F",
-  },
-  {
-    id: "4",
-    subject: "Molecular Basis of Inheritance",
-    chapter: "Chapter 6 · Class 12",
-    pages: "28 pages",
-    views: "6.7k views",
-    isPaid: true,
-    price: "₹49",
-    image: "/hero_premium_clean.png",
-    accent: "#016737",
-  },
-];
+interface NoteItem {
+  id: string;
+  subject: string;
+  chapter: string;
+  pages: string;
+  views: string;
+  isPaid: boolean;
+  price: string;
+  image: string;
+  accent: string;
+}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -71,13 +36,14 @@ const cardVariants = {
 
 export default function RecentPDFs() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [notesList, setNotesList] = useState(defaultRecentNotes);
+  const [notesList, setNotesList] = useState<NoteItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadLivePDFs() {
       try {
         const supabase = createClient();
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from("pdfs")
           .select("*")
           .eq("is_active", true)
@@ -97,9 +63,13 @@ export default function RecentPDFs() {
             accent: pdf.is_free ? "#8BC43F" : "#016737",
           }));
           setNotesList(liveNotes);
+        } else {
+          setNotesList([]);
         }
       } catch (err) {
         console.error("Error fetching live PDFs:", err);
+      } finally {
+        setLoading(false);
       }
     }
     loadLivePDFs();
@@ -155,79 +125,94 @@ export default function RecentPDFs() {
           </a>
         </motion.div>
 
-        {/* CARDS GRID — 50/50 Image Top Half & Details Bottom Half */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
-          {notesList.map((note) => (
-            <motion.div
-              key={note.id}
-              variants={cardVariants}
-              whileHover={{ y: -4 }}
-              transition={{ duration: 0.2 }}
-              className="bg-white rounded-2xl border border-gray-200 hover:border-[#016737]/40 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full group"
-            >
-              {/* TOP 50% — BIOLOGY THUMBNAIL IMAGE BANNER */}
-              <div className="h-40 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
-                <img
-                  src={note.image}
-                  alt={note.subject}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                
-                {/* Price / Free Badge */}
-                <div className="absolute top-3 right-3">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold shadow-xs ${
-                      note.isPaid
-                        ? "bg-[#016737] text-white"
-                        : "bg-[#8BC43F] text-[#111827]"
-                    }`}
+        {/* CARDS GRID — Live Data or Empty State */}
+        {loading ? (
+          <div className="py-12 text-center text-sm font-medium text-gray-500">
+            Loading recent study notes...
+          </div>
+        ) : notesList.length > 0 ? (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
+            {notesList.map((note) => (
+              <motion.div
+                key={note.id}
+                variants={cardVariants}
+                whileHover={{ y: -4 }}
+                transition={{ duration: 0.2 }}
+                className="bg-white rounded-2xl border border-gray-200 hover:border-[#016737]/40 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full group"
+              >
+                {/* TOP 50% — THUMBNAIL IMAGE BANNER */}
+                <div className="h-40 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
+                  <img
+                    src={note.image}
+                    alt={note.subject}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  
+                  {/* Price / Free Badge */}
+                  <div className="absolute top-3 right-3">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-bold shadow-xs ${
+                        note.isPaid
+                          ? "bg-[#016737] text-white"
+                          : "bg-[#8BC43F] text-[#111827]"
+                      }`}
+                    >
+                      {note.price}
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <span className="text-[11px] font-bold text-white/90 uppercase tracking-wider bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-md">
+                      {note.chapter}
+                    </span>
+                  </div>
+                </div>
+
+                {/* BOTTOM 50% — DETAILS & SECURE READER BUTTON */}
+                <div className="p-5 flex flex-col justify-between flex-1 gap-4">
+                  <div>
+                    <h3 className="text-base font-bold text-[#111827] leading-snug group-hover:text-[#016737] transition-colors">
+                      {note.subject}
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-2">
+                      <span>{note.pages}</span>
+                      <span>•</span>
+                      <span>{note.views}</span>
+                    </p>
+                  </div>
+
+                  <a
+                    href={`/secure-reader?title=${encodeURIComponent(note.subject)}&subject=${encodeURIComponent(note.chapter)}&pages=${encodeURIComponent(note.pages)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-2.5 rounded-xl border border-[#016737] text-[#016737] text-xs font-bold hover:bg-[#016737] hover:text-white transition-all flex items-center justify-center gap-1.5 shadow-2xs"
                   >
-                    {note.price}
-                  </span>
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>Open Secure Reader ↗</span>
+                  </a>
                 </div>
-
-                <div className="absolute bottom-3 left-3 right-3">
-                  <span className="text-[11px] font-bold text-white/90 uppercase tracking-wider bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-md">
-                    {note.chapter}
-                  </span>
-                </div>
-              </div>
-
-              {/* BOTTOM 50% — DETAILS & SECURE READER BUTTON */}
-              <div className="p-5 flex flex-col justify-between flex-1 gap-4">
-                <div>
-                  <h3 className="text-base font-bold text-[#111827] leading-snug group-hover:text-[#016737] transition-colors">
-                    {note.subject}
-                  </h3>
-                  <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-2">
-                    <span>{note.pages}</span>
-                    <span>•</span>
-                    <span>{note.views}</span>
-                  </p>
-                </div>
-
-                <a
-                  href={`/secure-reader?title=${encodeURIComponent(note.subject)}&subject=${encodeURIComponent(note.chapter)}&pages=${encodeURIComponent(note.pages)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-2.5 rounded-xl border border-[#016737] text-[#016737] text-xs font-bold hover:bg-[#016737] hover:text-white transition-all flex items-center justify-center gap-1.5 shadow-2xs"
-                >
-                  <BookOpen className="w-3.5 h-3.5" />
-                  <span>Open Secure Reader ↗</span>
-                </a>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : (
+          <div className="p-12 rounded-3xl bg-gray-50 border border-gray-200 text-center max-w-lg mx-auto">
+            <FileText className="w-10 h-10 text-[#016737] mx-auto mb-3 opacity-60" />
+            <h3 className="text-lg font-bold text-gray-900 mb-1">No Notes Uploaded Yet</h3>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              New NEET study notes added from the Admin Panel will appear here instantly.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );
 }
+
 
