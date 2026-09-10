@@ -191,7 +191,7 @@ function SecureReaderContent() {
           </div>
 
           <span className="bg-[#8BC43F]/20 text-[#016737] dark:text-[#8BC43F] border border-[#8BC43F]/40 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0">
-            🔒 DRM Protected
+            🔒 Protected Notes
           </span>
         </div>
 
@@ -356,7 +356,7 @@ function SecureReaderContent() {
         }`}
       >
         <span className="font-semibold">
-          Bio Vriksh DRM Secure Reader
+          Bio Vriksh Document Reader
         </span>
 
         <span className="font-mono font-bold text-[#016737] dark:text-[#8BC43F]">
@@ -380,7 +380,7 @@ export default function SecureReaderPage() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-gray-50 text-gray-700 flex items-center justify-center text-sm font-semibold">
-          Loading Secure Reader...
+          Loading Document Viewer...
         </div>
       }
     >

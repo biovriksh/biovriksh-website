@@ -8,11 +8,11 @@ export default function FounderStory() {
       <div className="max-w-6xl mx-auto px-6 md:px-12 relative min-h-[500px] md:min-h-[580px] flex items-center">
         
         {/* RIGHT SIDE PORTRAIT IMAGE (Spans top to bottom on the right side) */}
-        <div className="absolute right-4 sm:right-8 md:right-12 top-0 bottom-0 w-[48%] sm:w-[50%] md:w-[52%] z-0 overflow-hidden shadow-sm">
+        <div className="absolute right-4 sm:right-8 md:right-12 top-0 bottom-0 w-[48%] sm:w-[50%] md:w-[52%] z-0 overflow-hidden shadow-sm rounded-2xl md:rounded-3xl">
           <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900&auto=format&fit=crop&q=80"
-            alt="Founder - BioVriksh"
-            className="w-full h-full object-cover grayscale-[10%] contrast-[105%]"
+            src="/yashika_tarar.jpg"
+            alt="Yashika Tarar - Founder of BioVriksh"
+            className="w-full h-full object-cover object-top contrast-[102%]"
           />
           {/* Subtle blend overlay */}
           <div className="absolute inset-0 bg-[#4A3E34]/5 mix-blend-multiply pointer-events-none" />
@@ -37,10 +37,10 @@ export default function FounderStory() {
             Every NEET aspirant carries a dream of wearing that white coat. BioVriksh was born from the exact same passion — to simplify complex concepts into crystal-clear notes and empower every student to crack NEET with confidence.
           </p>
 
-          {/* DELICATE HANDWRITTEN SIGNATURE (Matching Reference Image) */}
+          {/* DELICATE HANDWRITTEN SIGNATURE */}
           <div className="pt-2">
             <span className="font-signature text-4xl sm:text-5xl md:text-6xl text-[#4A3E34] block leading-none tracking-wide">
-              Arjun Sharma
+              Yashika Tarar
             </span>
           </div>
         </motion.div>

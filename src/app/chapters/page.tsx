@@ -182,7 +182,7 @@ export default function ChaptersPage() {
             Loading chapters...
           </div>
         ) : filteredChapters.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
             {filteredChapters.map((ch) => (
               <motion.div
                 key={ch.id}
@@ -196,8 +196,8 @@ export default function ChaptersPage() {
                 }}
                 className="bg-white rounded-2xl border border-gray-200 hover:border-[#016737]/40 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full group cursor-pointer"
               >
-                {/* TOP 50% — THUMBNAIL IMAGE BANNER */}
-                <div className="h-44 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
+                {/* TOP — THUMBNAIL IMAGE BANNER */}
+                <div className="h-28 sm:h-44 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
                   <img
                     src={(ch as any).image || "/hero_premium_clean.png"}
                     alt={ch.title}
@@ -206,44 +206,44 @@ export default function ChaptersPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                   
                   {/* Header Badge */}
-                  <div className="absolute top-3 left-3 flex items-center gap-2">
-                    <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-[#016737] text-white shadow-xs">
+                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex items-center gap-2">
+                    <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-[#016737] text-white shadow-xs">
                       {ch.classLevel}
                     </span>
                   </div>
 
-                  <div className="absolute top-3 right-3">
-                    <span className="inline-flex items-center gap-1 text-xs font-bold bg-[#8BC43F] text-[#111827] px-2.5 py-1 rounded-full shadow-xs">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
+                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
+                    <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-bold bg-[#8BC43F] text-[#111827] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shadow-xs">
+                      <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                       {ch.isPaid ? ch.price : "Free Notes"}
                     </span>
                   </div>
 
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <span className="text-[11px] font-bold text-white/90 uppercase tracking-wider bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-md">
+                  <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3">
+                    <span className="text-[9px] sm:text-[11px] font-bold text-white/90 uppercase tracking-wider bg-black/40 backdrop-blur-md px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md truncate block">
                       {ch.unit}
                     </span>
                   </div>
                 </div>
 
-                {/* BOTTOM 50% — DETAILS */}
-                <div className="p-5 flex flex-col justify-between flex-1 gap-4">
+                {/* BOTTOM — DETAILS */}
+                <div className="p-3 sm:p-5 flex flex-col justify-between flex-1 gap-2.5 sm:gap-4">
                   <div>
-                    <h3 className="text-lg font-bold text-[#111827] leading-snug group-hover:text-[#016737] transition-colors">
+                    <h3 className="text-xs sm:text-lg font-bold text-[#111827] leading-snug group-hover:text-[#016737] transition-colors line-clamp-2">
                       {ch.title}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed">
+                    <p className="text-[11px] sm:text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed hidden sm:block">
                       {ch.summary}
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500 font-medium">
+                  <div className="pt-2 sm:pt-3 border-t border-gray-100 flex items-center justify-between text-[10px] sm:text-xs text-gray-500 font-medium">
                     <span className="flex items-center gap-1">
-                      <FileText className="w-3.5 h-3.5 text-[#016737]" />
+                      <FileText className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#016737]" />
                       {ch.pdfPages} Pages
                     </span>
                     <span className="flex items-center gap-1 text-[#016737] font-bold group-hover:translate-x-1 transition-transform">
-                      View Chapter Notes &rarr;
+                      View Notes &rarr;
                     </span>
                   </div>
                 </div>
@@ -350,7 +350,7 @@ export default function ChaptersPage() {
                           className="text-[11px] font-extrabold px-3 py-1.5 rounded-full bg-[#016737] text-white hover:bg-[#014d29] transition-colors flex items-center gap-1 shadow-2xs"
                         >
                           <BookOpen className="w-3.5 h-3.5" />
-                          <span>Open Secure Reader ↗</span>
+                          <span>Read Notes ↗</span>
                         </a>
                       </div>
                       <p className="text-sm text-gray-700 leading-relaxed font-normal">

@@ -162,7 +162,7 @@ export default function PaidPDFs() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-60px" }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+              className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6"
             >
               {paidList.map((pdf) => (
                 <motion.div
@@ -172,8 +172,8 @@ export default function PaidPDFs() {
                   transition={{ duration: 0.2 }}
                   className="bg-white rounded-2xl border border-gray-200 hover:border-[#016737]/40 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full group"
                 >
-                  {/* TOP 50% */}
-                  <div className="h-40 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
+                  {/* TOP */}
+                  <div className="h-28 sm:h-40 relative overflow-hidden bg-gradient-to-br from-[#016737]/10 to-[#8BC43F]/20">
                     <img
                       src={pdf.image}
                       alt={pdf.subject}
@@ -181,30 +181,30 @@ export default function PaidPDFs() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     
-                    <div className="absolute top-3 right-3">
-                      <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#016737] text-white shadow-xs">
+                    <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
+                      <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-[#016737] text-white shadow-xs">
                         {pdf.price}
                       </span>
                     </div>
 
-                    <div className="absolute bottom-3 left-3 right-3">
-                      <span className="text-[11px] font-bold text-white/90 uppercase tracking-wider bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-md">
+                    <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3">
+                      <span className="text-[9px] sm:text-[11px] font-bold text-white/90 uppercase tracking-wider bg-black/40 backdrop-blur-md px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md truncate block">
                         {pdf.chapter}
                       </span>
                     </div>
                   </div>
 
-                  {/* BOTTOM 50% */}
-                  <div className="p-5 flex flex-col justify-between flex-1 gap-4">
+                  {/* BOTTOM */}
+                  <div className="p-3 sm:p-5 flex flex-col justify-between flex-1 gap-2.5 sm:gap-4">
                     <div>
-                      <h3 className="text-base font-bold text-[#111827] leading-snug group-hover:text-[#016737] transition-colors">
+                      <h3 className="text-xs sm:text-base font-bold text-[#111827] leading-snug group-hover:text-[#016737] transition-colors line-clamp-2">
                         {pdf.subject}
                       </h3>
-                      <div className="flex flex-wrap gap-1.5 mt-2.5">
+                      <div className="flex flex-wrap gap-1 sm:gap-1.5 mt-2">
                         {pdf.topics.map((topic) => (
                           <span
                             key={topic}
-                            className="text-[10px] font-medium text-gray-600 bg-gray-100 px-2.5 py-0.5 rounded-full"
+                            className="text-[9px] sm:text-[10px] font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full"
                           >
                             {topic}
                           </span>
@@ -214,10 +214,10 @@ export default function PaidPDFs() {
 
                     <button
                       onClick={() => onUnlockClick(pdf.id)}
-                      className="w-full py-2.5 rounded-xl bg-[#016737] text-white text-xs font-bold hover:bg-[#014d29] transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                      className="w-full py-2 sm:py-2.5 rounded-xl bg-[#016737] text-white text-[11px] sm:text-xs font-bold hover:bg-[#014d29] transition-all flex items-center justify-center gap-1 shadow-2xs cursor-pointer text-center"
                     >
                       <Lock className="w-3.5 h-3.5" />
-                      <span>Unlock Note ({pdf.price})</span>
+                      <span>Unlock ({pdf.price})</span>
                     </button>
                   </div>
                 </motion.div>
