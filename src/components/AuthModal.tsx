@@ -41,6 +41,9 @@ export default function AuthModal({
     setErrorMsg("");
     setSuccessMsg("");
 
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password;
+
     try {
       if (mode === "signup") {
         if (!fullName.trim()) {
@@ -50,35 +53,80 @@ export default function AuthModal({
         }
 
         const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
+          email: cleanEmail,
+          password: cleanPassword,
           options: {
             data: {
-              full_name: fullName,
-              phone: phone,
+              full_name: fullName.trim(),
+              phone: phone.trim(),
             },
           },
         });
 
         if (error) throw error;
 
-        // Auto sign in if session is not active yet
-        if (!data.session) {
-          await supabase.auth.signInWithPassword({ email, password }).catch(() => {});
+        // Check if user already exists (Supabase returns user with empty identities if already registered)
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+          setErrorMsg("This email is already registered. Attempting to log you in...");
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email: cleanEmail,
+            password: cleanPassword,
+          });
+
+          if (signInError) {
+            if (signInError.message.includes("Email not confirmed")) {
+              throw new Error("Email confirmation is required. Please check your email inbox to verify your account, or turn off 'Confirm Email' in Supabase Auth Settings.");
+            }
+            throw new Error("Account already exists. Please enter your correct password to log in.");
+          }
+
+          setSuccessMsg("Welcome back! Logged in successfully.");
+          setTimeout(() => {
+            if (onSuccess) onSuccess();
+            onClose();
+          }, 1000);
+          return;
         }
 
-        setSuccessMsg("Account created successfully! You are now logged in.");
-        setTimeout(() => {
-          if (onSuccess) onSuccess();
-          onClose();
-        }, 1200);
+        // Auto sign in if session is not active yet
+        let activeSession = data.session;
+        if (!activeSession) {
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email: cleanEmail,
+            password: cleanPassword,
+          });
+          if (!signInError && signInData.session) {
+            activeSession = signInData.session;
+          }
+        }
+
+        if (activeSession) {
+          setSuccessMsg("Account created successfully! You are now logged in.");
+          setTimeout(() => {
+            if (onSuccess) onSuccess();
+            onClose();
+          }, 1200);
+        } else {
+          setSuccessMsg("Account created! If email confirmation is enabled in your Supabase project, please check your inbox to verify before logging in.");
+          setTimeout(() => {
+            setMode("signin");
+          }, 2500);
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+          email: cleanEmail,
+          password: cleanPassword,
         });
 
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes("Email not confirmed")) {
+            throw new Error("Email confirmation is required by your Supabase settings! Please check your email inbox to verify, or turn off 'Confirm Email' in your Supabase Auth settings.");
+          }
+          if (error.message.includes("Invalid login credentials")) {
+            throw new Error("Invalid email or password. Please verify your credentials or click Sign Up to create an account.");
+          }
+          throw error;
+        }
 
         setSuccessMsg("Welcome back! Login successful.");
         setTimeout(() => {

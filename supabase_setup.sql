@@ -2,6 +2,12 @@
 -- BIO VRIKSH — COMPLETE DATABASE SCHEMA, RLS POLICIES & STORAGE BUCKETS
 -- ============================================================================
 -- Paste this entire SQL file into your Supabase Dashboard -> SQL Editor and click RUN.
+--
+-- IMPORTANT AUTHENTICATION NOTE FOR PROD/LIVE SITE:
+-- If students cannot log in after signing up ("Email not confirmed" error), turn OFF Email Confirmation:
+-- Go to Supabase Dashboard -> Authentication -> Providers -> Email -> Toggle OFF "Confirm Email" -> Click Save.
+-- This allows students to sign up and immediately log in without waiting for an email link.
+-- ----------------------------------------------------------------------------
 
 -- ----------------------------------------------------------------------------
 -- 1. PROFILES TABLE (Extends Supabase Auth users)

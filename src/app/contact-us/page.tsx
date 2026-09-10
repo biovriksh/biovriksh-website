@@ -27,8 +27,8 @@ export default function ContactUsPage() {
             <div>
               <h3 className="font-bold text-[#111827] text-base mb-1">Email Support</h3>
               <p className="text-xs text-gray-500 mb-2">Send us a mail anytime</p>
-              <a href="mailto:support@biovriksh.in" className="text-sm font-bold text-[#016737] hover:underline">
-                support@biovriksh.in
+              <a href="mailto:workwithbiovriksh@gmail.com" className="text-sm font-bold text-[#016737] hover:underline">
+                workwithbiovriksh@gmail.com
               </a>
             </div>
           </div>
@@ -40,8 +40,8 @@ export default function ContactUsPage() {
             <div>
               <h3 className="font-bold text-[#111827] text-base mb-1">Phone &amp; WhatsApp</h3>
               <p className="text-xs text-gray-500 mb-2">Mon - Sat (9am - 7pm)</p>
-              <a href="tel:+919876543210" className="text-sm font-bold text-[#016737] hover:underline">
-                +91 98765 43210
+              <a href="tel:+918278071134" className="text-sm font-bold text-[#016737] hover:underline">
+                +91 8278071134
               </a>
             </div>
           </div>

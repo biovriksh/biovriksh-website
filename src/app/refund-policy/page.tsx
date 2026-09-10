@@ -59,7 +59,7 @@ export default function RefundPolicyPage() {
           <section className="space-y-3">
             <h2 className="text-xl font-bold text-[#111827]">4. Refund Process &amp; Timeline</h2>
             <p>
-              To request a refund for duplicate charges or technical failure, please email us at <strong>support@biovriksh.in</strong> with your payment receipt and Razorpay Order ID.
+              To request a refund for duplicate charges or technical failure, please email us at <strong>workwithbiovriksh@gmail.com</strong> with your payment receipt and Razorpay Order ID.
             </p>
             <p className="p-4 bg-[#F6F6F6] rounded-xl border border-gray-200 text-sm">
               <strong>Refund Timeline:</strong> Once approved, refunds are processed within <strong>5 to 7 business days</strong> and credited back directly to your original payment method (Bank Account, UPI, or Card) via Razorpay.
@@ -73,8 +73,8 @@ export default function RefundPolicyPage() {
             </p>
             <div className="p-4 bg-[#F6F6F6] rounded-xl border border-gray-200 text-sm">
               <p><strong>BioVriksh EdTech</strong></p>
-              <p>Email: support@biovriksh.in</p>
-              <p>Phone: +91 98765 43210</p>
+              <p>Email: workwithbiovriksh@gmail.com</p>
+              <p>Phone: +91 8278071134</p>
               <p>Location: Bangalore, Karnataka, India — 560001</p>
             </div>
           </section>

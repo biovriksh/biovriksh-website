@@ -147,18 +147,18 @@ export default function Footer() {
             <div className="flex flex-col gap-3 text-sm text-[#2B2F2C] font-medium">
               <p className="font-bold text-[#1A1A1A]">Reach out</p>
               <a
-                href="mailto:support@biovriksh.in"
+                href="mailto:workwithbiovriksh@gmail.com"
                 className="inline-flex items-center gap-2.5 hover:text-[#016737] transition-colors group"
               >
                 <MailLogo className="w-5 h-5 group-hover:scale-110 transition-transform shadow-xs" />
-                <span>support@biovriksh.in</span>
+                <span>workwithbiovriksh@gmail.com</span>
               </a>
               <a
-                href="tel:+919876543210"
+                href="tel:+918278071134"
                 className="inline-flex items-center gap-2.5 hover:text-[#016737] transition-colors group"
               >
                 <PhoneLogo className="w-5 h-5 group-hover:scale-110 transition-transform shadow-xs" />
-                <span>+91 98765 43210</span>
+                <span>+91 8278071134</span>
               </a>
             </div>
           </div>

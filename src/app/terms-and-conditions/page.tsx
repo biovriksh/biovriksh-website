@@ -61,8 +61,8 @@ export default function TermsAndConditionsPage() {
             <h2 className="text-xl font-bold text-[#111827]">6. Contact Information</h2>
             <div className="p-4 bg-[#F6F6F6] rounded-xl border border-gray-200 text-sm">
               <p><strong>BioVriksh EdTech</strong></p>
-              <p>Email: support@biovriksh.in</p>
-              <p>Phone: +91 98765 43210</p>
+              <p>Email: workwithbiovriksh@gmail.com</p>
+              <p>Phone: +91 8278071134</p>
               <p>Location: Bangalore, Karnataka, India — 560001</p>
             </div>
           </section>

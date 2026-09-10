@@ -143,6 +143,7 @@ export default function PaidPDFs() {
                 <p className="mt-2 text-xs sm:text-sm text-gray-600 max-w-xl leading-relaxed">
                   High-density question banks crafted by NEET toppers. Pay once, practice infinitely.
                 </p>
+              </div>
             </div>
           </motion.div>
 
