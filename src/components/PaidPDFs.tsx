@@ -143,11 +143,6 @@ export default function PaidPDFs() {
                 <p className="mt-2 text-xs sm:text-sm text-gray-600 max-w-xl leading-relaxed">
                   High-density question banks crafted by NEET toppers. Pay once, practice infinitely.
                 </p>
-              </div>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#016737]/10 border border-[#016737]/20 text-[#016737] text-xs font-bold self-start md:self-auto">
-                <Sparkles className="w-3.5 h-3.5" />
-                Starting at ₹49 only
-              </div>
             </div>
           </motion.div>
 

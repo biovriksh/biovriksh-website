@@ -12,8 +12,6 @@ import {
   ShieldCheck,
   Layers,
   Brain,
-  Sprout,
-  Compass,
 } from "lucide-react";
 
 export default function IntroVideo() {
@@ -21,7 +19,7 @@ export default function IntroVideo() {
     {
       step: "01",
       tag: "LOCATION & EXPERIENCE",
-      title: "01. Educator & Origin Story",
+      title: "Educator & Origin Story",
       tagIcon: MapPin,
       image: "/educator_chalkboard_3d.png",
       imgAlt: "BioVriksh Educator Origin Story",
@@ -33,7 +31,7 @@ export default function IntroVideo() {
     {
       step: "02",
       tag: "CONCEPTUAL MASTERY",
-      title: "02. Strong NCERT Foundation",
+      title: "Strong NCERT Foundation",
       tagIcon: BookOpen,
       image: "/ncert_root_decoding_3d.png",
       imgAlt: "NCERT Root Decoding & Zero to 350+ Marks",
@@ -45,7 +43,7 @@ export default function IntroVideo() {
     {
       step: "03",
       tag: "PRACTICE DRILLING",
-      title: "03. 250–300 Question Engine",
+      title: "250–300 Question Engine",
       tagIcon: Layers,
       image: "/question_practice_matrix_3d.png",
       imgAlt: "250-300 Question Practice Engine",
@@ -92,21 +90,21 @@ export default function IntroVideo() {
         </div>
 
 
-        {/* ── 3 EQUAL-HEIGHT PERFECTLY ALIGNED CARDS GRID ───────────── */}
+        {/* ── 3 EQUAL-HEIGHT PERFECTLY ALIGNED CARDS GRID (NO HOVER MOVEMENT) ───── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
           {cards.map((card, idx) => {
             const TagIcon = card.tagIcon;
             return (
               <div
                 key={idx}
-                className="rounded-2xl bg-white border border-gray-200/90 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md hover:border-[#8BC43F]/60 transition-all duration-300 group h-full"
+                className="rounded-2xl bg-white border border-gray-200/90 shadow-sm overflow-hidden flex flex-col justify-between h-full"
               >
-                {/* 1. Image Frame (Fixed Height h-44 across all cards) */}
+                {/* 1. Image Frame (Fixed Height h-44 across all cards, static image) */}
                 <div className="relative w-full h-44 overflow-hidden bg-gradient-to-b from-[#F2F8EE] to-[#E2F0D9] shrink-0">
                   <img
                     src={card.image}
                     alt={card.imgAlt}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
                   <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-white text-[11px] font-bold bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/20">
