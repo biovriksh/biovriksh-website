@@ -31,6 +31,14 @@ import Script from "next/script";
 export const metadata: Metadata = {
   title: "Bio Vriksh | Ultra-Aesthetic NEET Biology Learning & Practice Platform",
   description: "Free concept notes for every chapter. Paid practice sets that mirror the NEET exam pattern.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
