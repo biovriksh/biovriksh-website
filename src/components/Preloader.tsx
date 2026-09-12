@@ -15,18 +15,15 @@ export default function Preloader({ onComplete }: PreloaderProps) {
     const video = videoRef.current;
     if (!video) return;
 
-    // Speed up video slightly to finish in ~4 seconds
-    video.playbackRate = 1.3;
-
-    // Immediately play muted video
+    // Play intro video naturally
     video.play().catch((err) => {
       console.log("Autoplay note:", err);
     });
 
-    // Safety fallback timer to ensure transition completes in ~4s
+    // Safety fallback timer if video metadata or end event stalls
     const timer = setTimeout(() => {
       handleFinish();
-    }, 4200);
+    }, 15000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -38,14 +35,16 @@ export default function Preloader({ onComplete }: PreloaderProps) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 bg-white flex items-center justify-center overflow-hidden pointer-events-auto w-full h-full"
+      id="preloader-overlay"
+      className="fixed inset-0 z-[999999] bg-[#F2F2ED] flex items-center justify-center overflow-hidden pointer-events-auto w-full h-full"
+      style={{ backgroundColor: "#F2F2ED" }}
       initial={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
       animate={
         isBlurring
           ? {
               opacity: 0,
-              filter: "blur(40px)",
-              scale: 1.05,
+              filter: "blur(30px)",
+              scale: 1.04,
             }
           : {
               opacity: 1,
@@ -53,23 +52,28 @@ export default function Preloader({ onComplete }: PreloaderProps) {
               scale: 1,
             }
       }
-      transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
       onAnimationComplete={() => {
         if (isBlurring) {
           onComplete();
         }
       }}
     >
-      <div className="relative w-full h-full flex items-center justify-center bg-white px-4">
+      {/* Video Container (Medium balanced size with #F2F2ED & mix-blend-darken) */}
+      <div
+        className="relative w-full max-w-3xl md:max-w-4xl px-4 sm:px-8 flex items-center justify-center bg-[#F2F2ED]"
+        style={{ backgroundColor: "#F2F2ED" }}
+      >
         <video
           ref={videoRef}
-          src="/Elephant_bumps_logo_tree_animation.mp4"
+          src="/hero_intro_video.mp4"
           playsInline
           autoPlay
           muted
           preload="auto"
           onEnded={handleFinish}
-          className="max-w-2xl md:max-w-3xl w-full h-auto object-contain bg-white mix-blend-multiply select-none"
+          className="w-full h-auto max-h-[68vh] md:max-h-[540px] object-contain select-none bg-[#F2F2ED] mix-blend-darken"
+          style={{ backgroundColor: "#F2F2ED" }}
         />
       </div>
     </motion.div>

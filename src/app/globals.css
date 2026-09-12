@@ -294,4 +294,12 @@ p, .body-text {
   }
 }
 
+/* ─── INSTANT PRELOADER HIDE FOR REPEAT VISITS / REFRESH ───────── */
+html.preloader-seen #preloader-overlay {
+  display: none !important;
+}
+html.preloader-seen #main-site-content {
+  display: block !important;
+}
+
 

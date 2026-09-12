@@ -39,7 +39,9 @@ begin
     coalesce(new.raw_user_meta_data->>'phone', ''),
     'student'
   )
-  on conflict (id) do nothing;
+  on conflict (id) do update set
+    full_name = excluded.full_name,
+    phone = excluded.phone;
   return new;
 end;
 $$ language plpgsql security definer;
