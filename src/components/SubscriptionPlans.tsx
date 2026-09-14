@@ -115,8 +115,67 @@ export default function SubscriptionPlans() {
             </p>
           </motion.div>
 
-          {/* Horizontal scroll on mobile, grid on desktop */}
-          <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-5 items-stretch overflow-x-auto md:overflow-visible snap-x snap-mandatory hide-scrollbar pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
+          {/* ── MOBILE: Compact stacked cards (all visible in one frame) ── */}
+          <div className="flex flex-col gap-3 md:hidden">
+            {plans.map((plan) => (
+              <div
+                key={plan.id}
+                className={`bg-white rounded-xl border overflow-hidden p-3.5 relative ${
+                  plan.isHighlighted
+                    ? "border-[#8BC43F] ring-2 ring-[#8BC43F]/60 shadow-[0_8px_20px_rgba(1,103,55,0.1)]"
+                    : "border-gray-200/80 shadow-[0_4px_16px_rgba(0,0,0,0.04)]"
+                }`}
+              >
+                {/* Row 1: Badge */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span
+                    className={`text-[8px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full ${
+                      plan.isHighlighted
+                        ? "bg-[#8BC43F] text-[#013d20]"
+                        : "bg-gray-100 text-gray-700"
+                    }`}
+                  >
+                    {plan.badge}
+                  </span>
+                </div>
+
+                {/* Row 2: Name + Price + CTA in a single row */}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-baseline gap-2 shrink-0">
+                    <h3 className="text-xs font-extrabold text-gray-900 tracking-tight">
+                      {plan.name}
+                    </h3>
+                    <span className="text-xl font-extrabold text-gray-900 tracking-tight">
+                      {plan.price}
+                    </span>
+                    <span className="text-[9px] text-gray-400 font-medium hidden xs:inline">
+                      {plan.period}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => onPlanSelect(plan.id)}
+                    className={`px-4 py-2 rounded-lg font-bold text-[11px] whitespace-nowrap transition-all duration-200 shrink-0 ${plan.btnStyle}`}
+                  >
+                    {plan.cta}
+                  </button>
+                </div>
+
+                {/* Row 3: Short description */}
+                <p className="text-gray-500 text-[10px] leading-snug mt-1.5 font-normal">
+                  {plan.description}
+                </p>
+              </div>
+            ))}
+
+            {/* Trust badge */}
+            <div className="flex items-center justify-center gap-1 text-gray-400 text-[10px] font-medium pt-1">
+              <ShieldCheck className="w-3 h-3 text-[#016737]" />
+              <span>Razorpay Secure Payments</span>
+            </div>
+          </div>
+
+          {/* ── DESKTOP: Full 3-column grid with all details ── */}
+          <div className="hidden md:grid md:grid-cols-3 gap-5 items-stretch">
             {plans.map((plan) => (
               <motion.div
                 key={plan.id}
@@ -124,7 +183,7 @@ export default function SubscriptionPlans() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
-                className={`bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.05)] border flex flex-col justify-between overflow-hidden p-4 md:p-5 relative min-w-[75vw] sm:min-w-[60vw] md:min-w-0 snap-center shrink-0 md:shrink ${
+                className={`bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.05)] border flex flex-col justify-between overflow-hidden p-5 relative ${
                   plan.isHighlighted
                     ? "border-[#8BC43F] ring-2 ring-[#8BC43F]/60 shadow-[0_16px_40px_rgba(1,103,55,0.12)]"
                     : "border-gray-200/80"
