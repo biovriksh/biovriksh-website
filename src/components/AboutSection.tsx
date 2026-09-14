@@ -125,9 +125,21 @@ export default function AboutSection() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="lg:col-span-7 flex flex-col items-start"
             >
-              {/* CONCEPT OVER CRAMMING - Original Marker Style in Lime Green #8BC43F (NO BOX, NO BORDER) */}
-              <div className="font-marker text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#8BC43F] transform -rotate-3 mb-5 select-none tracking-wider">
-                CONCEPT OVER CRAMMING
+              {/* CONCEPT OVER CRAMMING - Distinct editorial chalk-style accent */}
+              <div className="relative inline-block mb-6 select-none">
+                <span
+                  className="font-marker text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#8BC43F] transform -rotate-2 inline-block tracking-wider"
+                  style={{
+                    textShadow: "2px 2px 0px rgba(0,0,0,0.15), 0 0 20px rgba(139,196,63,0.3)",
+                    WebkitTextStroke: "0.5px rgba(139,196,63,0.6)",
+                  }}
+                >
+                  CONCEPT OVER CRAMMING
+                </span>
+                {/* Chalk underline accent */}
+                <svg className="absolute -bottom-1.5 left-0 w-full h-3 text-[#8BC43F]/60" viewBox="0 0 300 12" fill="none" preserveAspectRatio="none">
+                  <path d="M2 8 Q75 2 150 7 T298 5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="6 4" />
+                </svg>
               </div>
 
               {/* High Contrast Pure White Body Text for Maximum Readability */}

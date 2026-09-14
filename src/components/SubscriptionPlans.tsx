@@ -88,7 +88,7 @@ export default function SubscriptionPlans() {
 
   return (
     <>
-      <section id="pricing" className="py-20 bg-white relative overflow-hidden">
+      <section id="pricing" className="py-10 md:py-20 bg-white relative overflow-hidden">
         {/* Background ambient lighting */}
         <div
           className="absolute inset-0 pointer-events-none opacity-30"
@@ -105,17 +105,18 @@ export default function SubscriptionPlans() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-10"
+            className="text-center mb-5 md:mb-10"
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#111827] tracking-tight leading-[1.1] mb-3">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-[#111827] tracking-tight leading-[1.1] mb-2 md:mb-3">
               Invest in Your NEET Success
             </h2>
-            <p className="text-[#6B7280] text-sm sm:text-base max-w-xl mx-auto leading-relaxed font-normal">
-              Choose a plan that fits your preparation strategy. Get unlimited access to NCERT summaries, practice sets, and rank-boosting analytics.
+            <p className="text-[#6B7280] text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed font-normal">
+              Choose a plan that fits your preparation strategy.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+          {/* Horizontal scroll on mobile, grid on desktop */}
+          <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-5 items-stretch overflow-x-auto md:overflow-visible snap-x snap-mandatory hide-scrollbar pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
             {plans.map((plan) => (
               <motion.div
                 key={plan.id}
@@ -123,7 +124,7 @@ export default function SubscriptionPlans() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
-                className={`bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.05)] border flex flex-col justify-between overflow-hidden p-5 relative ${
+                className={`bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.05)] border flex flex-col justify-between overflow-hidden p-4 md:p-5 relative min-w-[75vw] sm:min-w-[60vw] md:min-w-0 snap-center shrink-0 md:shrink ${
                   plan.isHighlighted
                     ? "border-[#8BC43F] ring-2 ring-[#8BC43F]/60 shadow-[0_16px_40px_rgba(1,103,55,0.12)]"
                     : "border-gray-200/80"

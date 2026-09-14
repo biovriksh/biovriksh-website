@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Sparkles, CheckCircle, PlayCircle } from "lucide-react";
+import { ArrowRight, Sparkles, CheckCircle } from "lucide-react";
 import { useRef } from "react";
 
 export default function HeroSection() {
@@ -101,16 +101,6 @@ export default function HeroSection() {
             className="flex flex-wrap items-start gap-3.5 mb-12"
           >
             <motion.a
-              href="#intro-video"
-              whileHover={{ scale: 1.04, boxShadow: "0 20px 40px rgba(1,103,55,0.28)" }}
-              whileTap={{ scale: 0.97 }}
-              className="btn-shimmer px-7 py-3.5 rounded-full bg-[#016737] text-white font-semibold flex items-center gap-2.5 shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#8BC43F] focus:ring-offset-2"
-            >
-              <PlayCircle className="w-5 h-5 text-[#8BC43F]" />
-              Watch Intro Video
-            </motion.a>
-
-            <motion.a
               href="#notes"
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
@@ -138,7 +128,8 @@ export default function HeroSection() {
           >
             {[
               "All NEET Subjects Covered",
-              "5,000+ Verified Questions",
+              "15,000+ Verified Questions",
+              "250–300 Questions/Topic",
               "NCERT Line-by-Line",
             ].map((txt) => (
               <div key={txt} className="flex items-center gap-1.5 shrink-0">
