@@ -126,10 +126,10 @@ export default function SubscriptionPlans() {
                     : "border-gray-200/80 shadow-[0_4px_16px_rgba(0,0,0,0.04)]"
                 }`}
               >
-                {/* Row 1: Badge */}
-                <div className="flex items-center gap-2 mb-2">
+                {/* Row 1: Badge + Name + Price */}
+                <div className="flex items-center gap-2.5 mb-2">
                   <span
-                    className={`text-[8px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full ${
+                    className={`text-[8px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full shrink-0 ${
                       plan.isHighlighted
                         ? "bg-[#8BC43F] text-[#013d20]"
                         : "bg-gray-100 text-gray-700"
@@ -139,29 +139,28 @@ export default function SubscriptionPlans() {
                   </span>
                 </div>
 
-                {/* Row 2: Name + Price + CTA in a single row */}
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-baseline gap-2 shrink-0">
-                    <h3 className="text-xs font-extrabold text-gray-900 tracking-tight">
-                      {plan.name}
-                    </h3>
-                    <span className="text-xl font-extrabold text-gray-900 tracking-tight">
-                      {plan.price}
-                    </span>
-                    <span className="text-[9px] text-gray-400 font-medium hidden xs:inline">
-                      {plan.period}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => onPlanSelect(plan.id)}
-                    className={`px-4 py-2 rounded-lg font-bold text-[11px] whitespace-nowrap transition-all duration-200 shrink-0 ${plan.btnStyle}`}
-                  >
-                    {plan.cta}
-                  </button>
+                <div className="flex items-baseline gap-2 mb-1.5">
+                  <h3 className="text-sm font-extrabold text-gray-900 tracking-tight">
+                    {plan.name}
+                  </h3>
+                  <span className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                    {plan.price}
+                  </span>
+                  <span className="text-[9px] text-gray-400 font-medium">
+                    {plan.period}
+                  </span>
                 </div>
 
+                {/* Row 2: Full-width CTA button */}
+                <button
+                  onClick={() => onPlanSelect(plan.id)}
+                  className={`w-full py-2 rounded-lg font-bold text-xs transition-all duration-200 mb-1.5 ${plan.btnStyle}`}
+                >
+                  {plan.cta}
+                </button>
+
                 {/* Row 3: Short description */}
-                <p className="text-gray-500 text-[10px] leading-snug mt-1.5 font-normal">
+                <p className="text-gray-500 text-[10px] leading-snug font-normal">
                   {plan.description}
                 </p>
               </div>
