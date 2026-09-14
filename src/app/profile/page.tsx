@@ -157,20 +157,20 @@ export default function StudentProfilePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#00381c] via-[#016737] to-[#014d29] p-6 sm:p-8 text-white shadow-xl mb-8 border border-emerald-800/40"
+              className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#00381c] via-[#016737] to-[#014d29] p-4 sm:p-8 text-white shadow-xl mb-8 border border-emerald-800/40"
             >
               <div className="absolute top-0 right-0 w-96 h-96 bg-[#8BC43F]/15 rounded-full blur-3xl pointer-events-none" />
 
-              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="flex items-center gap-4">
+              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
+                <div className="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 flex-1">
                   {/* Avatar Icon */}
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#8BC43F] to-[#016737] text-white font-black text-2xl sm:text-3xl shrink-0 flex items-center justify-center shadow-lg border-2 border-white/40">
+                  <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#8BC43F] to-[#016737] text-white font-black text-lg sm:text-3xl shrink-0 flex items-center justify-center shadow-lg border-2 border-white/40 mt-1 sm:mt-0">
                     {initialLetter}
                   </div>
 
-                  <div>
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-3 py-0.5 rounded-full border border-white/20 shadow-xs" style={{ color: "#ffffff" }}>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-2.5 py-0.5 rounded-full border border-white/20 shadow-xs" style={{ color: "#ffffff" }}>
                         NEET Aspirant
                       </span>
                       <span className="text-[10px] font-mono text-emerald-200" style={{ color: "#a7f3d0" }}>
@@ -178,18 +178,18 @@ export default function StudentProfilePage() {
                       </span>
                     </div>
 
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight" style={{ color: "#ffffff", textShadow: "0 2px 4px rgba(0,0,0,0.4)" }}>
+                    <h1 className="text-base sm:text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight leading-snug break-words" style={{ color: "#ffffff", textShadow: "0 2px 4px rgba(0,0,0,0.4)" }}>
                       Welcome, Future Doctor {displayName}! 👨‍⚕️
                     </h1>
 
-                    <p className="text-xs sm:text-sm text-emerald-100 mt-1 flex items-center gap-3 flex-wrap font-semibold" style={{ color: "#e2e8f0" }}>
-                      <span className="flex items-center gap-1.5">
-                        <Mail className="w-4 h-4 text-[#8BC43F]" />
-                        <span style={{ color: "#ffffff" }}>{user.email}</span>
+                    <p className="text-xs sm:text-sm text-emerald-100 mt-1 flex items-center gap-3 flex-wrap font-semibold min-w-0" style={{ color: "#e2e8f0" }}>
+                      <span className="flex items-center gap-1.5 min-w-0 max-w-full">
+                        <Mail className="w-3.5 h-3.5 text-[#8BC43F] shrink-0" />
+                        <span className="break-all text-[11px] sm:text-xs" style={{ color: "#ffffff" }}>{user.email}</span>
                       </span>
                       {profile?.phone && (
-                        <span className="flex items-center gap-1.5">
-                          <Phone className="w-4 h-4 text-[#8BC43F]" />
+                        <span className="flex items-center gap-1.5 shrink-0">
+                          <Phone className="w-3.5 h-3.5 text-[#8BC43F] shrink-0" />
                           <span style={{ color: "#ffffff" }}>{profile.phone}</span>
                         </span>
                       )}
@@ -197,18 +197,18 @@ export default function StudentProfilePage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 self-start md:self-auto">
+                <div className="flex items-center gap-2.5 justify-end border-t border-white/10 pt-3 md:border-t-0 md:pt-0">
                   <button
                     onClick={refreshProfile}
                     title="Refresh Profile Data"
-                    className="p-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition-colors border border-white/20 cursor-pointer shadow-xs"
+                    className="p-2 rounded-xl bg-white/15 hover:bg-white/25 text-white transition-colors border border-white/20 cursor-pointer shadow-xs"
                   >
                     <RefreshCw className="w-4 h-4 text-white" />
                   </button>
 
                   <button
                     onClick={signOut}
-                    className="px-4 py-2.5 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white text-xs font-bold transition-all border border-rose-400/40 flex items-center gap-1.5 cursor-pointer shadow-md"
+                    className="px-3.5 py-2 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white text-xs font-bold transition-all border border-rose-400/40 flex items-center gap-1.5 cursor-pointer shadow-md"
                   >
                     <LogOut className="w-4 h-4" />
                     <span style={{ color: "#ffffff" }}>Log Out</span>
