@@ -87,6 +87,9 @@ export default function PaidPDFs() {
     handleCheckout({
       pdfId: pdfId,
       onLoginRequired: () => setAuthModalOpen(true),
+      onSuccess: () => {
+        window.location.href = `/secure-reader?pdfId=${encodeURIComponent(pdfId)}`;
+      },
     });
   };
 

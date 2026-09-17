@@ -83,6 +83,9 @@ export default function SubscriptionPlans() {
     handleCheckout({
       planId: `plan-${planId}`,
       onLoginRequired: () => setAuthModalOpen(true),
+      onSuccess: () => {
+        window.location.href = "/profile";
+      },
     });
   };
 

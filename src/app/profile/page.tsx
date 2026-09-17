@@ -28,41 +28,32 @@ import { createClient } from "@/lib/supabase/client";
 import { PDFNote, Purchase } from "@/types/database";
 
 export default function StudentProfilePage() {
-  const { user, profile, isLoading, isSubscriptionActive, signOut, refreshProfile } = useStudentAuth();
+  const { user, profile: authProfile, isLoading, isSubscriptionActive: authIsSubActive, signOut, refreshProfile } = useStudentAuth();
   const [purchasedNotes, setPurchasedNotes] = useState<Purchase[]>([]);
   const [allPdfs, setAllPdfs] = useState<PDFNote[]>([]);
   const [fetchingData, setFetchingData] = useState(true);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-
-  const supabase = createClient();
+  const [liveProfile, setLiveProfile] = useState<any>(null);
+  const [liveSubActive, setLiveSubActive] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!user) return;
+    const studentId = user.id;
 
-    const userId = user.id;
+    // Refresh student auth state from Supabase
+    refreshProfile();
 
     async function loadStudentContent() {
       setFetchingData(true);
       try {
-        // 1. Fetch user's individual purchases
-        const { data: purchasesData } = await supabase
-          .from("purchases")
-          .select("*, pdf:pdfs(*)")
-          .eq("student_id", userId)
-          .eq("payment_status", "success");
+        const res = await fetch(`/api/student/purchases?studentId=${studentId}`, { cache: "no-store" });
+        const json = await res.json();
 
-        if (purchasesData) {
-          setPurchasedNotes(purchasesData as any);
-        }
-
-        // 2. Fetch all PDFs for overall dashboard view
-        const { data: pdfsData } = await supabase
-          .from("pdfs")
-          .select("*, chapter:chapters(name)")
-          .eq("is_active", true);
-
-        if (pdfsData) {
-          setAllPdfs(pdfsData as any);
+        if (json.success) {
+          if (json.profile) setLiveProfile(json.profile);
+          setLiveSubActive(json.isSubscriptionActive);
+          setPurchasedNotes(json.purchases || []);
+          setAllPdfs(json.allPdfs || []);
         }
       } catch (err) {
         console.error("Error loading student profile data:", err);
@@ -72,7 +63,10 @@ export default function StudentProfilePage() {
     }
 
     loadStudentContent();
-  }, [user, supabase]);
+  }, [user]);
+
+  const profile = liveProfile || authProfile;
+  const isSubscriptionActive = liveSubActive !== null ? liveSubActive : authIsSubActive;
 
   if (isLoading) {
     return (

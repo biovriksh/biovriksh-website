@@ -110,6 +110,9 @@ export default function ChaptersPage() {
     handleCheckout({
       pdfId: chapterId,
       onLoginRequired: () => setAuthModalOpen(true),
+      onSuccess: () => {
+        window.location.href = `/secure-reader?pdfId=${encodeURIComponent(chapterId)}`;
+      },
     });
   };
 
