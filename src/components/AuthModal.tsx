@@ -312,10 +312,10 @@ export default function AuthModal({
                     setErrorMsg("");
                     setSuccessMsg("");
                   }}
-                  className={`flex-1 py-3.5 text-xs font-black transition-all flex items-center justify-center gap-2 border-b-2 ${
+                  className={`flex-1 py-3.5 text-xs font-black transition-all duration-150 flex items-center justify-center gap-2 border-b-2 cursor-pointer active:scale-95 ${
                     mode === "signin"
-                      ? "border-[#016737] text-[#016737] bg-white"
-                      : "border-transparent text-gray-600 hover:text-gray-900"
+                      ? "border-[#016737] text-[#016737] bg-white shadow-xs"
+                      : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100/60"
                   }`}
                 >
                   <LogIn className="w-4 h-4" />
@@ -327,10 +327,10 @@ export default function AuthModal({
                     setErrorMsg("");
                     setSuccessMsg("");
                   }}
-                  className={`flex-1 py-3.5 text-xs font-black transition-all flex items-center justify-center gap-2 border-b-2 ${
+                  className={`flex-1 py-3.5 text-xs font-black transition-all duration-150 flex items-center justify-center gap-2 border-b-2 cursor-pointer active:scale-95 ${
                     mode === "signup"
-                      ? "border-[#016737] text-[#016737] bg-white"
-                      : "border-transparent text-gray-600 hover:text-gray-900"
+                      ? "border-[#016737] text-[#016737] bg-white shadow-xs"
+                      : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100/60"
                   }`}
                 >
                   <UserPlus className="w-4 h-4" />
@@ -348,7 +348,7 @@ export default function AuthModal({
                     type="button"
                     onClick={handleGoogleSignIn}
                     disabled={loading}
-                    className="w-full py-2.5 px-4 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-800 text-xs sm:text-sm font-bold transition-all shadow-xs flex items-center justify-center gap-2.5 cursor-pointer"
+                    className="w-full py-2.5 px-4 rounded-xl border border-gray-300 bg-white hover:bg-gray-100/80 hover:border-gray-400 active:bg-gray-200 text-gray-800 text-xs sm:text-sm font-bold transition-all duration-150 shadow-xs hover:shadow-md active:scale-[0.98] active:translate-y-0.5 flex items-center justify-center gap-2.5 cursor-pointer"
                   >
                     <GoogleLogo className="w-4 h-4" />
                     <span>Continue with Google</span>
@@ -518,7 +518,7 @@ export default function AuthModal({
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs sm:text-sm font-bold transition-all shadow-md shadow-[#016737]/20 flex items-center justify-center gap-2 mt-2 cursor-pointer"
+                    className="w-full py-3 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs sm:text-sm font-bold transition-all duration-150 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0.5 flex items-center justify-center gap-2 mt-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? (
                       <>
@@ -538,7 +538,7 @@ export default function AuthModal({
                         setErrorMsg("");
                         setSuccessMsg("");
                       }}
-                      className="text-xs text-gray-700 font-bold hover:text-[#016737] transition-colors cursor-pointer"
+                      className="text-xs text-gray-700 font-bold hover:text-[#016737] active:scale-95 transition-all cursor-pointer"
                     >
                       {mode === "signin"
                         ? "Don't have an account? Sign up now"
