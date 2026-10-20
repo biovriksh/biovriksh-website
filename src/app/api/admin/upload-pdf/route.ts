@@ -10,6 +10,7 @@ export async function POST(req: Request) {
     let description = "";
     let noteType = "paid";
     let classLevel = "Class 12";
+    let subject = "Biology";
     let price = 0;
     let pageCount = 12;
     let isRecent = false;
@@ -22,6 +23,7 @@ export async function POST(req: Request) {
       description = (formData.get("description") as string) || "";
       noteType = (formData.get("targetSection") as string) || "paid";
       classLevel = (formData.get("classLevel") as string) || "Class 12";
+      subject = (formData.get("subject") as string) || "Biology";
       price = Number(formData.get("price") || 0);
       pageCount = Number(formData.get("pageCount") || 12);
       isRecent = formData.get("isRecent") === "true";
@@ -78,6 +80,7 @@ export async function POST(req: Request) {
       description = body.description || "";
       noteType = body.targetSection || body.noteType || "paid";
       classLevel = body.classLevel || "Class 12";
+      subject = body.subject || "Biology";
       price = Number(body.price || 0);
       pageCount = Number(body.pageCount || 12);
       isRecent = Boolean(body.isRecent);
@@ -105,6 +108,7 @@ export async function POST(req: Request) {
       is_recent: isRecent,
       note_type: noteType,
       class_level: classLevel,
+      subject: subject,
       page_count: pageCount,
     };
 

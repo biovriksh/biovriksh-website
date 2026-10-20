@@ -41,6 +41,7 @@ export default function AdminChaptersPage() {
   const [subject, setSubject] = useState("Biology");
   const [classLevel, setClassLevel] = useState<ClassLevel>("Class 12");
   const [orderIndex, setOrderIndex] = useState(1);
+  const [selectedSubjectFilter, setSelectedSubjectFilter] = useState<"ALL" | "Biology" | "Physics" | "Chemistry">("ALL");
 
   // Dynamic Sub-Headings List State
   const [subHeadings, setSubHeadings] = useState<SubHeadingItem[]>([
@@ -277,42 +278,92 @@ export default function AdminChaptersPage() {
         </div>
       </div>
 
+      {/* Subject Filter Bar */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs font-bold text-slate-500 mr-1">Subject:</span>
+        {[
+          { id: "ALL", label: "All Subjects", count: chapters.length },
+          { id: "Biology", label: "🌿 Biology", count: chapters.filter((c) => (c.subject || "Biology") === "Biology").length },
+          { id: "Physics", label: "⚡ Physics", count: chapters.filter((c) => c.subject === "Physics").length },
+          { id: "Chemistry", label: "🧪 Chemistry", count: chapters.filter((c) => c.subject === "Chemistry").length },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setSelectedSubjectFilter(tab.id as any)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              selectedSubjectFilter === tab.id
+                ? "bg-[#016737] text-white shadow-xs"
+                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+            }`}
+          >
+            <span>{tab.label}</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                selectedSubjectFilter === tab.id ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+              }`}
+            >
+              {tab.count}
+            </span>
+          </button>
+        ))}
+      </div>
+
       {/* Chapters Grid / Display */}
-      <div className="grid grid-cols-1 gap-5">
-        {chapters.length > 0 ? (
-          chapters.map((ch) => {
-            // Group PDFs by sub_heading
-            const pdfList = ch.pdfs || [];
-            const groupedSubHeadings = pdfList.reduce((acc, pdf) => {
-              const sub = pdf.sub_heading || "General Notes";
-              if (!acc[sub]) acc[sub] = [];
-              acc[sub].push(pdf);
-              return acc;
-            }, {} as Record<string, PDFNote[]>);
+      {(() => {
+        const filteredChapters = chapters.filter(
+          (c) => selectedSubjectFilter === "ALL" || (c.subject || "Biology") === selectedSubjectFilter
+        );
 
-            return (
-              <div
-                key={ch.id}
-                className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs space-y-4 hover:border-slate-300 transition-all"
-              >
-                {/* Chapter Top Bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-[#016737] bg-[#016737]/10 px-2.5 py-1 rounded-lg border border-[#016737]/20 font-mono">
-                      #{ch.order_index}
-                    </span>
-                    <div>
-                      <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-                        <BookOpen className="w-4 h-4 text-slate-400" />
-                        <span>{ch.name}</span>
-                      </h3>
-                      <span className="text-[11px] font-semibold text-slate-400">
-                        {ch.class_level || "Class 12"} • {ch.subject || "Biology"}
-                      </span>
-                    </div>
-                  </div>
+        return (
+          <div className="grid grid-cols-1 gap-5">
+            {filteredChapters.length > 0 ? (
+              filteredChapters.map((ch) => {
+                const chSubject = ch.subject || "Biology";
+                const isPhysics = chSubject === "Physics";
+                const isChem = chSubject === "Chemistry";
+                const badgeColor = isPhysics
+                  ? "bg-violet-50 text-violet-700 border-violet-200"
+                  : isChem
+                  ? "bg-blue-50 text-blue-700 border-blue-200"
+                  : "bg-emerald-50 text-emerald-800 border-emerald-200";
 
-                  <div className="flex items-center gap-2 shrink-0">
+                // Group PDFs by sub_heading
+                const pdfList = ch.pdfs || [];
+                const groupedSubHeadings = pdfList.reduce((acc, pdf) => {
+                  const sub = pdf.sub_heading || "General Notes";
+                  if (!acc[sub]) acc[sub] = [];
+                  acc[sub].push(pdf);
+                  return acc;
+                }, {} as Record<string, PDFNote[]>);
+
+                return (
+                  <div
+                    key={ch.id}
+                    className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs space-y-4 hover:border-slate-300 transition-all"
+                  >
+                    {/* Chapter Top Bar */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-bold text-[#016737] bg-[#016737]/10 px-2.5 py-1 rounded-lg border border-[#016737]/20 font-mono">
+                          #{ch.order_index}
+                        </span>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
+                              <BookOpen className="w-4 h-4 text-slate-400" />
+                              <span>{ch.name}</span>
+                            </h3>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${badgeColor}`}>
+                              {chSubject === "Physics" ? "⚡ Physics" : chSubject === "Chemistry" ? "🧪 Chemistry" : "🌿 Biology"}
+                            </span>
+                          </div>
+                          <span className="text-[11px] font-semibold text-slate-400">
+                            {ch.class_level || "Class 12"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
                     {ch.is_active ? (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-bold">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
@@ -420,19 +471,21 @@ export default function AdminChaptersPage() {
         ) : (
           <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center space-y-3 shadow-2xs">
             <FolderTree className="w-8 h-8 text-slate-300 mx-auto" />
-            <h3 className="text-sm font-bold text-slate-700">No Biology Chapters Added Yet</h3>
+            <h3 className="text-sm font-bold text-slate-700">No Chapters Added Yet</h3>
             <p className="text-xs text-slate-400 max-w-sm mx-auto">
               Start building your NEET curriculum structure. Add chapters, create sub-heading topics, and attach your uploaded PDF notes.
             </p>
             <button
               onClick={openNewChapterModal}
-              className="px-4 py-2 rounded-xl bg-[#016737] text-white text-xs font-semibold shadow-2xs"
+              className="px-4 py-2 rounded-xl bg-[#016737] text-white text-xs font-semibold shadow-2xs cursor-pointer"
             >
               Add First Chapter
             </button>
           </div>
         )}
       </div>
+    );
+  })()}
 
       {/* ═══ MASTER BUILDER MODAL: CHAPTER + MULTIPLE SUB-HEADINGS + MULTIPLE PDFS ═══ */}
       {isModalOpen && (
@@ -465,7 +518,7 @@ export default function AdminChaptersPage() {
                   1. Chapter Basic Details
                 </h4>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
                       Chapter Title
@@ -475,9 +528,22 @@ export default function AdminChaptersPage() {
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g. Genetics & Evolution"
+                      placeholder="e.g. Genetics & Evolution or Electrostatics"
                       className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs font-medium focus:outline-none focus:border-[#016737]"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Subject</label>
+                    <select
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#016737]"
+                    >
+                      <option value="Biology">🌿 Biology</option>
+                      <option value="Physics">⚡ Physics</option>
+                      <option value="Chemistry">🧪 Chemistry</option>
+                    </select>
                   </div>
 
                   <div>
@@ -571,7 +637,7 @@ export default function AdminChaptersPage() {
                             <option value="">+ Choose Existing PDF Note --</option>
                             {availablePdfs.map((pdf) => (
                               <option key={pdf.id} value={pdf.id}>
-                                {pdf.title} ({pdf.is_free ? "FREE" : `₹${pdf.price}`})
+                                [{pdf.subject || "Biology"}] {pdf.title} ({pdf.is_free ? "FREE" : `₹${pdf.price}`})
                               </option>
                             ))}
                           </select>

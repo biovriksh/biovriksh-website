@@ -26,16 +26,31 @@ export default function AdminDashboardPage() {
     recentPurchases: [],
   });
   const [loading, setLoading] = useState(false);
+  const [subjectCounts, setSubjectCounts] = useState({
+    biology: 0,
+    physics: 0,
+    chemistry: 0,
+  });
 
   const fetchDashboardStats = async () => {
     setLoading(true);
     try {
       const supabase = createClient();
 
-      const { count: pdfCount } = await supabase
+      const { count: pdfCount, data: allPdfs } = await supabase
         .from("pdfs")
-        .select("*", { count: "exact", head: true })
+        .select("subject", { count: "exact" })
         .eq("is_active", true);
+
+      if (allPdfs) {
+        let bio = 0, phy = 0, chem = 0;
+        allPdfs.forEach((p: any) => {
+          if (p.subject === "Physics") phy++;
+          else if (p.subject === "Chemistry") chem++;
+          else bio++;
+        });
+        setSubjectCounts({ biology: bio, physics: phy, chemistry: chem });
+      }
 
       const { count: studentCount } = await supabase
         .from("profiles")
@@ -157,6 +172,48 @@ export default function AdminDashboardPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* ═══ 3-SUBJECT CONTENT BREAKDOWN ═══ */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="bg-white border border-emerald-200/80 p-4 rounded-xl flex items-center justify-between shadow-2xs">
+          <div className="flex items-center gap-2.5">
+            <span className="text-2xl">🌿</span>
+            <div>
+              <p className="text-xs font-bold text-slate-800">Biology Notes</p>
+              <p className="text-[11px] text-slate-500 font-medium">Zoology &amp; Botany</p>
+            </div>
+          </div>
+          <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
+            {subjectCounts.biology} Notes
+          </span>
+        </div>
+
+        <div className="bg-white border border-violet-200/80 p-4 rounded-xl flex items-center justify-between shadow-2xs">
+          <div className="flex items-center gap-2.5">
+            <span className="text-2xl">⚡</span>
+            <div>
+              <p className="text-xs font-bold text-slate-800">Physics Notes</p>
+              <p className="text-[11px] text-slate-500 font-medium">Class 11 &amp; 12 Syllabus</p>
+            </div>
+          </div>
+          <span className="text-xs font-extrabold text-violet-700 bg-violet-50 px-2.5 py-1 rounded-lg border border-violet-100">
+            {subjectCounts.physics} Notes
+          </span>
+        </div>
+
+        <div className="bg-white border border-blue-200/80 p-4 rounded-xl flex items-center justify-between shadow-2xs">
+          <div className="flex items-center gap-2.5">
+            <span className="text-2xl">🧪</span>
+            <div>
+              <p className="text-xs font-bold text-slate-800">Chemistry Notes</p>
+              <p className="text-[11px] text-slate-500 font-medium">Organic, Inorganic &amp; Physical</p>
+            </div>
+          </div>
+          <span className="text-xs font-extrabold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+            {subjectCounts.chemistry} Notes
+          </span>
+        </div>
       </div>
 
       {/* ═══ RECENT ORDERS TABLE ═══ */}

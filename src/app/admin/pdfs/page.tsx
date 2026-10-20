@@ -34,6 +34,8 @@ export default function AdminPDFsPage() {
   // Form State
   const [targetSection, setTargetSection] = useState<NoteType>("paid"); // "paid" | "short"
   const [classLevel, setClassLevel] = useState<ClassLevel>("Class 12");
+  const [subject, setSubject] = useState<"Biology" | "Physics" | "Chemistry">("Biology");
+  const [selectedSubjectFilter, setSelectedSubjectFilter] = useState<"ALL" | "Biology" | "Physics" | "Chemistry">("ALL");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isRecent, setIsRecent] = useState(false);
@@ -69,6 +71,7 @@ export default function AdminPDFsPage() {
     setDescription("");
     setTargetSection("paid");
     setClassLevel("Class 12");
+    setSubject("Biology");
     setPrice(49);
     setPageCount(12);
     setIsRecent(false);
@@ -84,6 +87,7 @@ export default function AdminPDFsPage() {
     setDescription(pdf.description || "");
     setTargetSection(pdf.note_type === "short" || pdf.is_free ? "short" : "paid");
     setClassLevel((pdf.class_level as ClassLevel) || "Class 12");
+    setSubject(((pdf as any).subject as any) || "Biology");
     setPrice(pdf.price || (pdf.is_free ? 0 : 49));
     setPageCount(pdf.page_count || 12);
     setIsRecent(pdf.is_recent || false);
@@ -174,6 +178,7 @@ export default function AdminPDFsPage() {
             description,
             targetSection,
             classLevel,
+            subject,
             price: targetSection === "short" ? 0 : price,
             pageCount,
             isRecent,
@@ -213,6 +218,7 @@ export default function AdminPDFsPage() {
             description,
             targetSection,
             classLevel,
+            subject,
             price: targetSection === "short" ? 0 : price,
             pageCount,
             isRecent,
@@ -304,10 +310,14 @@ export default function AdminPDFsPage() {
     }
   };
 
-  // Filtered PDFs List according to Website Section Tabs
+  // Filtered PDFs List according to Website Section Tabs and Subject
   const filteredPdfs = pdfs.filter((pdf) => {
     const matchesSearch = pdf.title.toLowerCase().includes(searchQuery.toLowerCase());
     if (!matchesSearch) return false;
+
+    if (selectedSubjectFilter !== "ALL" && (pdf.subject || "Biology") !== selectedSubjectFilter) {
+      return false;
+    }
 
     if (activeSectionTab === "all") return true;
     if (activeSectionTab === "paid") return pdf.note_type === "paid" && !pdf.is_free;
@@ -404,6 +414,36 @@ export default function AdminPDFsPage() {
         </div>
       </div>
 
+      {/* ═══ SUBJECT FILTER BAR ═══ */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs font-bold text-slate-500 mr-1">Subject:</span>
+        {[
+          { id: "ALL", label: "All Subjects", count: pdfs.length },
+          { id: "Biology", label: "🌿 Biology", count: pdfs.filter((p) => (p.subject || "Biology") === "Biology").length },
+          { id: "Physics", label: "⚡ Physics", count: pdfs.filter((p) => p.subject === "Physics").length },
+          { id: "Chemistry", label: "🧪 Chemistry", count: pdfs.filter((p) => p.subject === "Chemistry").length },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setSelectedSubjectFilter(tab.id as any)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              selectedSubjectFilter === tab.id
+                ? "bg-[#016737] text-white shadow-xs"
+                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+            }`}
+          >
+            <span>{tab.label}</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                selectedSubjectFilter === tab.id ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+              }`}
+            >
+              {tab.count}
+            </span>
+          </button>
+        ))}
+      </div>
+
       {/* ═══ PDF NOTES GRID ═══ */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredPdfs.length > 0 ? (
@@ -432,6 +472,19 @@ export default function AdminPDFsPage() {
                         Paid Note ₹{pdf.price}
                       </span>
                     )}
+
+                    {/* Subject Badge */}
+                    {(() => {
+                      const subj = pdf.subject || "Biology";
+                      const isPhysics = subj === "Physics";
+                      const isChem = subj === "Chemistry";
+                      const badgeBg = isPhysics ? "bg-violet-700" : isChem ? "bg-blue-700" : "bg-emerald-800";
+                      return (
+                        <span className={`px-2 py-0.5 rounded-md ${badgeBg} text-white text-[10px] font-bold shadow-xs`}>
+                          {subj === "Physics" ? "⚡ Physics" : subj === "Chemistry" ? "🧪 Chemistry" : "🌿 Biology"}
+                        </span>
+                      );
+                    })()}
 
                     <span className="px-2 py-0.5 rounded-md bg-slate-900/70 backdrop-blur-xs text-white text-[10px] font-bold">
                       {pdf.class_level || "Class 12"}
@@ -633,7 +686,22 @@ export default function AdminPDFsPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Subject
+                    </label>
+                    <select
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value as any)}
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#016737]"
+                    >
+                      <option value="Biology">🌿 Biology</option>
+                      <option value="Physics">⚡ Physics</option>
+                      <option value="Chemistry">🧪 Chemistry</option>
+                    </select>
+                  </div>
+
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
                       Class Level

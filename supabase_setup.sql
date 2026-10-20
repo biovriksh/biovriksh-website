@@ -83,6 +83,7 @@ create table if not exists public.pdfs (
   is_recent boolean default false, -- Owner toggle to showcase ANY note in Recents section
   note_type text default 'paid' check (note_type in ('paid', 'free', 'short', 'chapter')),
   class_level text default 'Class 12' check (class_level in ('Class 11', 'Class 12', 'NEET Special')),
+  subject text default 'Biology',
   page_count int default 12,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
@@ -90,10 +91,12 @@ create table if not exists public.pdfs (
 
 -- Add columns if table already exists
 alter table public.chapters add column if not exists class_level text default 'Class 12';
+alter table public.chapters add column if not exists subject text default 'Biology';
 alter table public.pdfs add column if not exists sub_heading text;
 alter table public.pdfs add column if not exists is_recent boolean default false;
 alter table public.pdfs add column if not exists note_type text default 'paid';
 alter table public.pdfs add column if not exists class_level text default 'Class 12';
+alter table public.pdfs add column if not exists subject text default 'Biology';
 
 -- ----------------------------------------------------------------------------
 -- 4. PURCHASES TABLE (Orders & Unlocked Notes)

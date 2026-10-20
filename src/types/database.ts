@@ -2,6 +2,7 @@ export type UserRole = "admin" | "student";
 
 export type NoteType = "paid" | "free" | "short" | "chapter";
 export type ClassLevel = "Class 11" | "Class 12" | "NEET Special";
+export type SubjectType = "Biology" | "Physics" | "Chemistry";
 
 export interface Profile {
   id: string;
@@ -17,7 +18,7 @@ export interface Profile {
 export interface Chapter {
   id: string;
   name: string;
-  subject: string;
+  subject: SubjectType | string;
   class_level?: ClassLevel;
   order_index: number;
   is_active: boolean;
@@ -30,6 +31,7 @@ export interface PDFNote {
   chapter_id: string | null;
   sub_heading?: string | null;
   title: string;
+  subject?: SubjectType | string;
   description: string | null;
   thumbnail_url: string | null;
   file_path: string;
