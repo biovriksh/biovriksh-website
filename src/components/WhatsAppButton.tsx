@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 export default function WhatsAppButton() {
   const whatsappNumber = "918278071134";
   const defaultMessage = encodeURIComponent(
-    "Hi BioVriksh team, I have a question regarding NEET Biology notes."
+    "Hi BioVriksh team, I have a question regarding NEET preparation notes (Physics, Chemistry & Biology)."
   );
 
   return (

@@ -1,8 +1,23 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Leaf, Menu, X, Sparkles, User as UserIcon } from "lucide-react";
-import { useState, useEffect } from "react";
+import { 
+  Search, 
+  Menu, 
+  X, 
+  Sparkles, 
+  User as UserIcon, 
+  ChevronDown, 
+  BookOpen, 
+  FileCheck2, 
+  GraduationCap, 
+  Flame,
+  MessageCircle,
+  Atom,
+  FlaskConical,
+  Dna
+} from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
 import AuthModal from "@/components/AuthModal";
 
@@ -11,6 +26,17 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+
+  // Dropdown states for desktop
+  const [testsDropdownOpen, setTestsDropdownOpen] = useState(false);
+  const [ncertDropdownOpen, setNcertDropdownOpen] = useState(false);
+
+  // Dropdown states for mobile
+  const [mobileTestsOpen, setMobileTestsOpen] = useState(false);
+  const [mobileNcertOpen, setMobileNcertOpen] = useState(false);
+
+  const testsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const ncertTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { user, profile } = useStudentAuth();
 
@@ -21,13 +47,21 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const navLinks = [
-    { name: "Notes", href: "/#notes" },
-    { name: "Pricing", href: "/#pricing" },
-    { name: "Chapters", href: "/chapters", isHighlight: true },
-    { name: "About Us", href: "/#about" },
-    { name: "Founder's Story", href: "/#founder-story" },
-  ];
+  const handleTestsMouseEnter = () => {
+    if (testsTimeoutRef.current) clearTimeout(testsTimeoutRef.current);
+    setTestsDropdownOpen(true);
+  };
+  const handleTestsMouseLeave = () => {
+    testsTimeoutRef.current = setTimeout(() => setTestsDropdownOpen(false), 200);
+  };
+
+  const handleNcertMouseEnter = () => {
+    if (ncertTimeoutRef.current) clearTimeout(ncertTimeoutRef.current);
+    setNcertDropdownOpen(true);
+  };
+  const handleNcertMouseLeave = () => {
+    ncertTimeoutRef.current = setTimeout(() => setNcertDropdownOpen(false), 200);
+  };
 
   return (
     <>
@@ -40,7 +74,7 @@ export default function Navbar() {
         <div
           className="max-w-6xl mx-auto rounded-2xl py-2 px-3 sm:px-5 border transition-all duration-500 flex flex-col gap-1 relative"
           style={{
-            background: scrolled ? "rgba(255,255,255,0.96)" : "rgba(255,255,255,0.90)",
+            background: scrolled ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.92)",
             backdropFilter: "blur(24px) saturate(200%)",
             WebkitBackdropFilter: "blur(24px) saturate(200%)",
             boxShadow: scrolled
@@ -58,7 +92,7 @@ export default function Navbar() {
             <img
               src="/logo_transparent.png"
               alt="Bio Vriksh Logo"
-              className="w-16 h-16 sm:w-22 sm:h-22 md:w-26 md:h-26 object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md -my-3"
+              className="w-16 h-16 sm:w-22 sm:h-22 md:w-24 md:h-24 object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md -my-3"
             />
           </a>
 
@@ -76,14 +110,14 @@ export default function Navbar() {
 
             {/* RIGHT: SEARCH & LOGIN / PROFILE */}
             <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 ml-auto relative z-20 translate-y-1.5 sm:translate-y-2">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <a
+                href="/chapters"
                 className="p-1.5 rounded-full text-[#2B2F2C] hover:text-[#016737] hover:bg-[#F8F9FA] transition-colors"
-                aria-label="Search"
+                aria-label="Search notes"
+                title="Search notes"
               >
                 <Search className="w-4 h-4 stroke-[2]" />
-              </motion.button>
+              </a>
 
               {user ? (
                 <a
@@ -98,7 +132,7 @@ export default function Navbar() {
                   whileHover={{ scale: 1.05, backgroundColor: "#016737", color: "#FFFFFF" }}
                   whileTap={{ scale: 0.96 }}
                   onClick={() => setAuthModalOpen(true)}
-                  className="hidden sm:block px-3.5 py-1 rounded-full border-2 border-[#016737] text-[#016737] text-xs font-bold transition-all duration-300 shadow-xs"
+                  className="hidden sm:block px-3.5 py-1 rounded-full border-2 border-[#016737] text-[#016737] text-xs font-bold transition-all duration-300 shadow-xs cursor-pointer"
                 >
                   Login / Signup
                 </motion.button>
@@ -106,7 +140,7 @@ export default function Navbar() {
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-1.5 rounded-xl text-[#016737] hover:bg-gray-100 transition-colors"
+                className="lg:hidden p-1.5 rounded-xl text-[#016737] hover:bg-gray-100 transition-colors cursor-pointer"
                 aria-label="Toggle navigation menu"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -119,34 +153,185 @@ export default function Navbar() {
             <div className="w-24 sm:w-36 h-[1px] bg-gradient-to-r from-transparent via-[#8BC43F]/40 to-transparent rounded-full" />
           </div>
 
-          {/* ═══ BOTTOM ROW: NAVIGATIONS ═══ */}
+          {/* ═══ BOTTOM ROW: NAVIGATIONS WITH DROPDOWNS ═══ */}
           <div className="hidden lg:flex items-center justify-center w-full text-center pb-0.5">
-            <nav className="flex items-center justify-center gap-7 xl:gap-9 mx-auto text-center pl-12 sm:pl-16">
-              {navLinks.map((link) => {
-                const isActive = activeTab === link.name;
-                const isChapters = link.name === "Chapters";
-                return (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    onClick={() => setActiveTab(link.name)}
-                    className={`relative text-xs xl:text-sm transition-colors duration-200 whitespace-nowrap text-center ${
-                      isChapters
-                        ? "text-[#8BC43F] font-bold hover:text-[#016737]"
-                        : isActive
-                        ? "text-[#016737] font-bold"
-                        : "text-[#4B5563] font-semibold hover:text-[#016737]"
-                    }`}
-                  >
-                    {link.name}
-                  </a>
-                );
-              })}
+            <nav className="flex items-center justify-center gap-6 xl:gap-8 mx-auto text-center pl-10 sm:pl-14">
+              {/* 1. Chapters Link */}
+              <a
+                href="/chapters"
+                className="relative text-xs xl:text-sm font-bold text-[#8BC43F] hover:text-[#016737] transition-colors duration-200 whitespace-nowrap"
+              >
+                Chapters
+              </a>
+
+              {/* 2. Tests Dropdown */}
+              <div
+                className="relative"
+                onMouseEnter={handleTestsMouseEnter}
+                onMouseLeave={handleTestsMouseLeave}
+              >
+                <button
+                  type="button"
+                  onClick={() => setTestsDropdownOpen(!testsDropdownOpen)}
+                  className="flex items-center gap-1 text-xs xl:text-sm font-semibold text-[#4B5563] hover:text-[#016737] transition-colors duration-200 cursor-pointer py-1"
+                >
+                  <span>Tests</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${testsDropdownOpen ? "rotate-180 text-[#016737]" : ""}`} />
+                </button>
+
+                <AnimatePresence>
+                  {testsDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.18 }}
+                      className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-64 rounded-2xl bg-white/95 backdrop-blur-xl border border-gray-100 shadow-xl p-2 z-50 text-left"
+                    >
+                      <a
+                        href="/tests/chapter-wise"
+                        className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-[#F4F9F2] transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-[#016737]/10 flex items-center justify-center text-[#016737] group-hover:bg-[#016737] group-hover:text-white transition-colors shrink-0">
+                          <FileCheck2 className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-gray-900 group-hover:text-[#016737] transition-colors">
+                            Chapter-wise Tests
+                          </div>
+                          <div className="text-[11px] text-gray-500 leading-tight mt-0.5">
+                            Class 11 & 12 PCB test PDFs with solutions
+                          </div>
+                        </div>
+                      </a>
+
+                      <div className="p-2.5 rounded-xl bg-gray-50/70 border border-gray-100 mt-1 flex items-start gap-3 opacity-90">
+                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
+                          <Flame className="w-4 h-4 fill-amber-500" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-gray-800">Test Series</span>
+                            <span className="px-1.5 py-0.2 rounded-full bg-red-100 text-red-600 text-[9px] font-black uppercase tracking-wider">
+                              HOT • Soon
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-gray-400 leading-tight mt-0.5">
+                            Full syllabus timed mock tests launching soon
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* 3. Annotated NCERT Dropdown */}
+              <div
+                className="relative"
+                onMouseEnter={handleNcertMouseEnter}
+                onMouseLeave={handleNcertMouseLeave}
+              >
+                <button
+                  type="button"
+                  onClick={() => setNcertDropdownOpen(!ncertDropdownOpen)}
+                  className="flex items-center gap-1 text-xs xl:text-sm font-semibold text-[#4B5563] hover:text-[#016737] transition-colors duration-200 cursor-pointer py-1"
+                >
+                  <span>Annotated NCERT</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${ncertDropdownOpen ? "rotate-180 text-[#016737]" : ""}`} />
+                </button>
+
+                <AnimatePresence>
+                  {ncertDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.18 }}
+                      className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-64 rounded-2xl bg-white/95 backdrop-blur-xl border border-gray-100 shadow-xl p-2 z-50 text-left"
+                    >
+                      <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-gray-400">
+                        PYQs & Annotations
+                      </div>
+
+                      <a
+                        href="/annotated-ncert/biology"
+                        className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#F4F9F2] transition-colors group"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+                          <Dna className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">
+                            Biology NCERT + PYQs
+                          </div>
+                          <div className="text-[10px] text-gray-500">Botany & Zoology high yield</div>
+                        </div>
+                      </a>
+
+                      <a
+                        href="/annotated-ncert/physics"
+                        className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-violet-50/60 transition-colors group"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-violet-50 text-violet-700 flex items-center justify-center shrink-0">
+                          <Atom className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-gray-900 group-hover:text-violet-700 transition-colors">
+                            Physics NCERT + PYQs
+                          </div>
+                          <div className="text-[10px] text-gray-500">Formulas, graph notes & questions</div>
+                        </div>
+                      </a>
+
+                      <a
+                        href="/annotated-ncert/chemistry"
+                        className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-blue-50/60 transition-colors group"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+                          <FlaskConical className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
+                            Chemistry NCERT + PYQs
+                          </div>
+                          <div className="text-[10px] text-gray-500">Organic, Inorganic & Physical</div>
+                        </div>
+                      </a>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* 4. One-to-One Session Button (Navigates directly to One-to-One section) */}
+              <a
+                href="/#one-to-one-session"
+                className="relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-[#016737]/10 to-[#8BC43F]/20 text-[#016737] text-xs xl:text-sm font-bold border border-[#8BC43F]/30 hover:border-[#016737]/40 hover:bg-[#016737] hover:text-white transition-all duration-300 shadow-xs cursor-pointer group"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#8BC43F] group-hover:text-white transition-colors" />
+                <span>One-to-One Session</span>
+              </a>
+
+              {/* 5. Pricing */}
+              <a
+                href="/#pricing"
+                className="text-xs xl:text-sm font-semibold text-[#4B5563] hover:text-[#016737] transition-colors duration-200 whitespace-nowrap"
+              >
+                Pricing
+              </a>
+
+              {/* 6. About Us */}
+              <a
+                href="/#about"
+                className="text-xs xl:text-sm font-semibold text-[#4B5563] hover:text-[#016737] transition-colors duration-200 whitespace-nowrap"
+              >
+                About Us
+              </a>
             </nav>
           </div>
         </div>
 
-        {/* MOBILE NAV DROPDOWN MENU */}
+        {/* ═══ MOBILE NAV DRAWER ═══ */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
@@ -154,29 +339,117 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
               transition={{ duration: 0.2 }}
-              className="lg:hidden max-w-7xl mx-auto mt-2 rounded-2xl bg-white/95 backdrop-blur-2xl border border-gray-200/80 p-4 shadow-xl flex flex-col gap-3"
+              className="lg:hidden max-w-7xl mx-auto mt-2 rounded-2xl bg-white/98 backdrop-blur-2xl border border-gray-200/80 p-4 shadow-2xl flex flex-col gap-2.5 max-h-[85vh] overflow-y-auto"
             >
-              {navLinks.map((link) => {
-                const isChapters = link.name === "Chapters";
-                return (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    onClick={() => {
-                      setActiveTab(link.name);
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                      isChapters
-                        ? "bg-[#8BC43F]/15 text-[#016737] border border-[#8BC43F]/30"
-                        : "text-gray-700 hover:bg-gray-50 hover:text-[#016737]"
-                    }`}
-                  >
-                    {link.name}
-                  </a>
-                );
-              })}
+              <a
+                href="/chapters"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-2.5 rounded-xl text-sm font-bold bg-[#8BC43F]/15 text-[#016737] border border-[#8BC43F]/30"
+              >
+                Chapters
+              </a>
 
+              {/* Mobile Tests Accordion */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setMobileTestsOpen(!mobileTestsOpen)}
+                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50"
+                >
+                  <span className="flex items-center gap-2">
+                    <FileCheck2 className="w-4 h-4 text-[#016737]" />
+                    Tests
+                  </span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${mobileTestsOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {mobileTestsOpen && (
+                  <div className="pl-6 pr-2 py-1 space-y-1 bg-gray-50/80 rounded-xl my-1">
+                    <a
+                      href="/tests/chapter-wise"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block py-2 text-xs font-semibold text-[#016737]"
+                    >
+                      • Chapter-wise Tests (Class 11 & 12)
+                    </a>
+                    <div className="py-1 text-xs text-gray-400 flex items-center gap-1.5">
+                      <span>• NEET Test Series</span>
+                      <span className="px-1.5 py-0.5 rounded bg-red-100 text-red-600 text-[9px] font-bold">
+                        HOT • Soon
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile Annotated NCERT Accordion */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setMobileNcertOpen(!mobileNcertOpen)}
+                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50"
+                >
+                  <span className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-[#016737]" />
+                    Annotated NCERT & PYQs
+                  </span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${mobileNcertOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {mobileNcertOpen && (
+                  <div className="pl-6 pr-2 py-1 space-y-1 bg-gray-50/80 rounded-xl my-1">
+                    <a
+                      href="/annotated-ncert/biology"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block py-2 text-xs font-semibold text-emerald-700"
+                    >
+                      • Biology NCERT + PYQs
+                    </a>
+                    <a
+                      href="/annotated-ncert/physics"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block py-2 text-xs font-semibold text-violet-700"
+                    >
+                      • Physics NCERT + PYQs
+                    </a>
+                    <a
+                      href="/annotated-ncert/chemistry"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block py-2 text-xs font-semibold text-blue-700"
+                    >
+                      • Chemistry NCERT + PYQs
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile One-to-One Session Link */}
+              <a
+                href="/#one-to-one-session"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#016737] to-[#0b381e] text-white text-xs font-bold shadow-md cursor-pointer hover:opacity-95 transition-opacity"
+              >
+                <Sparkles className="w-4 h-4 text-[#8BC43F]" />
+                <span>One-to-One Session</span>
+              </a>
+
+              <a
+                href="/#pricing"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-2 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50"
+              >
+                Pricing
+              </a>
+
+              <a
+                href="/#about"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-2 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50"
+              >
+                About Us
+              </a>
+
+              {/* Bottom Auth Profile */}
               <div className="pt-2 border-t border-gray-100 flex items-center justify-between">
                 {user ? (
                   <a
@@ -212,4 +485,3 @@ export default function Navbar() {
     </>
   );
 }
-

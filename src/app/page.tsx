@@ -14,6 +14,7 @@ import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import IntroVideo from "@/components/IntroVideo";
 import ReviewsSection from "@/components/ReviewsSection";
+import OneToOneSession from "@/components/OneToOneSession";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
 export default function Home() {
@@ -70,6 +71,7 @@ export default function Home() {
         <FounderStory />
         <IntroVideo />
         <ReviewsSection />
+        <OneToOneSession />
         <SubscriptionPlans />
         <FAQSection />
         <Footer />

@@ -40,7 +40,7 @@ export default function ShortNotes() {
           const mapped = (shortOnly.length > 0 ? shortOnly : json.pdfs).map((pdf: any) => ({
             id: pdf.id,
             title: pdf.title,
-            subtitle: pdf.sub_heading || `${pdf.class_level || 'Biology'} Short Note`,
+            subtitle: pdf.sub_heading || `${pdf.subject ? pdf.subject + ' ' : ''}${pdf.class_level || 'NEET'} Short Note`,
             pages: `${pdf.page_count || 1} page`,
             readTime: "5 min",
             image: pdf.thumbnail_url || "/hero_premium_clean.png",

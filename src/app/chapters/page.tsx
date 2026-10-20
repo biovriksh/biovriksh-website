@@ -38,6 +38,7 @@ interface Question {
 interface Chapter {
   id: string;
   title: string;
+  subject?: "Biology" | "Physics" | "Chemistry";
   classLevel: "Class 11" | "Class 12";
   unit: string;
   chapterNumber: number;
@@ -56,6 +57,7 @@ export default function ChaptersPage() {
   const { user } = useStudentAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [selectedClass, setSelectedClass] = useState<"ALL" | "Class 11" | "Class 12">("ALL");
+  const [selectedSubject, setSelectedSubject] = useState<"ALL" | "Biology" | "Physics" | "Chemistry">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
   const [activeTab, setActiveTab] = useState<"NOTES" | "MCQS">("NOTES");
@@ -69,30 +71,41 @@ export default function ChaptersPage() {
         const json = await res.json();
 
         if (json.success && json.pdfs && json.pdfs.length > 0) {
-          const mappedChapters: (Chapter & { image?: string })[] = json.pdfs.map((pdf: any, idx: number) => ({
-            id: pdf.id,
-            title: pdf.title,
-            classLevel: pdf.class_level === "Class 11" ? "Class 11" : "Class 12",
-            unit: pdf.sub_heading || `Unit ${idx + 1} · Biology`,
-            chapterNumber: idx + 1,
-            weightage: "High Weightage",
-            isPaid: !pdf.is_free,
-            price: pdf.is_free ? "FREE" : `₹${pdf.price || 49}`,
-            pdfPages: pdf.page_count || 14,
-            summary: pdf.description || `${pdf.title} — High yield study notes for NEET exam preparation.`,
-            keyTopics: [pdf.class_level || "NEET", "NCERT High Yield", "Revision Notes"],
-            image: pdf.thumbnail_url || "/hero_premium_clean.png",
-            notes: [
-              {
-                title: "1. Chapter Overview & Concepts",
-                content: [
-                  pdf.description || "Comprehensive NCERT key points and summary.",
-                  "Key formulas, diagrams, and memory tricks included.",
-                ],
-              },
-            ],
-            questions: [],
-          }));
+          const mappedChapters: (Chapter & { image?: string })[] = json.pdfs.map((pdf: any, idx: number) => {
+            const detectedSubject = pdf.subject || (
+              pdf.title?.toLowerCase().includes("physics") || pdf.sub_heading?.toLowerCase().includes("physics") 
+                ? "Physics" 
+                : pdf.title?.toLowerCase().includes("chemistry") || pdf.sub_heading?.toLowerCase().includes("chemistry")
+                ? "Chemistry"
+                : "Biology"
+            );
+
+            return {
+              id: pdf.id,
+              title: pdf.title,
+              subject: detectedSubject,
+              classLevel: pdf.class_level === "Class 11" ? "Class 11" : "Class 12",
+              unit: pdf.sub_heading || `Unit ${idx + 1} · ${detectedSubject}`,
+              chapterNumber: idx + 1,
+              weightage: "High Weightage",
+              isPaid: !pdf.is_free,
+              price: pdf.is_free ? "FREE" : `₹${pdf.price || 49}`,
+              pdfPages: pdf.page_count || 14,
+              summary: pdf.description || `${pdf.title} — High yield study notes for NEET exam preparation.`,
+              keyTopics: [pdf.class_level || "NEET", detectedSubject, "NCERT Revision"],
+              image: pdf.thumbnail_url || "/hero_premium_clean.png",
+              notes: [
+                {
+                  title: "1. Chapter Overview & Concepts",
+                  content: [
+                    pdf.description || "Comprehensive NCERT key points and summary.",
+                    "Key formulas, diagrams, and memory tricks included.",
+                  ],
+                },
+              ],
+              questions: [],
+            };
+          });
           setChaptersList(mappedChapters);
         } else {
           setChaptersList([]);
@@ -122,10 +135,11 @@ export default function ChaptersPage() {
 
   const filteredChapters = chaptersList.filter((ch) => {
     const matchesClass = selectedClass === "ALL" || ch.classLevel === selectedClass;
+    const matchesSubject = selectedSubject === "ALL" || (ch.subject || "Biology") === selectedSubject;
     const matchesQuery =
       ch.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ch.unit.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesClass && matchesQuery;
+    return matchesClass && matchesSubject && matchesQuery;
   });
 
   const handleSelectOption = (qId: number, optionIdx: number) => {
@@ -139,40 +153,60 @@ export default function ChaptersPage() {
 
       <main className="flex-1 pt-28 pb-20 px-4 sm:px-8 max-w-7xl mx-auto w-full">
         {/* HEADER SECTION */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
+        <div className="text-center max-w-3xl mx-auto mb-12">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-[#111827] tracking-tight leading-tight mb-3 font-sans">
             Chapter-Wise Notes &amp; Practice
           </h1>
 
           <p className="text-gray-600 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
-            Select any chapter to access NCERT bullet summaries, instant practice MCQs, and revision materials.
+            Select any chapter to access NCERT bullet summaries, instant practice MCQs, and revision materials for Biology, Physics &amp; Chemistry.
           </p>
 
-          {/* SEARCH & CLASS FILTERS */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search chapter or unit..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-full border border-gray-200 bg-gray-50/80 text-sm focus:outline-none focus:ring-2 focus:ring-[#016737] focus:bg-white transition-all"
-              />
+          {/* SEARCH & FILTERS ROW */}
+          <div className="mt-8 flex flex-col items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
+              <div className="relative w-full sm:w-80">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search chapter or unit..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-full border border-gray-200 bg-gray-50/80 text-sm focus:outline-none focus:ring-2 focus:ring-[#016737] focus:bg-white transition-all"
+                />
+              </div>
+
+              {/* Class Tabs */}
+              <div className="flex items-center gap-1.5 bg-gray-100/80 p-1 rounded-full border border-gray-200">
+                {(["ALL", "Class 11", "Class 12"] as const).map((cls) => (
+                  <button
+                    key={cls}
+                    onClick={() => setSelectedClass(cls)}
+                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                      selectedClass === cls
+                        ? "bg-[#016737] text-white shadow-xs"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    {cls}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="flex items-center gap-1.5 bg-gray-100/80 p-1 rounded-full border border-gray-200">
-              {(["ALL", "Class 11", "Class 12"] as const).map((cls) => (
+            {/* Subject Tabs */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              {(["ALL", "Biology", "Physics", "Chemistry"] as const).map((sub) => (
                 <button
-                  key={cls}
-                  onClick={() => setSelectedClass(cls)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                    selectedClass === cls
-                      ? "bg-[#016737] text-white shadow-xs"
-                      : "text-gray-600 hover:text-gray-900"
+                  key={sub}
+                  onClick={() => setSelectedSubject(sub)}
+                  className={`px-3.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                    selectedSubject === sub
+                      ? "bg-gray-900 text-white shadow-xs"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
-                  {cls}
+                  {sub === "ALL" ? "All Subjects" : sub}
                 </button>
               ))}
             </div>

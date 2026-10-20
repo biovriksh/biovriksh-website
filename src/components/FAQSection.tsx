@@ -9,7 +9,7 @@ const faqs = [
     id: 1,
     question: "Is BioVriksh NEET Oriented?",
     answer:
-      "Yes, 100%! BioVriksh is crafted specifically for NEET aspirants. Every short note, NCERT line-by-line summary, diagram explanation, and practice question set is strictly aligned with the latest NTA NEET Class 11 & 12 Biology syllabus.",
+      "Yes, 100%! BioVriksh is crafted specifically for NEET aspirants. Every short note, NCERT line-by-line summary, formula sheet, and practice question set is strictly aligned with the latest NTA NEET Class 11 & 12 syllabus across Physics, Chemistry, and Biology.",
   },
   {
     id: 2,
@@ -39,7 +39,7 @@ const faqs = [
     id: 6,
     question: "Is the content aligned with the latest NEET syllabus?",
     answer:
-      "Absolutely. All notes and practice sets are strictly aligned with the latest NTA NEET Class 11 & 12 NCERT Biology syllabus.",
+      "Absolutely. All notes and practice sets are strictly aligned with the latest NTA NEET Class 11 & 12 NCERT syllabus for Physics, Chemistry, and Biology.",
   },
   {
     id: 7,

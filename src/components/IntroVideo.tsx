@@ -25,7 +25,7 @@ export default function IntroVideo() {
       imgAlt: "BioVriksh Educator Origin Story",
       badgeLeft: "Offline Teaching",
       badgeRight: "3.5+ Yrs Exp",
-      desc: "Originally from a village in Haryana with 3.5+ years of offline teaching experience, helping students master complex NEET biology concepts.",
+      desc: "Originally from a village in Haryana with 3.5+ years of offline teaching experience, helping students master complex NEET concepts with ease across Physics, Chemistry, and Biology.",
       highlightBox: "“No student is inherently weak; with right guidance & mentorship, every student can succeed.”",
     },
     {
@@ -37,8 +37,8 @@ export default function IntroVideo() {
       imgAlt: "NCERT Root Decoding & Zero to 350+ Marks",
       badgeLeft: "Line-by-Line NCERT",
       badgeRight: "From Scratch",
-      desc: "Designed for students starting from zero. Taught line-by-line from NCERT roots with systematic revision to target 350+ marks in NEET.",
-      highlightBox: "“We begin right from zero fundamentals to make Biology your highest-scoring NEET subject.”",
+      desc: "Designed for students starting from zero. Taught line-by-line from NCERT roots with systematic revision to maximize your total NEET score.",
+      highlightBox: "“We begin right from zero fundamentals to build rock-solid concepts across all NEET subjects.”",
     },
     {
       step: "03",
@@ -84,7 +84,7 @@ export default function IntroVideo() {
                   "linear-gradient(135deg, #016737 0%, #2e9352 50%, #8BC43F 100%)",
               }}
             >
-              NEET Biology Success
+              NEET 2026 Success
             </span>
           </h2>
         </div>

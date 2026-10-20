@@ -29,8 +29,8 @@ const marker = Permanent_Marker({
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Bio Vriksh | Ultra-Aesthetic NEET Biology Learning & Practice Platform",
-  description: "Free concept notes for every chapter. Paid practice sets that mirror the NEET exam pattern.",
+  title: "Bio Vriksh | NEET Preparation Platform for Biology, Physics & Chemistry",
+  description: "Comprehensive NCERT concept notes, chapter-wise practice tests, and 1-on-1 faculty mentorship across Physics, Chemistry, and Biology.",
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },

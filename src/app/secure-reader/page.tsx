@@ -22,7 +22,7 @@ function SecureReaderContent() {
   const searchParams = useSearchParams();
   const pdfId = searchParams.get("pdfId") || searchParams.get("id");
   const titleParam = searchParams.get("title") || "Bio Vriksh Study Note";
-  const subjectParam = searchParams.get("subject") || "NEET Biology Series";
+  const subjectParam = searchParams.get("subject") || "NEET Series";
   const pagesCountParam = parseInt(searchParams.get("pages") || "1", 10) || 1;
 
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
