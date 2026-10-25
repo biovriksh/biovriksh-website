@@ -33,26 +33,45 @@ export async function POST(req: Request) {
         targetSection,
         classLevel,
         subject,
+        chapterId,
+        subHeading,
+        unit,
+        yearsCovered,
+        highlightText,
         price,
         pageCount,
+        questionsCount,
+        durationMinutes,
+        totalMarks,
         isRecent,
         isActive,
         thumbnailUrl,
         filePath,
       } = body;
 
+      const isFreeCalc = targetSection === "short" || (targetSection === "test" && (Number(price) === 0 || !price));
+
       const updatePayload: any = {
         title,
         description,
         note_type: targetSection,
-        is_free: targetSection === "short",
+        is_free: isFreeCalc,
         class_level: classLevel,
         subject: subject || "Biology",
-        price: targetSection === "short" ? 0 : price,
-        page_count: pageCount,
+        price: isFreeCalc ? 0 : Number(price || 0),
+        page_count: Number(pageCount || 12),
+        questions_count: questionsCount !== undefined ? Number(questionsCount) : 45,
+        duration_minutes: durationMinutes !== undefined ? Number(durationMinutes) : 45,
+        total_marks: totalMarks !== undefined ? Number(totalMarks) : 180,
         is_recent: !!isRecent,
         updated_at: new Date().toISOString(),
       };
+
+      if (chapterId !== undefined) updatePayload.chapter_id = chapterId || null;
+      if (subHeading !== undefined) updatePayload.sub_heading = subHeading || null;
+      if (unit !== undefined) updatePayload.unit = unit || null;
+      if (yearsCovered !== undefined) updatePayload.years_covered = yearsCovered || null;
+      if (highlightText !== undefined) updatePayload.highlight_text = highlightText || null;
 
       if (isActive !== undefined) {
         updatePayload.is_active = !!isActive;
@@ -113,4 +132,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
-

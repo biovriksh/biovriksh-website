@@ -313,12 +313,38 @@ export default function AnnotatedNcertSubjectPage({
   const [selectedClass, setSelectedClass] = useState<"All" | "Class 11" | "Class 12">("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [liveResources, setLiveResources] = useState<PYQResource[]>([]);
+  const [loadingLive, setLoadingLive] = useState(true);
 
   const { user } = useStudentAuth();
   const { handleCheckout } = useCheckout();
 
+  // Load live notes from Supabase
+  useEffect(() => {
+    async function loadLiveAnnotatedNotes() {
+      try {
+        setLoadingLive(true);
+        const res = await fetch(`/api/public/annotated-ncert?subject=${currentSubjectKey}`, { cache: "no-store" });
+        const json = await res.json();
+        if (json.success && json.notes && json.notes.length > 0) {
+          setLiveResources(json.notes);
+        } else {
+          setLiveResources([]);
+        }
+      } catch (e) {
+        console.error("Error fetching live annotated NCERT notes:", e);
+      } finally {
+        setLoadingLive(false);
+      }
+    }
+    loadLiveAnnotatedNotes();
+  }, [currentSubjectKey]);
+
+  // Use live resources if present in database; fallback to curated starter resources
+  const activeResourcesList = liveResources.length > 0 ? liveResources : subjectData.resources;
+
   // Filter resources
-  const filteredResources = subjectData.resources.filter((res) => {
+  const filteredResources = activeResourcesList.filter((res) => {
     if (selectedClass === "Class 11" && res.classLevel !== "Class 11") return false;
     if (selectedClass === "Class 12" && res.classLevel !== "Class 12") return false;
 

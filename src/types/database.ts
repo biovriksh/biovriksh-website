@@ -1,6 +1,6 @@
 export type UserRole = "admin" | "student";
 
-export type NoteType = "paid" | "free" | "short" | "chapter";
+export type NoteType = "paid" | "free" | "short" | "chapter" | "test" | "annotated_ncert";
 export type ClassLevel = "Class 11" | "Class 12" | "NEET Special";
 export type SubjectType = "Biology" | "Physics" | "Chemistry";
 
@@ -30,6 +30,9 @@ export interface PDFNote {
   id: string;
   chapter_id: string | null;
   sub_heading?: string | null;
+  unit?: string | null;
+  years_covered?: string | null;
+  highlight_text?: string | null;
   title: string;
   subject?: SubjectType | string;
   description: string | null;
@@ -42,10 +45,35 @@ export interface PDFNote {
   note_type: NoteType;
   class_level: ClassLevel;
   page_count: number;
+  questions_count?: number;
+  duration_minutes?: number;
+  total_marks?: number;
   created_at: string;
   updated_at: string;
   // Joined table data
   chapter?: Chapter | null;
+}
+
+export interface AnnotatedNCERTNote {
+  id: string;
+  chapter_id?: string | null;
+  chapter_name: string;
+  unit: string;
+  subject: SubjectType;
+  class_level: ClassLevel;
+  years_covered: string;
+  solved_questions: number;
+  total_pages: number;
+  highlight_text: string;
+  description?: string | null;
+  thumbnail_url?: string | null;
+  file_path: string;
+  is_free: boolean;
+  price: number;
+  is_active: boolean;
+  is_recent: boolean;
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface Purchase {

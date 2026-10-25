@@ -116,7 +116,45 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, pdf: data });
     }
 
+    if (action === "attach_pdf") {
+      const { chapterId, pdfId, subHeading } = body;
+      const updateData: any = { chapter_id: chapterId };
+      if (subHeading) updateData.sub_heading = subHeading;
+
+      const { data, error } = await supabaseAdmin
+        .from("pdfs")
+        .update(updateData)
+        .eq("id", pdfId)
+        .select("*")
+        .single();
+
+      if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: true, pdf: data });
+    }
+
+    if (action === "remove_pdf") {
+      const { pdfId } = body;
+      const { data, error } = await supabaseAdmin
+        .from("pdfs")
+        .update({ chapter_id: null })
+        .eq("id", pdfId)
+        .select("*")
+        .single();
+
+      if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: true, pdf: data });
+    }
+
+    if (action === "delete_pdf") {
+      const { pdfId } = body;
+      const { error } = await supabaseAdmin.from("pdfs").delete().eq("id", pdfId);
+      if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: true });
+    }
+
     if (action === "delete_chapter") {
+      // First disassociate any attached PDFs
+      await supabaseAdmin.from("pdfs").update({ chapter_id: null }).eq("chapter_id", id);
       const { error } = await supabaseAdmin.from("chapters").delete().eq("id", id);
       if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
       return NextResponse.json({ success: true });

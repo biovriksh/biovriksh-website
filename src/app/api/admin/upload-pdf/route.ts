@@ -11,8 +11,16 @@ export async function POST(req: Request) {
     let noteType = "paid";
     let classLevel = "Class 12";
     let subject = "Biology";
+    let chapterId: string | null = null;
+    let subHeading: string | null = null;
+    let unit: string | null = null;
+    let yearsCovered: string = "NEET 2016 - 2024";
+    let highlightText: string = "";
     let price = 0;
     let pageCount = 12;
+    let questionsCount = 45;
+    let durationMinutes = 45;
+    let totalMarks = 180;
     let isRecent = false;
     let thumbnailUrl = "/hero_premium_clean.png";
     let filePath = "";
@@ -21,11 +29,19 @@ export async function POST(req: Request) {
       const formData = await req.formData();
       title = (formData.get("title") as string) || "";
       description = (formData.get("description") as string) || "";
-      noteType = (formData.get("targetSection") as string) || "paid";
+      noteType = (formData.get("targetSection") as string) || (formData.get("noteType") as string) || "paid";
       classLevel = (formData.get("classLevel") as string) || "Class 12";
       subject = (formData.get("subject") as string) || "Biology";
+      chapterId = (formData.get("chapterId") as string) || (formData.get("chapter_id") as string) || null;
+      subHeading = (formData.get("subHeading") as string) || (formData.get("sub_heading") as string) || null;
+      unit = (formData.get("unit") as string) || null;
+      yearsCovered = (formData.get("yearsCovered") as string) || (formData.get("years_covered") as string) || "NEET 2016 - 2024";
+      highlightText = (formData.get("highlightText") as string) || (formData.get("highlight_text") as string) || "";
       price = Number(formData.get("price") || 0);
       pageCount = Number(formData.get("pageCount") || 12);
+      questionsCount = Number(formData.get("questionsCount") || 45);
+      durationMinutes = Number(formData.get("durationMinutes") || 45);
+      totalMarks = Number(formData.get("totalMarks") || 180);
       isRecent = formData.get("isRecent") === "true";
 
       const thumbnailFile = formData.get("thumbnailFile") as File | null;
@@ -57,13 +73,13 @@ export async function POST(req: Request) {
       // 2. Upload Private PDF Document on Server using Service Role Key
       if (pdfFile && pdfFile.size > 0) {
         const pdfExt = pdfFile.name.split(".").pop() || "pdf";
-        const pdfName = `pdf_${Date.now()}_${Math.random().toString(36).substring(7)}.${pdfExt}`;
+        const uniqueFileName = `${Date.now()}_${pdfFile.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
         const pdfBuffer = Buffer.from(await pdfFile.arrayBuffer());
 
         const { data: pdfUpload, error: pdfErr } = await supabaseAdmin.storage
           .from("pdf-files")
-          .upload(pdfName, pdfBuffer, {
-            contentType: pdfFile.type || "application/pdf",
+          .upload(uniqueFileName, pdfBuffer, {
+            contentType: "application/pdf",
             upsert: true,
           });
 
@@ -81,8 +97,16 @@ export async function POST(req: Request) {
       noteType = body.targetSection || body.noteType || "paid";
       classLevel = body.classLevel || "Class 12";
       subject = body.subject || "Biology";
+      chapterId = body.chapterId || body.chapter_id || null;
+      subHeading = body.subHeading || body.sub_heading || null;
+      unit = body.unit || null;
+      yearsCovered = body.yearsCovered || body.years_covered || "NEET 2016 - 2024";
+      highlightText = body.highlightText || body.highlight_text || "";
       price = Number(body.price || 0);
       pageCount = Number(body.pageCount || 12);
+      questionsCount = Number(body.questionsCount || 45);
+      durationMinutes = Number(body.durationMinutes || 45);
+      totalMarks = Number(body.totalMarks || 180);
       isRecent = Boolean(body.isRecent);
       thumbnailUrl = body.thumbnailUrl || "/hero_premium_clean.png";
       filePath = body.filePath || `notes_${Date.now()}.pdf`;
@@ -92,12 +116,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Title is required." }, { status: 400 });
     }
 
-    const isActuallyFree = noteType === "short" || price === 0;
+    const isActuallyFree = noteType === "short" || (noteType === "test" && price === 0) || price === 0;
 
     // 3. Insert PDF record into Supabase Database
-    const newPdfRow = {
-      chapter_id: null,
-      sub_heading: null,
+    const newPdfRow: any = {
+      chapter_id: chapterId || null,
+      sub_heading: subHeading || null,
+      unit: unit || null,
+      years_covered: yearsCovered || null,
+      highlight_text: highlightText || null,
       title: title.trim(),
       description: description.trim(),
       thumbnail_url: thumbnailUrl,
@@ -110,6 +137,9 @@ export async function POST(req: Request) {
       class_level: classLevel,
       subject: subject,
       page_count: pageCount,
+      questions_count: questionsCount,
+      duration_minutes: durationMinutes,
+      total_marks: totalMarks,
     };
 
     const { data: insertedPdf, error: dbErr } = await supabaseAdmin

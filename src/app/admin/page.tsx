@@ -6,13 +6,14 @@ import {
   DollarSign,
   ShoppingCart,
   FileText,
+  FileCheck2,
   Users,
   CheckCircle2,
   RefreshCw,
-  Plus,
   FolderPlus,
   UploadCloud,
-  LayoutDashboard,
+  BookOpen,
+  FolderTree,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { DashboardStats } from "@/types/database";
@@ -25,6 +26,9 @@ export default function AdminDashboardPage() {
     totalStudents: 0,
     recentPurchases: [],
   });
+  const [testCount, setTestCount] = useState(0);
+  const [annotatedCount, setAnnotatedCount] = useState(0);
+  const [chapterCount, setChapterCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [subjectCounts, setSubjectCounts] = useState({
     biology: 0,
@@ -37,19 +41,39 @@ export default function AdminDashboardPage() {
     try {
       const supabase = createClient();
 
+      // Count chapters
+      const { count: chCount } = await supabase
+        .from("chapters")
+        .select("*", { count: "exact", head: true });
+      if (chCount !== null) setChapterCount(chCount);
+
       const { count: pdfCount, data: allPdfs } = await supabase
         .from("pdfs")
-        .select("subject", { count: "exact" })
+        .select("subject, note_type, title, sub_heading", { count: "exact" })
         .eq("is_active", true);
 
       if (allPdfs) {
-        let bio = 0, phy = 0, chem = 0;
+        let bio = 0, phy = 0, chem = 0, tests = 0, ncerts = 0;
         allPdfs.forEach((p: any) => {
           if (p.subject === "Physics") phy++;
           else if (p.subject === "Chemistry") chem++;
           else bio++;
+
+          if (p.note_type === "annotated_ncert") {
+            ncerts++;
+          }
+
+          if (
+            p.note_type === "test" ||
+            (p.title && p.title.toLowerCase().includes("test")) ||
+            (p.sub_heading && p.sub_heading.toLowerCase().includes("test"))
+          ) {
+            tests++;
+          }
         });
         setSubjectCounts({ biology: bio, physics: phy, chemistry: chem });
+        setTestCount(tests);
+        setAnnotatedCount(ncerts);
       }
 
       const { count: studentCount } = await supabase
@@ -98,11 +122,25 @@ export default function AdminDashboardPage() {
       iconBg: "bg-blue-50 text-blue-700 border border-blue-200",
     },
     {
-      title: "Live PDF Notes",
-      value: stats.activePDFs.toString(),
-      subtitle: "Published",
-      icon: FileText,
+      title: "Chapters",
+      value: chapterCount.toString(),
+      subtitle: "Active Chapters",
+      icon: FolderTree,
       iconBg: "bg-amber-50 text-amber-700 border border-amber-200",
+    },
+    {
+      title: "Annotated NCERT",
+      value: annotatedCount.toString(),
+      subtitle: "Line-by-Line PYQs",
+      icon: BookOpen,
+      iconBg: "bg-emerald-50 text-emerald-800 border border-emerald-300",
+    },
+    {
+      title: "Chapter Tests",
+      value: testCount.toString(),
+      subtitle: "Practice Sets",
+      icon: FileCheck2,
+      iconBg: "bg-teal-50 text-teal-700 border border-teal-200",
     },
     {
       title: "NEET Aspirants",
@@ -127,31 +165,45 @@ export default function AdminDashboardPage() {
             </span>
           </div>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Real-time sales performance, active study materials, and recent orders.
+            Real-time management for Chapters, Annotated NCERT, Mindmaps, Tests, and Sales.
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           <Link
-            href="/admin/pdfs"
+            href="/admin/annotated-ncert"
             className="px-3.5 py-2 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-semibold transition-all flex items-center gap-1.5 shadow-2xs"
           >
-            <UploadCloud className="w-3.5 h-3.5 text-[#8BC43F]" />
-            <span>Upload PDF Note</span>
+            <BookOpen className="w-3.5 h-3.5 text-[#8BC43F]" />
+            <span>Annotated NCERT</span>
           </Link>
           <Link
             href="/admin/chapters"
             className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all flex items-center gap-1.5 border border-slate-200"
           >
             <FolderPlus className="w-3.5 h-3.5 text-slate-500" />
-            <span>Add Chapter</span>
+            <span>Manage Chapters</span>
+          </Link>
+          <Link
+            href="/admin/pdfs"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all flex items-center gap-1.5 border border-slate-200"
+          >
+            <UploadCloud className="w-3.5 h-3.5 text-slate-500" />
+            <span>Mindmaps &amp; PDFs</span>
+          </Link>
+          <Link
+            href="/admin/tests"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all flex items-center gap-1.5 border border-slate-200"
+          >
+            <FileCheck2 className="w-3.5 h-3.5 text-slate-500" />
+            <span>Tests</span>
           </Link>
         </div>
       </div>
 
       {/* ═══ COMPACT STATS CARDS GRID ═══ */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
@@ -180,12 +232,12 @@ export default function AdminDashboardPage() {
           <div className="flex items-center gap-2.5">
             <span className="text-2xl">🌿</span>
             <div>
-              <p className="text-xs font-bold text-slate-800">Biology Notes</p>
+              <p className="text-xs font-bold text-slate-800">Biology Materials</p>
               <p className="text-[11px] text-slate-500 font-medium">Zoology &amp; Botany</p>
             </div>
           </div>
           <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
-            {subjectCounts.biology} Notes
+            {subjectCounts.biology} Items
           </span>
         </div>
 
@@ -193,12 +245,12 @@ export default function AdminDashboardPage() {
           <div className="flex items-center gap-2.5">
             <span className="text-2xl">⚡</span>
             <div>
-              <p className="text-xs font-bold text-slate-800">Physics Notes</p>
+              <p className="text-xs font-bold text-slate-800">Physics Materials</p>
               <p className="text-[11px] text-slate-500 font-medium">Class 11 &amp; 12 Syllabus</p>
             </div>
           </div>
           <span className="text-xs font-extrabold text-violet-700 bg-violet-50 px-2.5 py-1 rounded-lg border border-violet-100">
-            {subjectCounts.physics} Notes
+            {subjectCounts.physics} Items
           </span>
         </div>
 
@@ -206,12 +258,12 @@ export default function AdminDashboardPage() {
           <div className="flex items-center gap-2.5">
             <span className="text-2xl">🧪</span>
             <div>
-              <p className="text-xs font-bold text-slate-800">Chemistry Notes</p>
+              <p className="text-xs font-bold text-slate-800">Chemistry Materials</p>
               <p className="text-[11px] text-slate-500 font-medium">Organic, Inorganic &amp; Physical</p>
             </div>
           </div>
           <span className="text-xs font-extrabold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
-            {subjectCounts.chemistry} Notes
+            {subjectCounts.chemistry} Items
           </span>
         </div>
       </div>
@@ -232,7 +284,7 @@ export default function AdminDashboardPage() {
           <button
             onClick={fetchDashboardStats}
             disabled={loading}
-            className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-medium transition-all flex items-center gap-1.5 border border-slate-200"
+            className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-medium transition-all flex items-center gap-1.5 border border-slate-200 cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
             <span>Refresh</span>

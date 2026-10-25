@@ -322,6 +322,8 @@ export default function AdminPDFsPage() {
     if (activeSectionTab === "all") return true;
     if (activeSectionTab === "paid") return pdf.note_type === "paid" && !pdf.is_free;
     if (activeSectionTab === "short") return pdf.note_type === "short" || pdf.is_free;
+    if (activeSectionTab === "chapter") return pdf.note_type === "chapter" || Boolean(pdf.chapter_id);
+    if (activeSectionTab === "annotated_ncert") return pdf.note_type === "annotated_ncert";
     if (activeSectionTab === "recent") return pdf.is_recent === true;
 
     return true;
@@ -337,7 +339,7 @@ export default function AdminPDFsPage() {
             <span>Study Notes &amp; PDF Manager</span>
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Upload, edit, manage Paid PDF Notes, Free Short Notes &amp; Mindmaps, and toggle Trending items.
+            Manage all PDF documents, Mindmaps, Free Short Notes, Chapter Notes, and Trending items.
           </p>
         </div>
 
@@ -355,22 +357,34 @@ export default function AdminPDFsPage() {
         {/* Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto p-1">
           {[
-            { id: "all", label: "All Study Notes", icon: FileText, count: pdfs.length },
-            {
-              id: "paid",
-              label: "Paid PDF Notes Section",
-              icon: Lock,
-              count: pdfs.filter((p) => p.note_type === "paid" && !p.is_free).length,
-            },
+            { id: "all", label: "All Notes", icon: FileText, count: pdfs.length },
             {
               id: "short",
-              label: "Free Short Notes Section",
+              label: "Mindmaps & Short Notes",
               icon: Unlock,
               count: pdfs.filter((p) => p.note_type === "short" || p.is_free).length,
             },
             {
+              id: "paid",
+              label: "Paid Notes",
+              icon: Lock,
+              count: pdfs.filter((p) => p.note_type === "paid" && !p.is_free).length,
+            },
+            {
+              id: "chapter",
+              label: "Chapter Notes",
+              icon: FileText,
+              count: pdfs.filter((p) => p.note_type === "chapter" || Boolean(p.chapter_id)).length,
+            },
+            {
+              id: "annotated_ncert",
+              label: "Annotated NCERT",
+              icon: FileText,
+              count: pdfs.filter((p) => p.note_type === "annotated_ncert").length,
+            },
+            {
               id: "recent",
-              label: "Recently Uploaded & Trending",
+              label: "Trending",
               icon: Flame,
               count: pdfs.filter((p) => p.is_recent).length,
             },

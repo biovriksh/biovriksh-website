@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   FolderTree,
   FileText,
+  FileCheck2,
   ShoppingCart,
   Users,
   LogOut,
@@ -14,6 +15,7 @@ import {
   Menu,
   X,
   Loader2,
+  BookOpen,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -110,9 +112,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navItems = [
     { name: "Dashboard Overview", href: "/admin", icon: LayoutDashboard },
-    { name: "Chapters Manager", href: "/admin/chapters", icon: FolderTree },
-    { name: "PDF Notes Manager", href: "/admin/pdfs", icon: FileText },
-    { name: "Orders & Sales Log", href: "/admin/orders", icon: ShoppingCart },
+    { name: "Chapters & Notes", href: "/admin/chapters", icon: FolderTree },
+    { name: "Annotated NCERT", href: "/admin/annotated-ncert", icon: BookOpen },
+    { name: "Mindmaps & PDFs", href: "/admin/pdfs", icon: FileText },
+    { name: "Chapter Tests", href: "/admin/tests", icon: FileCheck2 },
+    { name: "Orders & Sales", href: "/admin/orders", icon: ShoppingCart },
     { name: "Student Directory", href: "/admin/students", icon: Users },
   ];
 
