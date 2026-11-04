@@ -14,36 +14,56 @@ const plans = [
     badge: "100% Free Forever",
     price: "₹0",
     period: "Lifetime Free Access",
-    description: "Ideal for beginners to explore chapter summaries & basic concept practice.",
-    featuresHeader: "Included in Free:",
+    description: "Ideal for beginners. Preview overview and first chapter free.",
+    featuresHeader: "Included in Basic:",
     features: [
-      "All free chapter short notes (Biology, Physics, Chem)",
-      "Free chapter-wise practice tests & answer keys",
-      "NCERT line-by-line summary sheets",
-      "Instant PDF online viewer access",
-      "Topic-wise concept overviews",
+      "All chapter overviews & NCERT concept summaries",
+      "1st Chapter Question PDFs 100% Free (Class 11 & 12)",
+      "1st Chapter Annotated NCERT PDFs 100% Free",
+      "Instant secure online PDF reader for free chapters",
+      "Zero payment details needed",
     ],
     cta: "Start Free Learning",
     btnStyle: "bg-gray-100 text-gray-900 hover:bg-gray-200 border border-gray-200",
     isHighlighted: false,
   },
   {
-    id: "yearly",
-    name: "PREMIUM ALL-ACCESS",
-    badge: "🔥 MOST POPULAR • 1-YEAR FULL PASS",
+    id: "299",
+    name: "STANDARD PASS",
+    badge: "🔥 ALL NOTES & QUESTIONS",
     price: "₹299",
-    period: "per month (Billed annually • 1-Year Full Access)",
-    description: "Complete, unrestricted access to all premium notes, tests, and future mock test series.",
-    featuresHeader: "Everything in BASIC, plus:",
+    period: "/ month (Cancel anytime)",
+    description: "Complete access to all per-topic questions, PYPs and annotated NCERT.",
+    featuresHeader: "Everything in Basic, plus:",
     features: [
-      "All Paid Chapter Notes unlocked (Biology, Physics & Chemistry)",
-      "All Chapter-wise High-Yield Practice Tests & Solutions",
-      "Annotated NCERT + 10-Year Previous Year Questions (PYQs)",
-      "Upcoming Full NEET Mock Test Series (Unlocked at Launch)",
-      "1-Year Full Uninterrupted Access for NEET Aspirants",
-      "Priority One-to-One Mentorship & Doubt Resolution",
+      "ALL Per-Topic Question PDFs (Class 11 & 12 PCB)",
+      "ALL Annotated NCERT PDFs with diagrams & highlights",
+      "Complete 10-Year Previous Year Question Papers (PYPs)",
+      "Formula cheat sheets & reaction memory mindmaps",
+      "No per-PDF fees — complete question bank unlocked",
+      "Cancel anytime from your account settings",
     ],
-    cta: "Unlock Premium Access (₹299/mo)",
+    cta: "Subscribe for ₹299/mo",
+    btnStyle: "bg-gray-900 text-white hover:bg-black shadow-md",
+    isHighlighted: false,
+  },
+  {
+    id: "399",
+    name: "PREMIUM PASS",
+    badge: "⭐ COMPLETE ALL-ACCESS",
+    price: "₹399",
+    period: "/ month (Recommended for NEET)",
+    description: "The complete preparation suite with test series and personal mentorship.",
+    featuresHeader: "Everything in Standard, plus:",
+    features: [
+      "Everything included in Standard Pass",
+      "NEET All-India Mock Test Series with AIR Rank Predictor",
+      "Chapter-wise Timed Practice Tests with full solutions",
+      "Live 1-on-1 Faculty Mentorship & Doubt Resolution",
+      "Video explanation walkthroughs for high-difficulty questions",
+      "Personal revision checklist & mistake tracker",
+    ],
+    cta: "Unlock Premium (₹399/mo)",
     btnStyle: "bg-[#016737] text-white hover:bg-[#014d29] shadow-lg shadow-[#016737]/25",
     isHighlighted: true,
   },
@@ -106,8 +126,8 @@ export default function SubscriptionPlans() {
             </p>
           </motion.div>
 
-          {/* ── 2-PLAN COMPARISON GRID ── */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto items-stretch">
+          {/* ── 3-PLAN SUBSCRIPTION GRID ── */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch">
             {plans.map((plan) => (
               <motion.div
                 key={plan.id}

@@ -56,10 +56,10 @@ export default function PaidPDFs() {
             id: pdf.id,
             rawId: pdf.id,
             subject: pdf.title,
-            chapter: pdf.sub_heading || `${pdf.class_level || 'NEET'} Paid Note`,
+            chapter: pdf.sub_heading || `${pdf.class_level || 'NEET'} Premium Note`,
             questions: 150,
             difficulty: "Medium",
-            price: pdf.is_free ? "FREE" : `₹${pdf.price || 49}`,
+            price: pdf.is_free ? "FREE" : "PREMIUM PASS",
             topics: [pdf.class_level || "NEET", "NCERT High Yield"],
             image: pdf.thumbnail_url || "/hero_premium_clean.png",
           }));
@@ -84,13 +84,12 @@ export default function PaidPDFs() {
   const blobY = useTransform(scrollYProgress, [0, 1], [80, -80]);
 
   const onUnlockClick = (pdfId: string) => {
-    handleCheckout({
-      pdfId: pdfId,
-      onLoginRequired: () => setAuthModalOpen(true),
-      onSuccess: () => {
-        window.location.href = `/secure-reader?pdfId=${encodeURIComponent(pdfId)}`;
-      },
-    });
+    const pricingEl = document.getElementById("pricing");
+    if (pricingEl) {
+      pricingEl.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.location.href = "/#pricing";
+    }
   };
 
   return (
@@ -141,10 +140,10 @@ export default function PaidPDFs() {
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
               <div>
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#111827] leading-tight">
-                  Paid Notes
+                  Premium Study Material
                 </h2>
                 <p className="mt-2 text-xs sm:text-sm text-gray-600 max-w-xl leading-relaxed">
-                  High-density question banks crafted by NEET toppers. Pay once, practice infinitely.
+                  High-density question banks and complete notes. Included in your Bio Vriksh Subscription Pass — zero per-PDF charges.
                 </p>
               </div>
             </div>
@@ -213,10 +212,10 @@ export default function PaidPDFs() {
 
                     <button
                       onClick={() => onUnlockClick(pdf.id)}
-                      className="w-full py-2 sm:py-2.5 rounded-xl bg-[#016737] text-white text-[11px] sm:text-xs font-bold hover:bg-[#014d29] transition-all flex items-center justify-center gap-1 shadow-2xs cursor-pointer text-center"
+                      className="w-full py-2 sm:py-2.5 rounded-xl bg-[#016737] text-white text-[11px] sm:text-xs font-bold hover:bg-[#014d29] transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer text-center"
                     >
-                      <Lock className="w-3.5 h-3.5" />
-                      <span>Unlock ({pdf.price})</span>
+                      <Sparkles className="w-3.5 h-3.5 text-[#8BC43F]" />
+                      <span>Unlock with Subscription</span>
                     </button>
                   </div>
                 </motion.div>

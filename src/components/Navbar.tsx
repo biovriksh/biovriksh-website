@@ -8,6 +8,7 @@ import {
   Sparkles, 
   User as UserIcon, 
   ChevronDown, 
+  ChevronRight,
   BookOpen, 
   FileCheck2, 
   GraduationCap, 
@@ -28,15 +29,15 @@ export default function Navbar() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
   // Dropdown states for desktop
+  const [pypDropdownOpen, setPypDropdownOpen] = useState(false);
   const [testsDropdownOpen, setTestsDropdownOpen] = useState(false);
-  const [ncertDropdownOpen, setNcertDropdownOpen] = useState(false);
 
   // Dropdown states for mobile
+  const [mobilePypOpen, setMobilePypOpen] = useState(false);
   const [mobileTestsOpen, setMobileTestsOpen] = useState(false);
-  const [mobileNcertOpen, setMobileNcertOpen] = useState(false);
 
+  const pypTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const testsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const ncertTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { user, profile } = useStudentAuth();
 
@@ -47,20 +48,20 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const handlePypMouseEnter = () => {
+    if (pypTimeoutRef.current) clearTimeout(pypTimeoutRef.current);
+    setPypDropdownOpen(true);
+  };
+  const handlePypMouseLeave = () => {
+    pypTimeoutRef.current = setTimeout(() => setPypDropdownOpen(false), 200);
+  };
+
   const handleTestsMouseEnter = () => {
     if (testsTimeoutRef.current) clearTimeout(testsTimeoutRef.current);
     setTestsDropdownOpen(true);
   };
   const handleTestsMouseLeave = () => {
     testsTimeoutRef.current = setTimeout(() => setTestsDropdownOpen(false), 200);
-  };
-
-  const handleNcertMouseEnter = () => {
-    if (ncertTimeoutRef.current) clearTimeout(ncertTimeoutRef.current);
-    setNcertDropdownOpen(true);
-  };
-  const handleNcertMouseLeave = () => {
-    ncertTimeoutRef.current = setTimeout(() => setNcertDropdownOpen(false), 200);
   };
 
   return (
@@ -156,15 +157,103 @@ export default function Navbar() {
           {/* ═══ BOTTOM ROW: NAVIGATIONS WITH DROPDOWNS ═══ */}
           <div className="hidden lg:flex items-center justify-center w-full text-center pb-0.5">
             <nav className="flex items-center justify-center gap-6 xl:gap-8 mx-auto text-center pl-10 sm:pl-14">
-              {/* 1. Chapters Link */}
-              <a
-                href="/chapters"
-                className="relative text-xs xl:text-sm font-bold text-[#8BC43F] hover:text-[#016737] transition-colors duration-200 whitespace-nowrap"
+              {/* 1. PYP's Dropdown */}
+              <div
+                className="relative"
+                onMouseEnter={handlePypMouseEnter}
+                onMouseLeave={handlePypMouseLeave}
               >
-                Chapters
+                <button
+                  type="button"
+                  onClick={() => setPypDropdownOpen(!pypDropdownOpen)}
+                  className="flex items-center gap-1 text-xs xl:text-sm font-semibold text-[#4B5563] hover:text-[#016737] transition-colors duration-200 cursor-pointer py-1"
+                >
+                  <span className="font-bold text-gray-800 hover:text-[#016737]">PYP&apos;s</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${pypDropdownOpen ? "rotate-180 text-[#016737]" : ""}`} />
+                </button>
+
+                <AnimatePresence>
+                  {pypDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.18 }}
+                      className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-64 rounded-2xl bg-white/95 backdrop-blur-xl border border-gray-100 shadow-xl p-2 z-50 text-left"
+                    >
+                      <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-gray-400">
+                        Previous Year Papers &amp; PYQs
+                      </div>
+
+                      <a
+                        href="/annotated-ncert/biology"
+                        className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#F4F9F2] transition-colors group"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+                          <Dna className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">
+                            Biology PYP&apos;s
+                          </div>
+                          <div className="text-[10px] text-gray-500">Botany &amp; Zoology high yield</div>
+                        </div>
+                      </a>
+
+                      <a
+                        href="/annotated-ncert/physics"
+                        className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-violet-50/60 transition-colors group"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-violet-50 text-violet-700 flex items-center justify-center shrink-0">
+                          <Atom className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-gray-900 group-hover:text-violet-700 transition-colors">
+                            Physics PYP&apos;s
+                          </div>
+                          <div className="text-[10px] text-gray-500">Formulas, graph notes &amp; PYQs</div>
+                        </div>
+                      </a>
+
+                      <a
+                        href="/annotated-ncert?subject=Chemistry"
+                        className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-blue-50/60 transition-colors group"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+                          <FlaskConical className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
+                            Chemistry PYP&apos;s
+                          </div>
+                          <div className="text-[10px] text-gray-500">Organic, Inorganic &amp; Physical</div>
+                        </div>
+                      </a>
+
+                      <a
+                        href="/pyps"
+                        className="flex items-center justify-between p-2.5 rounded-xl bg-gray-50 hover:bg-[#F4F9F2] text-gray-900 text-xs font-bold transition-colors mt-1 border border-gray-100"
+                      >
+                        <span className="flex items-center gap-2">
+                          <BookOpen className="w-3.5 h-3.5 text-[#016737]" />
+                          <span>All PYP&apos;s (2015–2024 Archive)</span>
+                        </span>
+                        <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                      </a>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* 2. About */}
+              <a
+                href="/#about"
+                className="text-xs xl:text-sm font-semibold text-[#4B5563] hover:text-[#016737] transition-colors duration-200 whitespace-nowrap"
+              >
+                About
               </a>
 
-              {/* 2. Tests Dropdown */}
+              {/* 3. Tests Dropdown */}
               <div
                 className="relative"
                 onMouseEnter={handleTestsMouseEnter}
@@ -200,7 +289,7 @@ export default function Navbar() {
                             Chapter-wise Tests
                           </div>
                           <div className="text-[11px] text-gray-500 leading-tight mt-0.5">
-                            Class 11 & 12 PCB test PDFs with solutions
+                            Class 11 &amp; 12 PCB test PDFs with solutions
                           </div>
                         </div>
                       </a>
@@ -226,106 +315,20 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
 
-              {/* 3. Annotated NCERT Dropdown */}
-              <div
-                className="relative"
-                onMouseEnter={handleNcertMouseEnter}
-                onMouseLeave={handleNcertMouseLeave}
-              >
-                <button
-                  type="button"
-                  onClick={() => setNcertDropdownOpen(!ncertDropdownOpen)}
-                  className="flex items-center gap-1 text-xs xl:text-sm font-semibold text-[#4B5563] hover:text-[#016737] transition-colors duration-200 cursor-pointer py-1"
-                >
-                  <span>Annotated NCERT</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${ncertDropdownOpen ? "rotate-180 text-[#016737]" : ""}`} />
-                </button>
-
-                <AnimatePresence>
-                  {ncertDropdownOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      transition={{ duration: 0.18 }}
-                      className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-64 rounded-2xl bg-white/95 backdrop-blur-xl border border-gray-100 shadow-xl p-2 z-50 text-left"
-                    >
-                      <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-gray-400">
-                        PYQs & Annotations
-                      </div>
-
-                      <a
-                        href="/annotated-ncert/biology"
-                        className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#F4F9F2] transition-colors group"
-                      >
-                        <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                          <Dna className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div className="text-xs font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">
-                            Biology NCERT + PYQs
-                          </div>
-                          <div className="text-[10px] text-gray-500">Botany & Zoology high yield</div>
-                        </div>
-                      </a>
-
-                      <a
-                        href="/annotated-ncert/physics"
-                        className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-violet-50/60 transition-colors group"
-                      >
-                        <div className="w-7 h-7 rounded-lg bg-violet-50 text-violet-700 flex items-center justify-center shrink-0">
-                          <Atom className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div className="text-xs font-bold text-gray-900 group-hover:text-violet-700 transition-colors">
-                            Physics NCERT + PYQs
-                          </div>
-                          <div className="text-[10px] text-gray-500">Formulas, graph notes & questions</div>
-                        </div>
-                      </a>
-
-                      <a
-                        href="/annotated-ncert/chemistry"
-                        className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-blue-50/60 transition-colors group"
-                      >
-                        <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
-                          <FlaskConical className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div className="text-xs font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
-                            Chemistry NCERT + PYQs
-                          </div>
-                          <div className="text-[10px] text-gray-500">Organic, Inorganic & Physical</div>
-                        </div>
-                      </a>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* 4. One-to-One Session Button (Navigates directly to One-to-One section) */}
+              {/* 4. Questions */}
               <a
-                href="/#one-to-one-session"
-                className="relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-[#016737]/10 to-[#8BC43F]/20 text-[#016737] text-xs xl:text-sm font-bold border border-[#8BC43F]/30 hover:border-[#016737]/40 hover:bg-[#016737] hover:text-white transition-all duration-300 shadow-xs cursor-pointer group"
+                href="/questions"
+                className="text-xs xl:text-sm font-semibold text-[#4B5563] hover:text-[#016737] transition-colors duration-200 whitespace-nowrap"
               >
-                <Sparkles className="w-3.5 h-3.5 text-[#8BC43F] group-hover:text-white transition-colors" />
-                <span>One-to-One Session</span>
+                Questions
               </a>
 
-              {/* 5. Pricing */}
+              {/* 5. Pricing (Refined Clean Highlight) */}
               <a
                 href="/#pricing"
-                className="text-xs xl:text-sm font-semibold text-[#4B5563] hover:text-[#016737] transition-colors duration-200 whitespace-nowrap"
+                className="px-3.5 py-1 rounded-full text-xs xl:text-sm font-bold text-[#016737] bg-[#016737]/10 hover:bg-[#016737] hover:text-white border border-[#016737]/20 transition-all duration-200 whitespace-nowrap"
               >
                 Pricing
-              </a>
-
-              {/* 6. About Us */}
-              <a
-                href="/#about"
-                className="text-xs xl:text-sm font-semibold text-[#4B5563] hover:text-[#016737] transition-colors duration-200 whitespace-nowrap"
-              >
-                About Us
               </a>
             </nav>
           </div>
@@ -341,15 +344,64 @@ export default function Navbar() {
               transition={{ duration: 0.2 }}
               className="lg:hidden max-w-7xl mx-auto mt-2 rounded-2xl bg-white/98 backdrop-blur-2xl border border-gray-200/80 p-4 shadow-2xl flex flex-col gap-2.5 max-h-[85vh] overflow-y-auto"
             >
+              {/* 1. Mobile PYP's Accordion */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setMobilePypOpen(!mobilePypOpen)}
+                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-bold text-gray-800 hover:bg-gray-50"
+                >
+                  <span className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-[#016737]" />
+                    PYP&apos;s
+                  </span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${mobilePypOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {mobilePypOpen && (
+                  <div className="pl-6 pr-2 py-1 space-y-1 bg-gray-50/80 rounded-xl my-1">
+                    <a
+                      href="/annotated-ncert/biology"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block py-2 text-xs font-semibold text-emerald-700"
+                    >
+                      • Biology PYP&apos;s
+                    </a>
+                    <a
+                      href="/annotated-ncert/physics"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block py-2 text-xs font-semibold text-violet-700"
+                    >
+                      • Physics PYP&apos;s
+                    </a>
+                    <a
+                      href="/annotated-ncert?subject=Chemistry"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block py-2 text-xs font-semibold text-blue-700"
+                    >
+                      • Chemistry PYP&apos;s
+                    </a>
+                    <a
+                      href="/pyps"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block py-2 text-xs font-bold text-[#016737]"
+                    >
+                      • All PYP&apos;s by Year (2015–2024) ↗
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* 2. Mobile About */}
               <a
-                href="/chapters"
+                href="/#about"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-2.5 rounded-xl text-sm font-bold bg-[#8BC43F]/15 text-[#016737] border border-[#8BC43F]/30"
+                className="px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50"
               >
-                Chapters
+                About
               </a>
 
-              {/* Mobile Tests Accordion */}
+              {/* 3. Mobile Tests Accordion */}
               <div>
                 <button
                   type="button"
@@ -370,7 +422,7 @@ export default function Navbar() {
                       onClick={() => setMobileMenuOpen(false)}
                       className="block py-2 text-xs font-semibold text-[#016737]"
                     >
-                      • Chapter-wise Tests (Class 11 & 12)
+                      • Chapter-wise Tests (Class 11 &amp; 12)
                     </a>
                     <div className="py-1 text-xs text-gray-400 flex items-center gap-1.5">
                       <span>• NEET Test Series</span>
@@ -382,71 +434,25 @@ export default function Navbar() {
                 )}
               </div>
 
-              {/* Mobile Annotated NCERT Accordion */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setMobileNcertOpen(!mobileNcertOpen)}
-                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50"
-                >
-                  <span className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-[#016737]" />
-                    Annotated NCERT & PYQs
-                  </span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${mobileNcertOpen ? "rotate-180" : ""}`} />
-                </button>
-
-                {mobileNcertOpen && (
-                  <div className="pl-6 pr-2 py-1 space-y-1 bg-gray-50/80 rounded-xl my-1">
-                    <a
-                      href="/annotated-ncert/biology"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block py-2 text-xs font-semibold text-emerald-700"
-                    >
-                      • Biology NCERT + PYQs
-                    </a>
-                    <a
-                      href="/annotated-ncert/physics"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block py-2 text-xs font-semibold text-violet-700"
-                    >
-                      • Physics NCERT + PYQs
-                    </a>
-                    <a
-                      href="/annotated-ncert/chemistry"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block py-2 text-xs font-semibold text-blue-700"
-                    >
-                      • Chemistry NCERT + PYQs
-                    </a>
-                  </div>
-                )}
-              </div>
-
-              {/* Mobile One-to-One Session Link */}
+              {/* 4. Mobile Questions */}
               <a
-                href="/#one-to-one-session"
+                href="/questions"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#016737] to-[#0b381e] text-white text-xs font-bold shadow-md cursor-pointer hover:opacity-95 transition-opacity"
+                className="px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50"
               >
-                <Sparkles className="w-4 h-4 text-[#8BC43F]" />
-                <span>One-to-One Session</span>
+                Questions
               </a>
 
+              {/* 5. Mobile Pricing (Clean Refined Highlight) */}
               <a
                 href="/#pricing"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-2 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2.5 rounded-xl text-sm font-bold text-[#016737] bg-[#016737]/10 hover:bg-[#016737] hover:text-white transition-colors flex items-center justify-between"
               >
-                Pricing
-              </a>
-
-              <a
-                href="/#about"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-2 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50"
-              >
-                About Us
+                <span>Pricing</span>
+                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#016737] text-white">
+                  Plans
+                </span>
               </a>
 
               {/* Bottom Auth Profile */}

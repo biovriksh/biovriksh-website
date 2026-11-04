@@ -172,31 +172,31 @@ export default function AdminDashboardPage() {
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2 shrink-0">
           <Link
-            href="/admin/annotated-ncert"
+            href="/admin/questions"
             className="px-3.5 py-2 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-semibold transition-all flex items-center gap-1.5 shadow-2xs"
           >
-            <BookOpen className="w-3.5 h-3.5 text-[#8BC43F]" />
+            <UploadCloud className="w-3.5 h-3.5 text-[#8BC43F]" />
+            <span>Upload Questions</span>
+          </Link>
+          <Link
+            href="/admin/annotated-ncert"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-all flex items-center gap-1.5 border border-slate-200"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-[#016737]" />
             <span>Annotated NCERT</span>
           </Link>
           <Link
-            href="/admin/chapters"
-            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all flex items-center gap-1.5 border border-slate-200"
+            href="/admin/pyps"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-all flex items-center gap-1.5 border border-slate-200"
           >
-            <FolderPlus className="w-3.5 h-3.5 text-slate-500" />
-            <span>Manage Chapters</span>
-          </Link>
-          <Link
-            href="/admin/pdfs"
-            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all flex items-center gap-1.5 border border-slate-200"
-          >
-            <UploadCloud className="w-3.5 h-3.5 text-slate-500" />
-            <span>Mindmaps &amp; PDFs</span>
+            <FileText className="w-3.5 h-3.5 text-blue-600" />
+            <span>PYP&apos;s by Year</span>
           </Link>
           <Link
             href="/admin/tests"
-            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all flex items-center gap-1.5 border border-slate-200"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-all flex items-center gap-1.5 border border-slate-200"
           >
-            <FileCheck2 className="w-3.5 h-3.5 text-slate-500" />
+            <FileCheck2 className="w-3.5 h-3.5 text-teal-600" />
             <span>Tests</span>
           </Link>
         </div>

@@ -295,23 +295,8 @@ export default function ChapterWiseTestsPage() {
       return;
     }
 
-    // Paid test
-    if (!user) {
-      setAuthModalOpen(true);
-      return;
-    }
-
-    if (test.pdfId) {
-      handleCheckout({
-        pdfId: test.pdfId,
-        onLoginRequired: () => setAuthModalOpen(true),
-        onSuccess: () => {
-          window.location.href = `/secure-reader?pdfId=${encodeURIComponent(test.pdfId!)}`;
-        },
-      });
-    } else {
-      window.location.href = "/#pricing";
-    }
+    // Unlocked with Subscription Plan
+    window.location.href = "/#pricing";
   };
 
   return (

@@ -101,23 +101,23 @@ export default function HeroSection() {
             className="flex flex-wrap items-start gap-3.5 mb-12"
           >
             <motion.a
-              href="#notes"
+              href="/questions"
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
               className="px-7 py-3.5 rounded-full bg-gray-100 text-[#1a1f1c] font-semibold flex items-center gap-2 border border-gray-200 shadow-xs hover:bg-gray-200 transition-all duration-300"
             >
-              Explore Free Notes
+              Explore free questions
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </motion.a>
 
             <motion.a
-              href="#pricing"
-              whileHover={{ scale: 1.04, boxShadow: "0 20px 40px rgba(139,196,63,0.35)" }}
+              href="/#one-to-one-session"
+              whileHover={{ scale: 1.04, boxShadow: "0 20px 40px rgba(1,103,55,0.25)" }}
               whileTap={{ scale: 0.97 }}
-              className="btn-shimmer px-7 py-3.5 rounded-full bg-[#8BC43F] text-[#1a1f1c] font-semibold flex items-center gap-2 shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#016737] focus:ring-offset-2"
+              className="btn-shimmer px-7 py-3.5 rounded-full bg-[#016737] text-white font-semibold flex items-center gap-2 shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#016737] focus:ring-offset-2"
             >
-              <Sparkles className="w-4 h-4" />
-              Start Practising
+              <Sparkles className="w-4 h-4 text-[#8BC43F]" />
+              Meet your mentor
             </motion.a>
           </motion.div>
 

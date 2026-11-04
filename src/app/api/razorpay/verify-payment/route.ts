@@ -65,13 +65,17 @@ export async function POST(req: Request) {
     if (plan_id) {
       // Handle Subscription Plan Upgrade
       const normalizedPlan = plan_id.replace("plan-", "");
-      const days = normalizedPlan === "yearly" ? 365 : 30;
+      const days = 30; // Monthly subscription cycle
       const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+
+      const planTitle = normalizedPlan === "399" || normalizedPlan === "premium" 
+        ? "PREMIUM PASS (₹399/mo)" 
+        : "STANDARD PASS (₹299/mo)";
 
       const { error: profileError } = await supabaseAdmin
         .from("profiles")
         .update({
-          subscription_plan: normalizedPlan === "yearly" ? "PREMIUM YEARLY" : "PREMIUM MONTHLY",
+          subscription_plan: planTitle,
           subscription_status: "active",
           subscription_expires_at: expiresAt.toISOString(),
         })

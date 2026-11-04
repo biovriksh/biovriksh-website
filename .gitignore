@@ -43,6 +43,7 @@ next-env.d.ts
 
 # scratch and temp media
 /scratch/
+/.tools/
 /Intro video.mp4
 /Hero section video.mp4
 

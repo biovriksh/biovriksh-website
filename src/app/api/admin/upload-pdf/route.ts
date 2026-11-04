@@ -25,6 +25,8 @@ export async function POST(req: Request) {
     let thumbnailUrl = "/hero_premium_clean.png";
     let filePath = "";
 
+    let isFreeExplicit = false;
+
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
       title = (formData.get("title") as string) || "";
@@ -43,6 +45,7 @@ export async function POST(req: Request) {
       durationMinutes = Number(formData.get("durationMinutes") || 45);
       totalMarks = Number(formData.get("totalMarks") || 180);
       isRecent = formData.get("isRecent") === "true";
+      isFreeExplicit = formData.get("isFree") === "true";
 
       const thumbnailFile = formData.get("thumbnailFile") as File | null;
       const pdfFile = formData.get("pdfFile") as File | null;
@@ -108,6 +111,7 @@ export async function POST(req: Request) {
       durationMinutes = Number(body.durationMinutes || 45);
       totalMarks = Number(body.totalMarks || 180);
       isRecent = Boolean(body.isRecent);
+      isFreeExplicit = Boolean(body.isFree);
       thumbnailUrl = body.thumbnailUrl || "/hero_premium_clean.png";
       filePath = body.filePath || `notes_${Date.now()}.pdf`;
     }
@@ -116,7 +120,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Title is required." }, { status: 400 });
     }
 
-    const isActuallyFree = noteType === "short" || (noteType === "test" && price === 0) || price === 0;
+    const isActuallyFree = isFreeExplicit || noteType === "free" || noteType === "short" || price === 0;
 
     // 3. Insert PDF record into Supabase Database
     const newPdfRow: any = {

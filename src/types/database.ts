@@ -1,6 +1,6 @@
 export type UserRole = "admin" | "student";
 
-export type NoteType = "paid" | "free" | "short" | "chapter" | "test" | "annotated_ncert";
+export type NoteType = "paid" | "free" | "short" | "chapter" | "test" | "annotated_ncert" | "questions" | "pyp";
 export type ClassLevel = "Class 11" | "Class 12" | "NEET Special";
 export type SubjectType = "Biology" | "Physics" | "Chemistry";
 

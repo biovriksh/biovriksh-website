@@ -15,19 +15,19 @@ const faqs = [
     id: 2,
     question: "Is BioVriksh free to use?",
     answer:
-      "Yes! The free plan gives you unlimited access to all chapter short notes and NCERT summaries with no login required. Premium unlocks all paid notes and practice question sets.",
+      "Yes! The free plan gives you unlimited access to chapter short notes, NCERT summaries, and free question practice. The Premium All-Access subscription unlocks all complete notes, tests, and future mock series without any per-PDF charges.",
   },
   {
     id: 3,
-    question: "Monthly vs Yearly Premium — what's the difference?",
+    question: "Do I have to pay per PDF or note?",
     answer:
-      "Both plans unlock identical content. Monthly Pass is ₹249/month with cancel-anytime flexibility. Premium Yearly is ₹199/month (billed ₹2,388 annually), saving you ₹600 for full NEET preparation.",
+      "No! There are zero per-PDF charges on BioVriksh. Everything is covered under the simple, transparent All-Access Subscription Plan so you never have to buy individual PDFs again.",
   },
   {
     id: 4,
-    question: "Can I download the paid notes?",
+    question: "How can I access the premium notes and tests?",
     answer:
-      "Premium notes are unlocked for high-quality, instant viewing directly inside the BioVriksh platform. This keeps content updated, secure, and fresh for all members.",
+      "Premium notes, PYPs, and full chapter tests are unlocked instantly upon subscribing to the BioVriksh All-Access Pass, accessible across mobile and desktop inside the secure reader.",
   },
   {
     id: 5,

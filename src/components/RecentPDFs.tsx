@@ -53,7 +53,7 @@ export default function RecentPDFs() {
             pages: `${pdf.page_count || 12} pages`,
             views: "Live Note",
             isPaid: !pdf.is_free,
-            price: pdf.is_free ? "FREE" : `₹${pdf.price || 49}`,
+            price: pdf.is_free ? "FREE" : "PREMIUM",
             image: pdf.thumbnail_url || "/hero_premium_clean.png",
             accent: pdf.is_free ? "#8BC43F" : "#016737",
           }));

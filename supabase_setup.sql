@@ -104,7 +104,7 @@ alter table public.pdfs add column if not exists total_marks int default 180;
 
 -- Update constraints safely for note_type, subject & class_level
 alter table public.pdfs drop constraint if exists pdfs_note_type_check;
-alter table public.pdfs add constraint pdfs_note_type_check check (note_type in ('paid', 'free', 'short', 'chapter', 'test', 'annotated_ncert'));
+alter table public.pdfs add constraint pdfs_note_type_check check (note_type in ('paid', 'free', 'short', 'chapter', 'test', 'annotated_ncert', 'questions', 'pyp'));
 
 alter table public.pdfs drop constraint if exists pdfs_class_level_check;
 alter table public.pdfs add constraint pdfs_class_level_check check (class_level in ('Class 11', 'Class 12', 'NEET Special'));

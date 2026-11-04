@@ -26,12 +26,15 @@ export async function POST(req: Request) {
     if (planId) {
       // Subscription Plan Order
       const normalizedPlan = planId.replace("plan-", "");
-      if (normalizedPlan === "yearly") {
-        amountInPaise = 2388 * 100; // ₹2,388
-        orderNotes = { planId: "yearly", title: "PREMIUM YEARLY PASS" };
+      if (normalizedPlan === "299" || normalizedPlan === "standard") {
+        amountInPaise = 299 * 100; // ₹299/mo
+        orderNotes = { planId: "299", title: "STANDARD PASS (₹299/mo)" };
+      } else if (normalizedPlan === "399" || normalizedPlan === "premium" || normalizedPlan === "yearly") {
+        amountInPaise = 399 * 100; // ₹399/mo
+        orderNotes = { planId: "399", title: "PREMIUM ALL-ACCESS PASS (₹399/mo)" };
       } else if (normalizedPlan === "monthly") {
-        amountInPaise = 249 * 100; // ₹249
-        orderNotes = { planId: "monthly", title: "PREMIUM MONTHLY PASS" };
+        amountInPaise = 299 * 100;
+        orderNotes = { planId: "299", title: "STANDARD PASS (₹299/mo)" };
       } else {
         return NextResponse.json({ success: false, error: "Invalid subscription plan" }, { status: 400 });
       }
