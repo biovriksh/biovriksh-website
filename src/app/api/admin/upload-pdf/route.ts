@@ -50,6 +50,10 @@ export async function POST(req: Request) {
       const thumbnailFile = formData.get("thumbnailFile") as File | null;
       const pdfFile = formData.get("pdfFile") as File | null;
 
+      if (formData.get("thumbnailUrl")) {
+        thumbnailUrl = (formData.get("thumbnailUrl") as string);
+      }
+
       // 1. Upload Thumbnail Image on Server using Service Role Key
       if (thumbnailFile && thumbnailFile.size > 0) {
         const thumbExt = thumbnailFile.name.split(".").pop() || "png";

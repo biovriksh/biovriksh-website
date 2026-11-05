@@ -31,6 +31,7 @@ interface PYPItem {
   durationMinutes: number;
   isFree: boolean;
   pdfId?: string;
+  thumbnailUrl?: string;
   description: string;
   tags: string[];
 }
@@ -292,6 +293,7 @@ function PYPsContent() {
         ...paper,
         pdfId: matched.id,
         isFree: matched.is_free,
+        thumbnailUrl: matched.thumbnail_url || paper.thumbnailUrl,
         title: matched.title,
       };
     }
@@ -446,58 +448,82 @@ function PYPsContent() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.25, delay: idx * 0.03 }}
-                  className="bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-md hover:border-[#016737]/40 transition-all duration-300 p-5 flex flex-col justify-between"
+                  className="bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-md hover:border-[#016737]/40 transition-all duration-300 overflow-hidden flex flex-col justify-between group"
                 >
-                  <div>
-                    {/* Header Badges */}
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-black px-2.5 py-0.5 rounded-md bg-[#016737] text-white">
-                          NEET {paper.year}
-                        </span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-gray-100 text-gray-700">
-                          {paper.paperType}
-                        </span>
-                      </div>
+                  {/* ═══ SMALL THUMBNAIL IMAGE BANNER AT TOP ═══ */}
+                  <div className="h-28 sm:h-32 w-full relative overflow-hidden bg-gradient-to-br from-[#016737]/10 via-[#8BC43F]/15 to-emerald-100 shrink-0">
+                    <img
+                      src={
+                        paper.thumbnailUrl ||
+                        (paper.paperType === "Biology"
+                          ? "/ncert_root_decoding_3d.png"
+                          : paper.paperType === "Physics"
+                          ? "/neet_biology_study_desk.png"
+                          : paper.paperType === "Chemistry"
+                          ? "/intro_biology_ecosystem.png"
+                          : "/educator_chalkboard_3d.png")
+                      }
+                      alt={paper.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
 
+                    {/* Status badges overlaid on image */}
+                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-white border border-white/20">
+                        NEET {paper.year}
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-emerald-300 border border-emerald-400/20">
+                        {paper.paperType}
+                      </span>
+                    </div>
+
+                    <div className="absolute top-2.5 right-2.5">
                       {paper.isFree ? (
-                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#8BC43F]/25 text-[#014d29] border border-[#8BC43F]/40">
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#8BC43F] text-[#014d29] shadow-xs">
                           Free Sample
                         </span>
                       ) : (
-                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 flex items-center gap-1">
-                          <Lock className="w-3 h-3" />
-                          Subscription Pass
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-amber-300 border border-amber-400/30 flex items-center gap-1 shadow-xs">
+                          <Lock className="w-3 h-3 text-amber-400" />
+                          Pass
                         </span>
                       )}
                     </div>
 
-                    {/* Paper Title */}
-                    <h3 className="text-base font-bold text-gray-900 leading-snug line-clamp-2 mb-2">
-                      {paper.title}
-                    </h3>
-
-                    <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-4">
-                      {paper.description}
-                    </p>
-
-                    {/* Meta Row */}
-                    <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-gray-50 text-[11px] text-gray-600 font-medium mb-4">
-                      <div className="flex items-center gap-1">
-                        <Award className="w-3.5 h-3.5 text-[#016737]" />
-                        <span>{paper.totalQuestions} Questions</span>
-                      </div>
-                      <span>•</span>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-[#016737]" />
-                        <span>{paper.durationMinutes} Mins</span>
-                      </div>
-                      <span>•</span>
-                      <span className="font-bold text-gray-800">{paper.totalMarks} Marks</span>
+                    <div className="absolute bottom-2 right-2.5">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-white/95 flex items-center gap-1">
+                        <Award className="w-3 h-3 text-[#8BC43F]" />
+                        {paper.totalQuestions} Qs • {paper.totalMarks}M
+                      </span>
                     </div>
+                  </div>
 
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-1.5 mb-4">
+                  <div className="p-4 sm:p-5 flex flex-col justify-between flex-1">
+                    <div>
+                      {/* Paper Title */}
+                      <h3 className="text-base font-bold text-gray-900 leading-snug line-clamp-2 mb-2 group-hover:text-[#016737] transition-colors">
+                        {paper.title}
+                      </h3>
+
+                      <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-4">
+                        {paper.description}
+                      </p>
+
+                      {/* Meta Row */}
+                      <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-gray-50 text-[11px] text-gray-600 font-medium mb-4">
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5 text-[#016737]" />
+                          <span>{paper.durationMinutes} Mins Exam</span>
+                        </div>
+                        <span className="text-gray-300">•</span>
+                        <div className="flex items-center gap-1 font-bold text-gray-800">
+                          <span>{paper.totalMarks} Marks</span>
+                        </div>
+                      </div>
+
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-1.5 mb-4">
                       {paper.tags.map((t) => (
                         <span
                           key={t}
@@ -533,7 +559,8 @@ function PYPsContent() {
                       </a>
                     )}
                   </div>
-                </motion.div>
+                </div>
+              </motion.div>
               ))}
             </div>
           )}

@@ -25,6 +25,7 @@ interface PYPItem {
   total_marks?: number;
   duration_minutes?: number;
   is_free: boolean;
+  thumbnail_url?: string;
   file_path: string;
   created_at: string;
 }
@@ -47,6 +48,7 @@ export default function AdminPYPsPage() {
   const [durationMinutes, setDurationMinutes] = useState("200");
   const [isFree, setIsFree] = useState(false);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -114,6 +116,9 @@ export default function AdminPYPsPage() {
       formData.append("isFree", String(isFree));
       formData.append("price", isFree ? "0" : "299");
       formData.append("pdfFile", pdfFile);
+      if (thumbnailFile) {
+        formData.append("thumbnailFile", thumbnailFile);
+      }
 
       const res = await fetch("/api/admin/upload-pdf", {
         method: "POST",
@@ -127,6 +132,7 @@ export default function AdminPYPsPage() {
 
       setSuccessMsg(`NEET ${examYear} Paper uploaded successfully!`);
       setPdfFile(null);
+      setThumbnailFile(null);
       setIsFree(false);
       loadPYPs();
     } catch (err: any) {
@@ -291,7 +297,7 @@ export default function AdminPYPsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
             {/* 7. PDF File */}
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
@@ -306,7 +312,20 @@ export default function AdminPYPsPage() {
               />
             </div>
 
-            {/* 8. Free Sample Checkbox */}
+            {/* 8. Thumbnail Image File */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                Small Thumbnail Image (Optional)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
+                className="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#8BC43F]/20 file:text-[#016737] hover:file:bg-[#8BC43F]/30 cursor-pointer"
+              />
+            </div>
+
+            {/* 9. Free Sample Checkbox */}
             <div className="flex items-center gap-3 pt-4">
               <input
                 type="checkbox"
@@ -410,11 +429,20 @@ export default function AdminPYPsPage() {
                 {filteredList.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="p-3.5 font-bold text-slate-900">
-                      <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded-md font-black text-[10px] bg-[#016737] text-white">
-                          {item.years_covered || "NEET"}
-                        </span>
-                        <span>{item.title}</span>
+                      <div className="flex items-center gap-2.5">
+                        <img
+                          src={item.thumbnail_url || "/neet_biology_study_desk.png"}
+                          alt=""
+                          className="w-9 h-9 rounded-lg object-cover border border-slate-200 shrink-0"
+                        />
+                        <div>
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="px-1.5 py-0.2 rounded font-black text-[9px] bg-[#016737] text-white">
+                              {item.years_covered || "NEET"}
+                            </span>
+                          </div>
+                          <span className="block leading-snug line-clamp-1">{item.title}</span>
+                        </div>
                       </div>
                     </td>
                     <td className="p-3.5">

@@ -26,6 +26,7 @@ interface QuestionPDF {
   questions_count?: number;
   page_count?: number;
   is_free: boolean;
+  thumbnail_url?: string;
   file_path: string;
   created_at: string;
 }
@@ -46,6 +47,7 @@ export default function AdminQuestionsPage() {
   const [pageCount, setPageCount] = useState("16");
   const [isFree, setIsFree] = useState(false);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -105,6 +107,9 @@ export default function AdminQuestionsPage() {
       formData.append("isFree", String(isFree));
       formData.append("price", isFree ? "0" : "299");
       formData.append("pdfFile", pdfFile);
+      if (thumbnailFile) {
+        formData.append("thumbnailFile", thumbnailFile);
+      }
 
       const res = await fetch("/api/admin/upload-pdf", {
         method: "POST",
@@ -121,6 +126,7 @@ export default function AdminQuestionsPage() {
       setTitle("");
       setUnit("");
       setPdfFile(null);
+      setThumbnailFile(null);
       setIsFree(false);
       // Reload table
       loadQuestions();
@@ -288,7 +294,7 @@ export default function AdminQuestionsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
             {/* 7. PDF File */}
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
@@ -303,7 +309,20 @@ export default function AdminQuestionsPage() {
               />
             </div>
 
-            {/* 8. Free Sample Checkbox */}
+            {/* 8. Thumbnail Image File */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                Small Thumbnail Image (Optional)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
+                className="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#8BC43F]/20 file:text-[#016737] hover:file:bg-[#8BC43F]/30 cursor-pointer"
+              />
+            </div>
+
+            {/* 9. Free Sample Checkbox */}
             <div className="flex items-center gap-3 pt-4">
               <input
                 type="checkbox"
@@ -313,7 +332,7 @@ export default function AdminQuestionsPage() {
                 className="w-4 h-4 rounded text-[#016737] focus:ring-[#016737] cursor-pointer"
               />
               <label htmlFor="isFreeToggle" className="text-xs font-bold text-slate-800 cursor-pointer">
-                Mark as 1st / Free Chapter (Free sample for students without subscription)
+                Mark as Free Sample (1st Chapter)
               </label>
             </div>
           </div>
@@ -405,9 +424,16 @@ export default function AdminQuestionsPage() {
                 {filteredList.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="p-3.5 font-bold text-slate-900">
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-[#016737]" />
-                        <span>{item.title}</span>
+                      <div className="flex items-center gap-2.5">
+                        <img
+                          src={item.thumbnail_url || "/question_practice_matrix_3d.png"}
+                          alt=""
+                          className="w-9 h-9 rounded-lg object-cover border border-slate-200 shrink-0"
+                        />
+                        <div>
+                          <span className="block leading-snug">{item.title}</span>
+                          <span className="text-[10px] text-slate-400 font-normal">{item.page_count || 12} Pages</span>
+                        </div>
                       </div>
                     </td>
                     <td className="p-3.5">

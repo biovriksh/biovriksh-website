@@ -33,6 +33,7 @@ interface AnnotatedChapterItem {
   totalPages: number;
   isFree: boolean;
   pdfId?: string;
+  thumbnailUrl?: string;
   highlightText: string;
 }
 
@@ -359,6 +360,7 @@ function AnnotatedNcertContent() {
         ...ch,
         pdfId: matched.id,
         isFree: matched.is_free,
+        thumbnailUrl: matched.thumbnail_url || ch.thumbnailUrl,
         totalPages: matched.page_count || ch.totalPages,
         highlightText: matched.highlight_text || ch.highlightText,
       };
@@ -512,48 +514,75 @@ function AnnotatedNcertContent() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.25, delay: idx * 0.03 }}
-                  className="bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-md hover:border-[#016737]/40 transition-all duration-300 p-5 flex flex-col justify-between"
+                  className="bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-md hover:border-[#016737]/40 transition-all duration-300 overflow-hidden flex flex-col justify-between group"
                 >
-                  <div>
-                    {/* Top Status Badges */}
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-gray-100 text-gray-600">
+                  {/* ═══ SMALL THUMBNAIL IMAGE BANNER AT TOP ═══ */}
+                  <div className="h-28 sm:h-32 w-full relative overflow-hidden bg-gradient-to-br from-[#016737]/10 via-[#8BC43F]/15 to-emerald-100 shrink-0">
+                    <img
+                      src={
+                        ch.thumbnailUrl ||
+                        (ch.subject === "Biology"
+                          ? "/ncert_root_decoding_3d.png"
+                          : ch.subject === "Physics"
+                          ? "/neet_biology_study_desk.png"
+                          : "/intro_biology_ecosystem.png")
+                      }
+                      alt={ch.chapterTitle}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
+
+                    {/* Status badges overlaid on image */}
+                    <div className="absolute top-2.5 left-2.5">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-white border border-white/20">
                         Ch {ch.chapterNumber} • {ch.unit}
                       </span>
+                    </div>
 
+                    <div className="absolute top-2.5 right-2.5">
                       {ch.isFree ? (
-                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#8BC43F]/25 text-[#014d29] border border-[#8BC43F]/40">
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#8BC43F] text-[#014d29] shadow-xs">
                           Free Sample
                         </span>
                       ) : (
-                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 flex items-center gap-1">
-                          <Lock className="w-3 h-3" />
-                          Subscription Pass
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-amber-300 border border-amber-400/30 flex items-center gap-1 shadow-xs">
+                          <Lock className="w-3 h-3 text-amber-400" />
+                          Pass
                         </span>
                       )}
                     </div>
 
-                    {/* Chapter Title */}
-                    <h3 className="text-base font-bold text-gray-900 leading-snug line-clamp-2 mb-2">
-                      {ch.chapterTitle}
-                    </h3>
-
-                    <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-4">
-                      {ch.highlightText}
-                    </p>
-
-                    {/* Meta Specs */}
-                    <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-gray-50 text-[11px] text-gray-600 font-medium mb-4">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 text-[#016737]" />
-                        <span>{ch.yearsCovered}</span>
-                      </div>
-                      <div className="flex items-center gap-1 font-bold text-gray-800">
-                        <span>{ch.solvedQuestions} PYQs</span>
-                        <span className="text-gray-400 font-normal">({ch.totalPages} pgs)</span>
-                      </div>
+                    <div className="absolute bottom-2 right-2.5">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-white/95 flex items-center gap-1">
+                        <BookOpen className="w-3 h-3 text-[#8BC43F]" />
+                        {ch.totalPages} Pgs
+                      </span>
                     </div>
                   </div>
+
+                  <div className="p-4 sm:p-5 flex flex-col justify-between flex-1">
+                    <div>
+                      {/* Chapter Title */}
+                      <h3 className="text-base font-bold text-gray-900 leading-snug line-clamp-2 mb-2 group-hover:text-[#016737] transition-colors">
+                        {ch.chapterTitle}
+                      </h3>
+
+                      <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-4">
+                        {ch.highlightText}
+                      </p>
+
+                      {/* Meta Specs */}
+                      <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-gray-50 text-[11px] text-gray-600 font-medium mb-4">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5 text-[#016737]" />
+                          <span>{ch.yearsCovered}</span>
+                        </div>
+                        <div className="flex items-center gap-1 font-bold text-gray-800">
+                          <span>{ch.solvedQuestions} PYQs</span>
+                          <span className="text-gray-400 font-normal">({ch.totalPages} pgs)</span>
+                        </div>
+                      </div>
+                    </div>
 
                   {/* Action Button */}
                   <div>
@@ -579,7 +608,8 @@ function AnnotatedNcertContent() {
                       </a>
                     )}
                   </div>
-                </motion.div>
+                </div>
+              </motion.div>
               ))}
             </div>
           )}

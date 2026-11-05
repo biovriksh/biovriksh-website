@@ -487,6 +487,22 @@ export default function AdminAnnotatedNCERTPage() {
                     </div>
                   </div>
 
+                  {/* Small thumbnail preview */}
+                  <div className="h-24 w-full rounded-xl overflow-hidden mb-3 bg-slate-100 border border-slate-200/80">
+                    <img
+                      src={
+                        note.thumbnail_url ||
+                        (note.subject === "Biology"
+                          ? "/ncert_root_decoding_3d.png"
+                          : note.subject === "Physics"
+                          ? "/neet_biology_study_desk.png"
+                          : "/intro_biology_ecosystem.png")
+                      }
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
                   {/* Chapter Title */}
                   <h3 className="text-sm font-bold text-slate-900 leading-snug line-clamp-2">
                     {note.title}
