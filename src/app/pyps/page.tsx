@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -238,9 +239,23 @@ const availableYears = [
   "2015",
 ] as const;
 
-export default function PYPsPage() {
-  const [selectedYear, setSelectedYear] = useState<string>("All Years");
-  const [selectedType, setSelectedType] = useState<string>("All Papers");
+function PYPsContent() {
+  const searchParams = useSearchParams();
+  const initialTypeParam = searchParams.get("type");
+  const initialYearParam = searchParams.get("year");
+
+  const [selectedYear, setSelectedYear] = useState<string>(initialYearParam || "All Years");
+  const [selectedType, setSelectedType] = useState<string>(
+    initialTypeParam?.toLowerCase() === "biology"
+      ? "Biology"
+      : initialTypeParam?.toLowerCase() === "physics"
+      ? "Physics"
+      : initialTypeParam?.toLowerCase() === "chemistry"
+      ? "Chemistry"
+      : initialTypeParam?.toLowerCase() === "full"
+      ? "Full NEET Paper"
+      : "All Papers"
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [livePdfs, setLivePdfs] = useState<any[]>([]);
 
@@ -528,5 +543,19 @@ export default function PYPsPage() {
       <Footer />
       <WhatsAppButton />
     </div>
+  );
+}
+
+export default function PYPsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FDFEFD] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-2 border-[#016737] border-t-transparent animate-spin" />
+        </div>
+      }
+    >
+      <PYPsContent />
+    </Suspense>
   );
 }

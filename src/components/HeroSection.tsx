@@ -106,7 +106,7 @@ export default function HeroSection() {
               whileTap={{ scale: 0.97 }}
               className="px-7 py-3.5 rounded-full bg-gray-100 text-[#1a1f1c] font-semibold flex items-center gap-2 border border-gray-200 shadow-xs hover:bg-gray-200 transition-all duration-300"
             >
-              Explore free questions
+              Start practicing
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </motion.a>
 

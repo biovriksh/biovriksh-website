@@ -4,9 +4,7 @@ import { useState, useEffect } from "react";
 import Preloader from "@/components/Preloader";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import RecentPDFs from "@/components/RecentPDFs";
-import PaidPDFs from "@/components/PaidPDFs";
-import ShortNotes from "@/components/ShortNotes";
+import SubjectSections from "@/components/SubjectSections";
 import AboutSection from "@/components/AboutSection";
 import FounderStory from "@/components/FounderStory";
 import SubscriptionPlans from "@/components/SubscriptionPlans";
@@ -64,9 +62,7 @@ export default function Home() {
       <div id="main-site-content" className={showPreloader ? "hidden" : "block"}>
         <Navbar />
         <HeroSection />
-        <RecentPDFs />
-        <PaidPDFs />
-        <ShortNotes />
+        <SubjectSections />
         <AboutSection />
         <FounderStory />
         <IntroVideo />

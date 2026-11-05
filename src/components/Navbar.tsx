@@ -186,7 +186,7 @@ export default function Navbar() {
                       </div>
 
                       <a
-                        href="/annotated-ncert/biology"
+                        href="/pyps?type=Biology"
                         className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#F4F9F2] transition-colors group"
                       >
                         <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
@@ -201,7 +201,7 @@ export default function Navbar() {
                       </a>
 
                       <a
-                        href="/annotated-ncert/physics"
+                        href="/pyps?type=Physics"
                         className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-violet-50/60 transition-colors group"
                       >
                         <div className="w-7 h-7 rounded-lg bg-violet-50 text-violet-700 flex items-center justify-center shrink-0">
@@ -216,7 +216,7 @@ export default function Navbar() {
                       </a>
 
                       <a
-                        href="/annotated-ncert?subject=Chemistry"
+                        href="/pyps?type=Chemistry"
                         className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-blue-50/60 transition-colors group"
                       >
                         <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
@@ -323,7 +323,15 @@ export default function Navbar() {
                 Questions
               </a>
 
-              {/* 5. Pricing (Refined Clean Highlight) */}
+              {/* 5. Annotated NCERT */}
+              <a
+                href="/annotated-ncert"
+                className="text-xs xl:text-sm font-semibold text-[#4B5563] hover:text-[#016737] transition-colors duration-200 whitespace-nowrap"
+              >
+                Annotated NCERT
+              </a>
+
+              {/* 6. Pricing (Refined Clean Highlight) */}
               <a
                 href="/#pricing"
                 className="px-3.5 py-1 rounded-full text-xs xl:text-sm font-bold text-[#016737] bg-[#016737]/10 hover:bg-[#016737] hover:text-white border border-[#016737]/20 transition-all duration-200 whitespace-nowrap"
@@ -361,21 +369,21 @@ export default function Navbar() {
                 {mobilePypOpen && (
                   <div className="pl-6 pr-2 py-1 space-y-1 bg-gray-50/80 rounded-xl my-1">
                     <a
-                      href="/annotated-ncert/biology"
+                      href="/pyps?type=Biology"
                       onClick={() => setMobileMenuOpen(false)}
                       className="block py-2 text-xs font-semibold text-emerald-700"
                     >
                       • Biology PYP&apos;s
                     </a>
                     <a
-                      href="/annotated-ncert/physics"
+                      href="/pyps?type=Physics"
                       onClick={() => setMobileMenuOpen(false)}
                       className="block py-2 text-xs font-semibold text-violet-700"
                     >
                       • Physics PYP&apos;s
                     </a>
                     <a
-                      href="/annotated-ncert?subject=Chemistry"
+                      href="/pyps?type=Chemistry"
                       onClick={() => setMobileMenuOpen(false)}
                       className="block py-2 text-xs font-semibold text-blue-700"
                     >
@@ -441,6 +449,16 @@ export default function Navbar() {
                 className="px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50"
               >
                 Questions
+              </a>
+
+              {/* 5. Mobile Annotated NCERT */}
+              <a
+                href="/annotated-ncert"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+              >
+                <BookOpen className="w-4 h-4 text-[#016737]" />
+                Annotated NCERT
               </a>
 
               {/* 5. Mobile Pricing (Clean Refined Highlight) */}

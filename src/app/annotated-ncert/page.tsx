@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
@@ -310,7 +310,7 @@ const defaultAnnotatedSyllabus: AnnotatedChapterItem[] = [
   },
 ];
 
-export default function AnnotatedNcertPage() {
+function AnnotatedNcertContent() {
   const searchParams = useSearchParams();
   const initialSubject = searchParams.get("subject");
 
@@ -589,5 +589,19 @@ export default function AnnotatedNcertPage() {
       <Footer />
       <WhatsAppButton />
     </div>
+  );
+}
+
+export default function AnnotatedNcertPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FDFEFD] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-2 border-[#016737] border-t-transparent animate-spin" />
+        </div>
+      }
+    >
+      <AnnotatedNcertContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -338,9 +339,21 @@ const defaultSyllabus: ChapterQuestionItem[] = [
   },
 ];
 
-export default function QuestionsPage() {
-  const [selectedClass, setSelectedClass] = useState<"Class 11" | "Class 12">("Class 11");
-  const [selectedSubject, setSelectedSubject] = useState<"Biology" | "Physics" | "Chemistry">("Biology");
+function QuestionsContent() {
+  const searchParams = useSearchParams();
+  const initialSubjectParam = searchParams.get("subject");
+  const initialClassParam = searchParams.get("class");
+
+  const [selectedClass, setSelectedClass] = useState<"Class 11" | "Class 12">(
+    initialClassParam === "Class 12" ? "Class 12" : "Class 11"
+  );
+  const [selectedSubject, setSelectedSubject] = useState<"Biology" | "Physics" | "Chemistry">(
+    initialSubjectParam?.toLowerCase() === "physics"
+      ? "Physics"
+      : initialSubjectParam?.toLowerCase() === "chemistry"
+      ? "Chemistry"
+      : "Biology"
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [livePdfs, setLivePdfs] = useState<any[]>([]);
 
@@ -601,5 +614,19 @@ export default function QuestionsPage() {
       <Footer />
       <WhatsAppButton />
     </div>
+  );
+}
+
+export default function QuestionsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FDFEFD] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-2 border-[#016737] border-t-transparent animate-spin" />
+        </div>
+      }
+    >
+      <QuestionsContent />
+    </Suspense>
   );
 }
