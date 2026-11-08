@@ -12,7 +12,8 @@ import {
   Loader2,
   ExternalLink,
   Award,
-  Clock
+  Clock,
+  Flame
 } from "lucide-react";
 
 interface PYPItem {
@@ -25,6 +26,7 @@ interface PYPItem {
   total_marks?: number;
   duration_minutes?: number;
   is_free: boolean;
+  is_recent?: boolean;
   thumbnail_url?: string;
   file_path: string;
   created_at: string;
@@ -47,6 +49,7 @@ export default function AdminPYPsPage() {
   const [totalMarks, setTotalMarks] = useState("720");
   const [durationMinutes, setDurationMinutes] = useState("200");
   const [isFree, setIsFree] = useState(false);
+  const [isRecent, setIsRecent] = useState(false);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 
@@ -114,6 +117,7 @@ export default function AdminPYPsPage() {
       formData.append("totalMarks", totalMarks);
       formData.append("durationMinutes", durationMinutes);
       formData.append("isFree", String(isFree));
+      formData.append("isRecent", String(isRecent));
       formData.append("price", isFree ? "0" : "299");
       formData.append("pdfFile", pdfFile);
       if (thumbnailFile) {
@@ -134,11 +138,33 @@ export default function AdminPYPsPage() {
       setPdfFile(null);
       setThumbnailFile(null);
       setIsFree(false);
+      setIsRecent(false);
       loadPYPs();
     } catch (err: any) {
       setErrorMsg(err.message || "Failed to upload PYP PDF.");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleToggleRecent = async (id: string, currentStatus?: boolean) => {
+    try {
+      const isCurrentlyRecent = Boolean(currentStatus);
+      const res = await fetch("/api/admin/manage-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_recent", id, currentStatus: isCurrentlyRecent }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPypsList((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, is_recent: !isCurrentlyRecent } : item))
+        );
+      } else {
+        alert(data.error || "Failed to toggle recent status.");
+      }
+    } catch (err: any) {
+      console.error("Toggle recent error:", err);
     }
   };
 
@@ -325,18 +351,34 @@ export default function AdminPYPsPage() {
               />
             </div>
 
-            {/* 9. Free Sample Checkbox */}
-            <div className="flex items-center gap-3 pt-4">
-              <input
-                type="checkbox"
-                id="isFreePYP"
-                checked={isFree}
-                onChange={(e) => setIsFree(e.target.checked)}
-                className="w-4 h-4 rounded text-[#016737] focus:ring-[#016737] cursor-pointer"
-              />
-              <label htmlFor="isFreePYP" className="text-xs font-bold text-slate-800 cursor-pointer">
-                Mark as Free Sample Paper (e.g. Free preview for NEET 2024)
-              </label>
+            {/* 9. Free Sample & Recent Toggles */}
+            <div className="flex flex-wrap items-center gap-6 pt-4">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="isFreePYP"
+                  checked={isFree}
+                  onChange={(e) => setIsFree(e.target.checked)}
+                  className="w-4 h-4 rounded text-[#016737] focus:ring-[#016737] cursor-pointer"
+                />
+                <label htmlFor="isFreePYP" className="text-xs font-bold text-slate-800 cursor-pointer">
+                  Mark as Free Sample Paper (e.g. Free preview for NEET 2024)
+                </label>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="isRecentPYP"
+                  checked={isRecent}
+                  onChange={(e) => setIsRecent(e.target.checked)}
+                  className="w-4 h-4 rounded text-orange-600 focus:ring-orange-600 cursor-pointer"
+                />
+                <label htmlFor="isRecentPYP" className="text-xs font-bold text-slate-800 cursor-pointer flex items-center gap-1.5">
+                  <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
+                  Show in Homepage Recent Row
+                </label>
+              </div>
             </div>
           </div>
 
@@ -469,6 +511,18 @@ export default function AdminPYPsPage() {
                       )}
                     </td>
                     <td className="p-3.5 text-right space-x-2">
+                      <button
+                        onClick={() => handleToggleRecent(item.id, item.is_recent)}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[11px] font-bold transition-colors cursor-pointer ${
+                          item.is_recent
+                            ? "bg-orange-50 border-orange-200 text-orange-600 hover:bg-orange-100"
+                            : "bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100"
+                        }`}
+                        title={item.is_recent ? "Remove from Homepage Recent" : "Pin to Homepage Recent"}
+                      >
+                        <Flame className={`w-3 h-3 ${item.is_recent ? "text-orange-500 fill-orange-500" : "text-slate-400"}`} />
+                        <span>{item.is_recent ? "Recent" : "Pin Recent"}</span>
+                      </button>
                       <a
                         href={`/secure-reader?pdfId=${item.id}&title=${encodeURIComponent(item.title)}`}
                         target="_blank"

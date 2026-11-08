@@ -64,13 +64,14 @@ export async function POST(req: Request) {
 
     if (plan_id) {
       // Handle Subscription Plan Upgrade
-      const normalizedPlan = plan_id.replace("plan-", "");
-      const days = 30; // Monthly subscription cycle
+      const normalizedPlan = plan_id.replace("plan-", "").toLowerCase();
+      const days = 365; // 1-Year / Full Session Access
       const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
 
-      const planTitle = normalizedPlan === "399" || normalizedPlan === "premium" 
-        ? "PREMIUM PASS (₹399/mo)" 
-        : "STANDARD PASS (₹299/mo)";
+      const isPremium = normalizedPlan === "3999" || normalizedPlan === "premium" || normalizedPlan === "399" || normalizedPlan === "yearly";
+      const planTitle = isPremium 
+        ? "PREMIUM ALL-IN-ONE (₹3,999)" 
+        : "BASIC PLAN (₹2,999)";
 
       const { error: profileError } = await supabaseAdmin
         .from("profiles")

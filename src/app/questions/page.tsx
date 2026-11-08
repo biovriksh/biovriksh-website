@@ -424,42 +424,14 @@ function QuestionsContent() {
 
       <main className="flex-1 pt-28 sm:pt-36 pb-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* ═══ SECTION HEADING ═══ */}
-          <div className="text-center max-w-3xl mx-auto mb-8">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#016737]/10 text-[#016737] text-xs font-bold tracking-wider uppercase mb-3">
-              <HelpCircle className="w-4 h-4 text-[#016737]" />
-              NEET Question Banks
-            </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#111827] tracking-tight leading-[1.15] mb-3">
+          {/* ═══ CLEAN COMPACT HEADING ═══ */}
+          <div className="text-center max-w-2xl mx-auto mb-8">
+            <h1 className="text-3xl sm:text-4xl font-black text-[#111827] tracking-tight leading-tight mb-2">
               Per Topic Questions
             </h1>
-            <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
-              NCERT line-by-line question PDFs, chapter-wise problem sheets, and past year question sets.
-              <span className="font-bold text-[#016737]"> 1st Chapter is 100% Free</span> — full question banks unlocked via Subscription.
+            <p className="text-gray-500 text-xs sm:text-sm">
+              Chapter-wise NEET question sets with 250+ questions per chapter. 1st chapter is free!
             </p>
-          </div>
-
-          {/* ═══ PROMINENT SUBSCRIPTION NOTICE ═══ */}
-          <div className="mb-8 rounded-2xl bg-gradient-to-r from-emerald-50 via-green-50 to-emerald-100/60 border border-emerald-200 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#016737] text-white flex items-center justify-center shrink-0">
-                <Sparkles className="w-5 h-5 text-[#8BC43F]" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-gray-900">
-                  Zero Per-PDF Charges • Pure All-Access Subscription
-                </h4>
-                <p className="text-xs text-gray-600">
-                  Basic Pass includes 1st chapter free. Upgrade to Standard (₹299/mo) or Premium (₹399/mo) to unlock all chapter PDFs.
-                </p>
-              </div>
-            </div>
-            <a
-              href="/#pricing"
-              className="px-5 py-2 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-bold transition-all shadow-sm shrink-0 whitespace-nowrap"
-            >
-              View Subscription Plans
-            </a>
           </div>
 
           {/* ═══ 2-LEVEL HIERARCHY SELECTOR ═══ */}

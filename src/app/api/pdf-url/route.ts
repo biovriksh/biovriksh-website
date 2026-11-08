@@ -17,7 +17,7 @@ export async function GET(req: Request) {
     // 1. Fetch PDF Metadata
     const { data: pdf, error: pdfError } = await supabaseAdmin
       .from("pdfs")
-      .select("id, title, sub_heading, class_level, file_path, is_free, is_active, page_count, price")
+      .select("id, title, sub_heading, class_level, file_path, is_free, is_active, page_count, price, note_type, subject, unit")
       .eq("id", pdfId)
       .single();
 
@@ -30,22 +30,54 @@ export async function GET(req: Request) {
     if (pdf.is_free) {
       isAuthorized = true;
     } else {
-      // For paid PDFs, check user authentication and subscription/purchase
+      // For paid PDFs, check user authentication and subscription/purchase/free trial
       const supabaseUser = await createServerSupabaseClient();
       const { data: { user } } = await supabaseUser.auth.getUser();
       const activeStudentId = user?.id || studentIdParam;
 
       if (activeStudentId) {
-        // Check active subscription
-        const { data: profile } = await supabaseAdmin
-          .from("profiles")
-          .select("subscription_status, subscription_expires_at")
-          .eq("id", activeStudentId)
-          .single();
+        // Free Trial: Logged in students get free access to 1st chapters of Class 11 & 12 PCB
+        const isFirstChapter =
+          pdf.title?.toLowerCase().includes("chapter 1") ||
+          pdf.title?.toLowerCase().includes("the living world") ||
+          pdf.title?.toLowerCase().includes("some basic concepts") ||
+          pdf.title?.toLowerCase().includes("units and measurements") ||
+          pdf.title?.toLowerCase().includes("motion in a straight line") ||
+          pdf.title?.toLowerCase().includes("reproduction in organisms") ||
+          pdf.title?.toLowerCase().includes("sexual reproduction in flowering") ||
+          pdf.title?.toLowerCase().includes("electric charges and fields") ||
+          pdf.title?.toLowerCase().includes("solutions") ||
+          pdf.unit?.toLowerCase().includes("chapter 1") ||
+          pdf.sub_heading?.toLowerCase().includes("ch 1") ||
+          pdf.sub_heading?.toLowerCase().includes("chapter 1");
 
-        if (profile?.subscription_status === "active" && profile?.subscription_expires_at) {
-          if (new Date(profile.subscription_expires_at).getTime() > Date.now()) {
-            isAuthorized = true;
+        if (isFirstChapter) {
+          isAuthorized = true;
+        }
+
+        // Check active subscription
+        if (!isAuthorized) {
+          const { data: profile } = await supabaseAdmin
+            .from("profiles")
+            .select("subscription_status, subscription_expires_at, subscription_plan")
+            .eq("id", activeStudentId)
+            .single();
+
+          if (profile?.subscription_status === "active" && profile?.subscription_expires_at) {
+            if (new Date(profile.subscription_expires_at).getTime() > Date.now()) {
+              const plan = (profile.subscription_plan || "").toLowerCase();
+              if (plan.includes("premium") || plan.includes("3999") || plan.includes("399")) {
+                // Premium Plan (₹3999) unlocks everything
+                isAuthorized = true;
+              } else if (plan.includes("basic") || plan.includes("2999") || plan.includes("standard")) {
+                // Basic Plan (₹2999) unlocks all question PDFs
+                if (pdf.note_type === "questions" || pdf.title?.toLowerCase().includes("question")) {
+                  isAuthorized = true;
+                }
+              } else {
+                isAuthorized = true;
+              }
+            }
           }
         }
 

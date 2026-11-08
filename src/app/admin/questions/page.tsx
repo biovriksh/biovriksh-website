@@ -13,7 +13,8 @@ import {
   Filter,
   Loader2,
   ExternalLink,
-  Sparkles
+  Sparkles,
+  Flame
 } from "lucide-react";
 
 interface QuestionPDF {
@@ -26,6 +27,7 @@ interface QuestionPDF {
   questions_count?: number;
   page_count?: number;
   is_free: boolean;
+  is_recent?: boolean;
   thumbnail_url?: string;
   file_path: string;
   created_at: string;
@@ -46,6 +48,7 @@ export default function AdminQuestionsPage() {
   const [questionsCount, setQuestionsCount] = useState("150");
   const [pageCount, setPageCount] = useState("16");
   const [isFree, setIsFree] = useState(false);
+  const [isRecent, setIsRecent] = useState(false);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 
@@ -105,6 +108,7 @@ export default function AdminQuestionsPage() {
       formData.append("questionsCount", questionsCount);
       formData.append("pageCount", pageCount);
       formData.append("isFree", String(isFree));
+      formData.append("isRecent", String(isRecent));
       formData.append("price", isFree ? "0" : "299");
       formData.append("pdfFile", pdfFile);
       if (thumbnailFile) {
@@ -128,12 +132,33 @@ export default function AdminQuestionsPage() {
       setPdfFile(null);
       setThumbnailFile(null);
       setIsFree(false);
+      setIsRecent(false);
       // Reload table
       loadQuestions();
     } catch (err: any) {
       setErrorMsg(err.message || "Failed to upload question PDF.");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleToggleRecent = async (id: string, currentStatus: boolean) => {
+    try {
+      const res = await fetch("/api/admin/manage-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_recent", id, currentStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setQuestionsList((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, is_recent: !currentStatus } : item))
+        );
+      } else {
+        alert(data.error || "Failed to toggle recent status.");
+      }
+    } catch (err: any) {
+      console.error("Toggle recent error:", err);
     }
   };
 
@@ -322,18 +347,34 @@ export default function AdminQuestionsPage() {
               />
             </div>
 
-            {/* 9. Free Sample Checkbox */}
-            <div className="flex items-center gap-3 pt-4">
-              <input
-                type="checkbox"
-                id="isFreeToggle"
-                checked={isFree}
-                onChange={(e) => setIsFree(e.target.checked)}
-                className="w-4 h-4 rounded text-[#016737] focus:ring-[#016737] cursor-pointer"
-              />
-              <label htmlFor="isFreeToggle" className="text-xs font-bold text-slate-800 cursor-pointer">
-                Mark as Free Sample (1st Chapter)
-              </label>
+            {/* 9. Free Sample & Recent Checkboxes */}
+            <div className="flex flex-col gap-2 pt-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isFreeToggle"
+                  checked={isFree}
+                  onChange={(e) => setIsFree(e.target.checked)}
+                  className="w-4 h-4 rounded text-[#016737] focus:ring-[#016737] cursor-pointer"
+                />
+                <label htmlFor="isFreeToggle" className="text-xs font-bold text-slate-800 cursor-pointer">
+                  Mark as Free Sample (1st Chapter)
+                </label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isRecentToggle"
+                  checked={isRecent}
+                  onChange={(e) => setIsRecent(e.target.checked)}
+                  className="w-4 h-4 rounded text-[#016737] focus:ring-[#016737] cursor-pointer"
+                />
+                <label htmlFor="isRecentToggle" className="text-xs font-bold text-amber-800 cursor-pointer flex items-center gap-1">
+                  <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                  <span>Show in Home Page Recent Row</span>
+                </label>
+              </div>
             </div>
           </div>
 
@@ -462,12 +503,25 @@ export default function AdminQuestionsPage() {
                         </span>
                       )}
                     </td>
-                    <td className="p-3.5 text-right space-x-2">
+                    <td className="p-3.5 text-right space-x-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleRecent(item.id, Boolean(item.is_recent))}
+                        title={item.is_recent ? "Featured in Home Recent row (Click to remove)" : "Not in Home Recent row (Click to feature)"}
+                        className={`p-1.5 rounded-lg text-xs transition cursor-pointer inline-flex items-center gap-1 ${
+                          item.is_recent
+                            ? "bg-amber-100 text-amber-700 hover:bg-amber-200 border border-amber-300"
+                            : "bg-slate-100 text-slate-400 hover:text-amber-600 hover:bg-amber-50"
+                        }`}
+                      >
+                        <Flame className={`w-3.5 h-3.5 ${item.is_recent ? "fill-amber-500 text-amber-500" : ""}`} />
+                        <span className="text-[10px] font-bold">{item.is_recent ? "Recent" : "+ Recent"}</span>
+                      </button>
                       <a
                         href={`/secure-reader?pdfId=${item.id}&title=${encodeURIComponent(item.title)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors font-bold text-[11px]"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors font-bold text-[11px]"
                       >
                         <ExternalLink className="w-3 h-3" />
                         <span>View</span>

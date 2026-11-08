@@ -1,13 +1,17 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Sparkles, CheckCircle } from "lucide-react";
-import { useRef } from "react";
+import { ArrowRight, Sparkles, CheckCircle, Zap } from "lucide-react";
+import { useRef, useState } from "react";
+import { useStudentAuth } from "@/hooks/useStudentAuth";
+import AuthModal from "@/components/AuthModal";
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollY } = useScroll();
   const imgY = useTransform(scrollY, [0, 600], [0, 80]);
+  const { user } = useStudentAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -100,15 +104,23 @@ export default function HeroSection() {
             variants={itemVariants}
             className="flex flex-wrap items-start gap-3.5 mb-12"
           >
-            <motion.a
-              href="/questions"
+            <motion.button
+              type="button"
+              onClick={() => {
+                if (user) {
+                  window.location.href = "/questions?trial=true";
+                } else {
+                  setAuthModalOpen(true);
+                }
+              }}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
-              className="px-7 py-3.5 rounded-full bg-gray-100 text-[#1a1f1c] font-semibold flex items-center gap-2 border border-gray-200 shadow-xs hover:bg-gray-200 transition-all duration-300"
+              className="px-7 py-3.5 rounded-full bg-gray-100 text-[#1a1f1c] font-semibold flex items-center gap-2 border border-gray-200 shadow-xs hover:bg-gray-200 transition-all duration-300 cursor-pointer"
             >
-              Start practicing
+              <Zap className="w-4 h-4 fill-amber-500 text-amber-500" />
+              <span>Start free trial</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-            </motion.a>
+            </motion.button>
 
             <motion.a
               href="/#one-to-one-session"
@@ -128,7 +140,7 @@ export default function HeroSection() {
           >
             {[
               "All NEET Subjects Covered",
-              "15,000+ Verified Questions",
+              "10 Lakhs+ Questions",
               "250–300 Questions/Topic",
               "NCERT Line-by-Line",
             ].map((txt) => (
@@ -140,6 +152,13 @@ export default function HeroSection() {
           </motion.div>
         </motion.div>
       </div>
+
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        customTitle="Start Your Free Trial"
+        customSubtitle="Create your free student profile to access Class 11 & 12 first chapter questions & annotated notes across Biology, Physics and Chemistry!"
+      />
 
       {/* ── MOBILE HERO BACKGROUND VISUAL (Behind text) ── */}
       <div className="lg:hidden absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">

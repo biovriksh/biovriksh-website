@@ -25,16 +25,13 @@ export async function POST(req: Request) {
 
     if (planId) {
       // Subscription Plan Order
-      const normalizedPlan = planId.replace("plan-", "");
-      if (normalizedPlan === "299" || normalizedPlan === "standard") {
-        amountInPaise = 299 * 100; // ₹299/mo
-        orderNotes = { planId: "299", title: "STANDARD PASS (₹299/mo)" };
-      } else if (normalizedPlan === "399" || normalizedPlan === "premium" || normalizedPlan === "yearly") {
-        amountInPaise = 399 * 100; // ₹399/mo
-        orderNotes = { planId: "399", title: "PREMIUM ALL-ACCESS PASS (₹399/mo)" };
-      } else if (normalizedPlan === "monthly") {
-        amountInPaise = 299 * 100;
-        orderNotes = { planId: "299", title: "STANDARD PASS (₹299/mo)" };
+      const normalizedPlan = planId.replace("plan-", "").toLowerCase();
+      if (normalizedPlan === "2999" || normalizedPlan === "basic" || normalizedPlan === "299" || normalizedPlan === "standard") {
+        amountInPaise = 2999 * 100; // ₹2,999 Basic Plan
+        orderNotes = { planId: "2999", title: "BASIC PLAN (₹2,999)" };
+      } else if (normalizedPlan === "3999" || normalizedPlan === "premium" || normalizedPlan === "399" || normalizedPlan === "yearly") {
+        amountInPaise = 3999 * 100; // ₹3,999 Premium All-Access
+        orderNotes = { planId: "3999", title: "PREMIUM ALL-IN-ONE (₹3,999)" };
       } else {
         return NextResponse.json({ success: false, error: "Invalid subscription plan" }, { status: 400 });
       }

@@ -320,42 +320,14 @@ function PYPsContent() {
 
       <main className="flex-1 pt-28 sm:pt-36 pb-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="text-center max-w-3xl mx-auto mb-8">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#016737]/10 text-[#016737] text-xs font-bold tracking-wider uppercase mb-3">
-              <Calendar className="w-4 h-4 text-[#016737]" />
-              NEET Previous Year Papers
-            </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#111827] tracking-tight leading-[1.15] mb-3">
-              PYP&apos;s According to Year
+          {/* ═══ CLEAN COMPACT HEADING ═══ */}
+          <div className="text-center max-w-2xl mx-auto mb-8">
+            <h1 className="text-3xl sm:text-4xl font-black text-[#111827] tracking-tight leading-tight mb-2">
+              Previous Year Papers (PYP&apos;s)
             </h1>
-            <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
-              Official NEET UG question papers (2015–2024) with line-by-line NCERT references and step-by-step solutions.
-              <span className="font-bold text-[#016737]"> NEET 2024 is 100% Free</span> — 10-year archives unlocked via Subscription.
+            <p className="text-gray-500 text-xs sm:text-sm">
+              Official NEET UG solved papers from 2015 to 2024. NEET 2024 sample is free!
             </p>
-          </div>
-
-          {/* Subscription Notice */}
-          <div className="mb-8 rounded-2xl bg-gradient-to-r from-emerald-50 via-green-50 to-emerald-100/60 border border-emerald-200 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#016737] text-white flex items-center justify-center shrink-0">
-                <Sparkles className="w-5 h-5 text-[#8BC43F]" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-gray-900">
-                  Zero Per-PDF Charges • Pure All-Access Subscription
-                </h4>
-                <p className="text-xs text-gray-600">
-                  Access all 10 years of solved NEET papers with our Standard (₹299/mo) or Premium (₹399/mo) subscription pass.
-                </p>
-              </div>
-            </div>
-            <a
-              href="/#pricing"
-              className="px-5 py-2 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-bold transition-all shadow-sm shrink-0 whitespace-nowrap"
-            >
-              View Subscription Plans
-            </a>
           </div>
 
           {/* ═══ FILTER BAR: GROUPED ACCORDING TO YEAR ═══ */}
