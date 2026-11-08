@@ -277,7 +277,7 @@ export default function StudentProfilePage() {
                 <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 my-4 text-left">
                   <p className="text-xs font-bold text-gray-800 mb-1">Unlock Unlimited Notes</p>
                   <p className="text-[11px] text-gray-500 leading-relaxed">
-                    Upgrade to Premium Monthly or Yearly to access all chapter notes and NEET test series across Physics, Chemistry, and Biology.
+                    Upgrade to Premium 1-Year Pass to access all chapter notes and NEET test series across Physics, Chemistry, and Biology.
                   </p>
                 </div>
               )}

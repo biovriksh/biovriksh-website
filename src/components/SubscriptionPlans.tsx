@@ -32,8 +32,8 @@ const plans = [
     name: "BASIC PLAN",
     badge: "🔥 250 Qs / CHAPTER PASS",
     price: "₹2,999",
-    period: "/ Full Session Access",
-    description: "Including 250 questions in each subject of all chapters.",
+    period: "1-Year Full Access • One-Time Payment",
+    description: "Including 250 questions in each subject of all chapters for the full academic year.",
     featuresHeader: "Everything in Free Trial, plus:",
     features: [
       "250 Questions in each subject of all chapters",
@@ -41,9 +41,9 @@ const plans = [
       "Biology, Physics & Chemistry covered",
       "Topic-wise MCQs with step-by-step solutions",
       "Unlocks all Chapter Question PDFs",
-      "Full session unlimited access",
+      "Full 1-Year access (No monthly renewals)",
     ],
-    cta: "Get Basic Plan (₹2,999)",
+    cta: "Get Basic Plan (₹2,999 / Year)",
     btnStyle: "bg-gray-900 text-white hover:bg-black shadow-md",
     isHighlighted: false,
   },
@@ -52,8 +52,8 @@ const plans = [
     name: "PREMIUM PLAN",
     badge: "⭐ COMPLETE ALL-IN-ONE",
     price: "₹3,999",
-    period: "/ Full Session Access (Recommended)",
-    description: "The complete NEET preparation suite with notes, PYQs, tests & mentorship.",
+    period: "1-Year Full Access • One-Time Payment (Recommended)",
+    description: "The complete NEET preparation suite with notes, PYQs, tests & mentorship for entire 1 year.",
     featuresHeader: "Everything in Basic, plus:",
     features: [
       "Complete Comprehensive Theory Notes",
@@ -65,8 +65,9 @@ const plans = [
       "Quick Revision Short Notes",
       "Chapter-wise Practice Tests",
       "NEET All-India Test Series",
+      "Full 1-Year access (Single one-time payment)",
     ],
-    cta: "Unlock Premium (₹3,999)",
+    cta: "Unlock Premium (₹3,999 / Year)",
     btnStyle: "bg-[#016737] text-white hover:bg-[#014d29] shadow-lg shadow-[#016737]/25",
     isHighlighted: true,
   },
@@ -168,12 +169,14 @@ export default function SubscriptionPlans() {
                     {plan.name}
                   </h3>
                   
-                  <div className="flex items-baseline gap-1.5 mb-1">
+                  <div className="flex items-baseline gap-2 mb-1 flex-wrap">
                     <span className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight font-sans">
                       {plan.price}
                     </span>
                     {plan.id !== "free" && (
-                      <span className="text-sm font-bold text-gray-500">/ month</span>
+                      <span className="text-xs font-bold text-[#016737] bg-[#8BC43F]/20 border border-[#8BC43F]/40 px-2 py-0.5 rounded-md">
+                        One-Time • 1 Year Access
+                      </span>
                     )}
                   </div>
 

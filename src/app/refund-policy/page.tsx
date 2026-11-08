@@ -29,7 +29,7 @@ export default function RefundPolicyPage() {
           <section className="space-y-3">
             <h2 className="text-xl font-bold text-[#111827]">2. Subscription Cancellations</h2>
             <p>
-              For recurring Monthly or Yearly passes, you can cancel your subscription renewal at any time directly from your student profile settings or by contacting support.
+              For subscription passes (Basic ₹2,999 and Premium ₹3,999), your access is active for 1 full year with a single one-time payment. There are no automatic recurring deductions.
             </p>
             <ul className="list-disc pl-6 space-y-2 text-gray-600">
               <li>

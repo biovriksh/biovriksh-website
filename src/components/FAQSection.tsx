@@ -31,9 +31,9 @@ const faqs = [
   },
   {
     id: 5,
-    question: "Can I cancel anytime?",
+    question: "Is this a monthly subscription or a one-time payment?",
     answer:
-      "Yes. Monthly Pass can be cancelled at any time from your account settings — no questions asked. Your access remains active until the end of the billing cycle.",
+      "All BioVriksh plans (Basic ₹2,999 and Premium ₹3,999) are 1-Year Full Access with a single one-time payment. There are NO recurring monthly charges or hidden auto-debits.",
   },
   {
     id: 6,
