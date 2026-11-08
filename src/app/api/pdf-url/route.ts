@@ -17,7 +17,7 @@ export async function GET(req: Request) {
     // 1. Fetch PDF Metadata
     const { data: pdf, error: pdfError } = await supabaseAdmin
       .from("pdfs")
-      .select("id, title, sub_heading, class_level, file_path, is_free, is_active, page_count, price, note_type, subject, unit")
+      .select("id, chapter_id, title, sub_heading, class_level, file_path, is_free, is_active, page_count, price, note_type, subject, unit")
       .eq("id", pdfId)
       .single();
 
@@ -37,19 +37,34 @@ export async function GET(req: Request) {
 
       if (activeStudentId) {
         // Free Trial: Logged in students get free access to 1st chapters of Class 11 & 12 PCB
-        const isFirstChapter =
-          pdf.title?.toLowerCase().includes("chapter 1") ||
-          pdf.title?.toLowerCase().includes("the living world") ||
-          pdf.title?.toLowerCase().includes("some basic concepts") ||
-          pdf.title?.toLowerCase().includes("units and measurements") ||
-          pdf.title?.toLowerCase().includes("motion in a straight line") ||
-          pdf.title?.toLowerCase().includes("reproduction in organisms") ||
-          pdf.title?.toLowerCase().includes("sexual reproduction in flowering") ||
-          pdf.title?.toLowerCase().includes("electric charges and fields") ||
-          pdf.title?.toLowerCase().includes("solutions") ||
-          pdf.unit?.toLowerCase().includes("chapter 1") ||
-          pdf.sub_heading?.toLowerCase().includes("ch 1") ||
-          pdf.sub_heading?.toLowerCase().includes("chapter 1");
+        const titleText = (pdf.title || "").toLowerCase();
+        const subText = (pdf.sub_heading || "").toLowerCase();
+        const unitText = (pdf.unit || "").toLowerCase();
+        const combined = `${titleText} ${subText} ${unitText}`;
+
+        let isFirstChapter =
+          /\b(chapter|ch|unit)[-.\s]*0?1\b/i.test(combined) ||
+          /^\s*0?1[.\s-]/i.test(titleText) ||
+          combined.includes("the living world") ||
+          combined.includes("some basic concepts") ||
+          combined.includes("units and measurements") ||
+          combined.includes("motion in a straight line") ||
+          combined.includes("reproduction in organisms") ||
+          combined.includes("sexual reproduction in flowering") ||
+          combined.includes("electric charges and fields") ||
+          combined.includes("solutions");
+
+        if (!isFirstChapter && pdf.chapter_id) {
+          const { data: chapter } = await supabaseAdmin
+            .from("chapters")
+            .select("order_index, name")
+            .eq("id", pdf.chapter_id)
+            .maybeSingle();
+
+          if (chapter && (chapter.order_index === 1 || /\b(chapter|ch)[-.\s]*0?1\b/i.test(chapter.name))) {
+            isFirstChapter = true;
+          }
+        }
 
         if (isFirstChapter) {
           isAuthorized = true;
