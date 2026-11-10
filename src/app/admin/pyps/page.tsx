@@ -68,6 +68,8 @@ export default function AdminPYPsPage() {
             p.note_type === "pyp" ||
             p.title.toLowerCase().includes("pyp") ||
             p.title.toLowerCase().includes("previous year") ||
+            p.title.toLowerCase().includes("solved paper") ||
+            Boolean(p.years_covered) ||
             p.sub_heading?.toLowerCase().includes("pyp")
         );
         setPypsList(filtered);

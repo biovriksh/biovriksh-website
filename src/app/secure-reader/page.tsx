@@ -40,19 +40,30 @@ function SecureReaderContent() {
   const { handleCheckout, loading: checkoutLoading } = useCheckout();
   const { user } = useStudentAuth();
 
+  const handleCloseReader = () => {
+    if (typeof window !== "undefined") {
+      if (window.opener && !window.opener.closed) {
+        window.close();
+      } else if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = "/";
+      }
+    }
+  };
+
   // 1. Fetch live signed PDF URL from Supabase storage
   const fetchPdf = async () => {
-    if (!pdfId) {
-      setLoadingPdf(false);
-      setPdfError("No note selected. Please select a note from the Bio Vriksh website.");
-      return;
-    }
-
     try {
       setLoadingPdf(true);
       setPdfError(null);
 
-      const res = await fetch(`/api/pdf-url?pdfId=${encodeURIComponent(pdfId)}`);
+      const params = new URLSearchParams();
+      if (pdfId) params.append("pdfId", pdfId);
+      if (titleParam) params.append("title", titleParam);
+      if (subjectParam) params.append("subject", subjectParam);
+
+      const res = await fetch(`/api/pdf-url?${params.toString()}`);
       const json = await res.json();
 
       if (res.ok && json.signedUrl) {
@@ -60,7 +71,7 @@ function SecureReaderContent() {
         setPdfMeta(json);
       } else {
         setPdfError(json.error || "Unable to open PDF document.");
-        if (json.price !== undefined || json.title) {
+        if (json.price !== undefined || json.title || json.is_free !== undefined) {
           setPdfMeta(json);
         }
       }
@@ -200,7 +211,7 @@ function SecureReaderContent() {
           {/* Left: Close Button & Subject */}
           <div className="flex items-center gap-3">
             <button
-              onClick={() => window.close()}
+              onClick={handleCloseReader}
               className="px-3.5 py-1.5 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white transition-colors flex items-center gap-1.5 text-xs font-bold shrink-0 shadow-xs cursor-pointer"
               title="Close Reader"
             >
@@ -309,25 +320,28 @@ function SecureReaderContent() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 w-full">
               <button
-                onClick={() => window.close()}
+                onClick={handleCloseReader}
                 className="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-xs font-bold transition-all cursor-pointer text-gray-700 dark:text-gray-300"
               >
                 Close Reader
               </button>
-              <button
-                onClick={onUnlockClick}
-                disabled={checkoutLoading}
-                className="flex-1 py-2.5 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer disabled:opacity-50"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#8BC43F]" />
-                <span>
-                  {checkoutLoading
-                    ? "Opening Razorpay..."
-                    : pdfMeta?.price
-                    ? `Unlock Note (₹${pdfMeta.price})`
-                    : "Unlock Note"}
-                </span>
-              </button>
+              {pdfMeta?.is_free ? (
+                <button
+                  onClick={fetchPdf}
+                  className="flex-1 py-2.5 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#8BC43F]" />
+                  <span>Reload Free Note</span>
+                </button>
+              ) : (
+                <a
+                  href="/#pricing"
+                  className="flex-1 py-2.5 rounded-xl bg-[#016737] hover:bg-[#014d29] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer text-center"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#8BC43F]" />
+                  <span>Get Subscription Pass</span>
+                </a>
+              )}
             </div>
           </div>
         ) : (

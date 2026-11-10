@@ -51,10 +51,14 @@ export async function POST(req: Request) {
 
       const isFreeCalc = targetSection === "short" || (targetSection === "test" && (Number(price) === 0 || !price));
 
+      let safeNoteType = targetSection || "paid";
+      if (safeNoteType === "questions") safeNoteType = "chapter";
+      else if (safeNoteType === "pyp") safeNoteType = "test";
+
       const updatePayload: any = {
         title,
         description,
-        note_type: targetSection,
+        note_type: safeNoteType,
         is_free: isFreeCalc,
         class_level: classLevel,
         subject: subject || "Biology",

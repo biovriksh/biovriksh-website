@@ -563,7 +563,7 @@ function AnnotatedNcertContent() {
                         href={
                           ch.pdfId
                             ? `/secure-reader?pdfId=${encodeURIComponent(ch.pdfId)}&title=${encodeURIComponent(ch.chapterTitle)}`
-                            : `/chapters`
+                            : `/secure-reader?title=${encodeURIComponent(ch.chapterTitle)}&subject=${encodeURIComponent(ch.subject)}`
                         }
                         className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-[#016737] hover:bg-[#014d29] text-white flex items-center justify-center gap-2 transition duration-200 shadow-xs cursor-pointer"
                       >

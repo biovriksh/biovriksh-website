@@ -65,7 +65,10 @@ export default function AdminQuestionsPage() {
         const filtered = json.pdfs.filter(
           (p: any) =>
             p.note_type === "questions" ||
+            p.note_type === "chapter" ||
             p.title.toLowerCase().includes("question") ||
+            p.title.toLowerCase().includes("mcq") ||
+            p.title.toLowerCase().includes("problem") ||
             p.sub_heading?.toLowerCase().includes("question")
         );
         setQuestionsList(filtered);

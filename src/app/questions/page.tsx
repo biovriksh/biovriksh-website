@@ -581,21 +581,21 @@ function QuestionsContent() {
                       </div>
                     </div>
 
-                  {/* Action Button */}
-                  <div>
-                    {ch.isFree ? (
-                      <a
-                        href={
-                          ch.pdfId
-                            ? `/secure-reader?pdfId=${encodeURIComponent(ch.pdfId)}&title=${encodeURIComponent(ch.chapterTitle)}`
-                            : `/chapters`
-                        }
-                        className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-[#016737] hover:bg-[#014d29] text-white flex items-center justify-center gap-2 transition duration-200 shadow-xs cursor-pointer"
-                      >
-                        <FileText className="w-3.5 h-3.5" />
-                        <span>Read Free Question PDF ↗</span>
-                      </a>
-                    ) : (
+                    {/* Action Button */}
+                    <div>
+                      {ch.isFree ? (
+                        <a
+                          href={
+                            ch.pdfId
+                              ? `/secure-reader?pdfId=${encodeURIComponent(ch.pdfId)}&title=${encodeURIComponent(ch.chapterTitle)}`
+                              : `/secure-reader?title=${encodeURIComponent(ch.chapterTitle)}&subject=${encodeURIComponent(ch.subject)}`
+                          }
+                          className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-[#016737] hover:bg-[#014d29] text-white flex items-center justify-center gap-2 transition duration-200 shadow-xs cursor-pointer"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>Read Free Question PDF ↗</span>
+                        </a>
+                      ) : (
                       <a
                         href="/#pricing"
                         className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-gray-900 hover:bg-black text-white flex items-center justify-center gap-1.5 transition duration-200 cursor-pointer"

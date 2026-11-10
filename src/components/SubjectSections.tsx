@@ -470,11 +470,7 @@ export default function SubjectSections() {
                     <div className="pt-2 border-t border-gray-100">
                       {card.is_free ? (
                         <a
-                          href={
-                            card.id && !card.id.startsWith("default-")
-                              ? `/secure-reader?pdfId=${encodeURIComponent(card.id)}&title=${encodeURIComponent(card.title)}`
-                              : `/questions?subject=${encodeURIComponent(subj.name)}`
-                          }
+                          href={`/secure-reader?pdfId=${encodeURIComponent(card.id)}&title=${encodeURIComponent(card.title)}&subject=${encodeURIComponent(subj.name)}`}
                           className="w-full py-2 px-3 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5 transition duration-200 shadow-xs cursor-pointer"
                           style={{ backgroundColor: subj.accentColor }}
                         >

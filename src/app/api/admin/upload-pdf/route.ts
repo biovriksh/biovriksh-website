@@ -126,6 +126,11 @@ export async function POST(req: Request) {
 
     const isActuallyFree = isFreeExplicit || noteType === "free" || noteType === "short" || price === 0;
 
+    // Sanitize note_type to match Postgres database check constraint
+    let safeNoteType = noteType;
+    if (noteType === "questions") safeNoteType = "chapter";
+    else if (noteType === "pyp") safeNoteType = "test";
+
     // 3. Insert PDF record into Supabase Database
     const newPdfRow: any = {
       chapter_id: chapterId || null,
@@ -141,7 +146,7 @@ export async function POST(req: Request) {
       price: isActuallyFree ? 0 : price,
       is_active: true,
       is_recent: isRecent,
-      note_type: noteType,
+      note_type: safeNoteType,
       class_level: classLevel,
       subject: subject,
       page_count: pageCount,
